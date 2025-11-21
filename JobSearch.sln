@@ -5,7 +5,7 @@ VisualStudioVersion = 17.14.36221.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JobSearch", "JobSearch\JobSearch.csproj", "{330F6CB3-7284-4D52-BD62-90994BA626EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimcToJson", "SimcToJson\SimcToJson.csproj", "{232DF394-F9B5-E59C-4723-48A2125AC47D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimcToJson", "SimcToJson\SimcToJson.csproj", "{232DF394-F9B5-E59C-4723-48A2125AC47D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

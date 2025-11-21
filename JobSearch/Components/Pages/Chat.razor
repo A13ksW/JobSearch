@@ -1,0 +1,181 @@
+﻿@page "/chat"
+@rendermode InteractiveServer
+@using System.Security.Claims
+@using JobSearch.Data
+@using JobSearch.Services
+@using Microsoft.AspNetCore.Authorization
+@inject ChatService ChatService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavManager
+@implements IDisposable
+@attribute [Authorize]
+
+<PageTitle>Wiadomości</PageTitle>
+
+<div class="container mt-3">
+    <div class="row chat-layout g-0">
+
+        <div class="col-md-4 chat-sidebar">
+            <div class="p-3 border-bottom bg-white sticky-top">
+                <h5 class="m-0 fw-bold text-primary">Wiadomości</h5>
+            </div>
+
+            <div class="list-group list-group-flush">
+                @if (!chatPartners.Any())
+                {
+                    <div class="p-4 text-center text-muted">
+                        <i class="bi bi-chat-square-dots fs-1 mb-2"></i>
+                        <p>Brak rozmów. Aplikuj na oferty, aby nawiązać kontakt.</p>
+                    </div>
+                }
+
+                @foreach (var user in chatPartners)
+                {
+                    <div class="contact-item @(selectedUserId == user.Id ? "active" : "")"
+                         @onclick="() => SelectUser(user)">
+                        <div class="d-flex align-items-center">
+                            <div class="contact-avatar">
+                                @GetInitials(user.DisplayName ?? user.Email)
+                            </div>
+                            <div class="flex-grow-1 overflow-hidden">
+                                <div class="fw-bold text-truncate">@(user.DisplayName ?? user.Email)</div>
+                                <small class="text-muted text-truncate d-block">@user.Email</small>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-8 chat-area">
+            @if (selectedUser != null)
+            {
+                <div class="chat-header">
+                    <div class="contact-avatar me-2" style="background-color: var(--primary);">
+                        @GetInitials(selectedUser.DisplayName ?? selectedUser.Email)
+                    </div>
+                    <div>
+                        <div class="fw-bold">@(selectedUser.DisplayName ?? selectedUser.Email)</div>
+                        <div class="small text-success"><i class="bi bi-circle-fill" style="font-size: 8px;"></i> Dostępny</div>
+                    </div>
+                </div>
+
+                <div class="messages-container" id="messagesBox">
+                    @foreach (var msg in messages)
+                    {
+                        var isMe = msg.SenderId == currentUserId;
+
+                        <div class="message-wrapper @(isMe ? "me" : "other")">
+                            <div class="message-bubble">
+                                <div>@msg.Message</div>
+                                <span class="message-time">@msg.Timestamp.ToLocalTime().ToString("HH:mm")</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="input-area">
+                    <div class="input-group">
+                        <input @bind="newMessageInput"
+                               @bind:event="oninput"
+                               @onkeyup="HandleEnter"
+                               class="form-control chat-input"
+                               placeholder="Napisz wiadomość..." />
+                        <button class="btn btn-primary ms-2 rounded-circle" style="width: 45px; height: 45px;" @onclick="SendMessage">
+                            <i class="bi bi-send-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="d-flex flex-column align-items-center justify-content-center h-100 text-muted bg-light">
+                    <i class="bi bi-chat-left-text fs-1 mb-3 text-secondary"></i>
+                    <h5>Wybierz osobę, aby rozpocząć czat</h5>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? currentUserId;
+    private List<ApplicationUser> chatPartners = new();
+    private ApplicationUser? selectedUser;
+    private string? selectedUserId;
+    private List<ChatMessage> messages = new();
+    private string newMessageInput = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        currentUserId = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!string.IsNullOrEmpty(currentUserId))
+        {
+            chatPartners = await ChatService.GetChatPartnersAsync(currentUserId);
+            ChatService.OnMessageSent += HandleNewMessage;
+        }
+    }
+
+    private async void HandleNewMessage(string senderId, string receiverId)
+    {
+        if (selectedUser != null &&
+            ((senderId == selectedUser.Id && receiverId == currentUserId) ||
+             (senderId == currentUserId && receiverId == selectedUser.Id)))
+        {
+            await InvokeAsync(async () =>
+            {
+                await LoadMessages();
+                StateHasChanged();
+                // Opcjonalnie: Tutaj można by dodać auto-scroll do dołu
+            });
+        }
+    }
+
+    private async Task SelectUser(ApplicationUser user)
+    {
+        selectedUser = user;
+        selectedUserId = user.Id;
+        await LoadMessages();
+    }
+
+    private async Task LoadMessages()
+    {
+        if (currentUserId != null && selectedUserId != null)
+        {
+            messages = await ChatService.GetConversationAsync(currentUserId, selectedUserId);
+        }
+    }
+
+    private async Task SendMessage()
+    {
+        if (!string.IsNullOrWhiteSpace(newMessageInput) && currentUserId != null && selectedUserId != null)
+        {
+            await ChatService.SendMessageAsync(currentUserId, selectedUserId, newMessageInput);
+            newMessageInput = "";
+        }
+    }
+
+    private async Task HandleEnter(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") await SendMessage();
+    }
+
+    // Helper do inicjałów
+    private string GetInitials(string? name)
+    {
+        if (string.IsNullOrEmpty(name)) return "?";
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length >= 2)
+        {
+            return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+        }
+        return name.Substring(0, Math.Min(2, name.Length)).ToUpper();
+    }
+
+    public void Dispose()
+    {
+        ChatService.OnMessageSent -= HandleNewMessage;
+    }
+}

@@ -14,12 +14,14 @@ namespace JobSearch.Data
         public DbSet<AuditLog> AuditLogs { get; set; } = default!;
         public DbSet<Notification> Notifications { get; set; } = default!;
 
+        // --- NOWE: Tabela Czatu ---
+        public DbSet<ChatMessage> ChatMessages { get; set; } = default!;
+
         // CV Kandydata
         public DbSet<UserProfileCV> UserProfileCVs { get; set; } = default!;
         public DbSet<CVSkill> CVSkills { get; set; } = default!;
         public DbSet<CVLanguage> CVLanguages { get; set; } = default!;
 
-        // USUNIĘTO: CVCategories, CVDepartments, CVLocations (zrezygnowaliśmy z tego)
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -77,6 +79,20 @@ namespace JobSearch.Data
                 .HasMany(cv => cv.Skills)
                 .WithOne(s => s.UserProfileCV)
                 .HasForeignKey(s => s.UserProfileCVId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // === RELACJE CZATU ===
+            // Używamy Restrict dla nadawcy, aby uniknąć pętli usuwania (multiple cascade paths)
+            builder.Entity<ChatMessage>()
+                .HasOne(m => m.Sender)
+                .WithMany()
+                .HasForeignKey(m => m.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ChatMessage>()
+                .HasOne(m => m.Receiver)
+                .WithMany()
+                .HasForeignKey(m => m.ReceiverId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

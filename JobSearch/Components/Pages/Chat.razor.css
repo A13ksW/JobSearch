@@ -1,0 +1,129 @@
+﻿/* Kontener główny */
+.chat-layout {
+    height: calc(100vh - 140px); /* Dopasuj wysokość do ekranu */
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+
+/* --- LEWA STRONA (LISTA) --- */
+.chat-sidebar {
+    background-color: #f8fafc;
+    border-right: 1px solid #e2e8f0;
+    overflow-y: auto;
+}
+
+.contact-item {
+    border: none;
+    border-bottom: 1px solid #f1f5f9;
+    padding: 1rem;
+    transition: background 0.2s;
+    cursor: pointer;
+}
+
+    .contact-item:hover {
+        background-color: #e2e8f0;
+    }
+
+    .contact-item.active {
+        background-color: #eff6ff; /* Jasnoniebieski dla aktywnego */
+        border-left: 4px solid #2563eb;
+    }
+
+.contact-avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #cbd5e1;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* --- PRAWA STRONA (ROZMOWA) --- */
+.chat-area {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+}
+
+.chat-header {
+    padding: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    background-color: white;
+    display: flex;
+    align-items: center;
+}
+
+.messages-container {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* --- DYMKI WIADOMOŚCI --- */
+.message-wrapper {
+    display: flex;
+    margin-bottom: 0.5rem;
+}
+
+    /* MOJE WIADOMOŚCI (Prawa strona) */
+    .message-wrapper.me {
+        justify-content: flex-end;
+    }
+
+        .message-wrapper.me .message-bubble {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); /* Niebieski */
+            color: white;
+            border-radius: 16px 16px 0 16px; /* "Dziubek" w prawym dolnym rogu */
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+        }
+
+    /* INNE WIADOMOŚCI (Lewa strona) */
+    .message-wrapper.other {
+        justify-content: flex-start;
+    }
+
+        .message-wrapper.other .message-bubble {
+            background-color: #f1f5f9; /* Szary */
+            color: #0f172a;
+            border-radius: 16px 16px 16px 0; /* "Dziubek" w lewym dolnym rogu */
+            border: 1px solid #e2e8f0;
+        }
+
+.message-bubble {
+    max-width: 75%;
+    padding: 0.75rem 1rem;
+    position: relative;
+    word-wrap: break-word;
+}
+
+.message-time {
+    font-size: 0.65rem;
+    margin-top: 4px;
+    opacity: 0.7;
+    text-align: right;
+    display: block;
+}
+
+/* Pole wpisywania */
+.input-area {
+    padding: 1rem;
+    border-top: 1px solid #e2e8f0;
+    background-color: white;
+}
+
+.chat-input {
+    border-radius: 20px;
+    padding-left: 1.2rem;
+    border: 1px solid #cbd5e1;
+}

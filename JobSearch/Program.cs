@@ -58,6 +58,7 @@ builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
 // --- SERWISY APLIKACJI ---
 builder.Services.AddScoped<IJobOfferService, JobOfferService>();
 builder.Services.AddSingleton<INotificationService, NotificationService>();
+builder.Services.AddSingleton<ChatService>();
 builder.Services.AddHostedService<ExpiredOfferService>();
 
 builder.Services.AddScoped<INipValidationService, NipValidationService>();
