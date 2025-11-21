@@ -1,0 +1,291 @@
+﻿@page "/"
+@using JobSearch.Data
+@using JobSearch.Services
+@inject IJobOfferService JobOfferService
+@inject NavigationManager NavManager
+@inject IGeoLocationService GeoLocationService
+@rendermode InteractiveServer
+
+<PageTitle>JobSearch - Znajdź swoją przyszłość</PageTitle>
+
+<div class="home-container">
+    <div class="container">
+
+        <div class="text-center py-5 animate-fade-up">
+            <h1 class="display-3 hero-title mb-3">Twoja kariera zaczyna się <span style="color: #ffcf40;">tutaj</span></h1>
+            <p class="hero-subtitle mb-5">Najlepsze oferty. Sprawdzone firmy. Błyskawiczna rekrutacja.</p>
+
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="search-glass position-relative">
+                        <div class="d-flex">
+                            <input type="text"
+                                   class="form-control search-input"
+                                   placeholder="Gdzie chcesz pracować? (np. Kraków)"
+                                   value="@searchLocation"
+                                   @oninput="OnLocationInput"
+                                   @onfocus="ShowLocationSuggestions"
+                                   @onblur="HideLocationSuggestionsDelayed"
+                                   @onkeyup="HandleEnter" />
+
+                            <button class="btn search-btn" @onclick="Search">
+                                SZUKAJ
+                            </button>
+                        </div>
+
+                        @if (showLocationSuggestions && locationSuggestions.Any())
+
+                        {
+                            <ul class="list-group position-absolute w-100 text-start suggestions-list" style="top: 100%; left: 0; z-index: 1050;">
+                                @foreach (var suggestion in locationSuggestions)
+
+                                {
+                                    <li class="list-group-item list-group-item-action border-0"
+                                        style="cursor: pointer;"
+                                        @onmousedown="@(() => SelectLocationSuggestion(suggestion))">
+                                        <i class="bi bi-geo-alt text-primary me-2"></i> @suggestion
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5 justify-content-center animate-fade-up delay-1">
+            <div class="col-md-4 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-value">@offersCount</div>
+                    <div class="stat-label"><i class="bi bi-briefcase me-2"></i>Dostępnych Ofert</div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-value">@companiesCount</div>
+                    <div class="stat-label"><i class="bi bi-building me-2"></i>Zaufanych Firm</div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-value">@latestOffers.Count</div>
+                    <div class="stat-label"><i class="bi bi-fire me-2"></i>Dodano Dzisiaj</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 animate-fade-up delay-2">
+
+            <div class="col-lg-7">
+                <div class="content-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-bold m-0"><i class="bi bi-star-fill text-warning me-2"></i>Najnowsze Oferty</h4>
+                        <a href="offers" class="btn btn-link text-decoration-none fw-bold">Wszystkie &rarr;</a>
+                    </div>
+
+                    @if (latestOffers.Any())
+
+                    {
+                        <div class="d-flex flex-column gap-2">
+                            @foreach (var offer in latestOffers)
+
+                            {
+                                <a href="/offer/@offer.Id" class="offer-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="fw-bold mb-1 text-dark">@offer.Title</h6>
+                                            <div class="text-muted small">@offer.CompanyName</div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-primary rounded-pill">@offer.JobType</span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2 d-flex gap-3 text-secondary small">
+                                        <span><i class="bi bi-geo-alt"></i> @offer.Location</span>
+                                        <span class="text-success fw-bold"><i class="bi bi-cash"></i> @offer.SalaryRange</span>
+                                    </div>
+                                </a>
+                            }
+                        </div>
+                    }
+
+                    else
+
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                            Brak nowych ofert w tej chwili.
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="content-card">
+                    <h4 class="fw-bold mb-4">Co chcesz zrobić?</h4>
+                    <div class="vstack gap-3">
+
+                        <div class="role-card">
+                            <div class="role-icon"><i class="bi bi-person-bounding-box"></i></div>
+                            <h5 class="fw-bold">Jestem Kandydatem</h5>
+                            <p class="text-muted small">Stwórz profil, dodaj CV i aplikuj jednym kliknięciem.</p>
+                            <a href="Account/Manage/MyCV" class="btn btn-primary w-100 rounded-pill">Uzupełnij Profil</a>
+                        </div>
+
+                        <div class="role-card">
+                            <div class="role-icon text-success"><i class="bi bi-briefcase-fill"></i></div>
+                            <h5 class="fw-bold">Jestem Pracodawcą</h5>
+                            <p class="text-muted small">Dodaj ogłoszenie i znajdź najlepszych specjalistów.</p>
+                            <a href="joboffers/create" class="btn btn-success w-100 rounded-pill">Dodaj Ofertę</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private int offersCount = 0;
+
+    private int companiesCount = 0;
+
+    private List<JobOffer> latestOffers = new();
+
+
+
+    private string searchLocation = "";
+
+    private List<string> locationSuggestions = new();
+
+    private bool showLocationSuggestions = false;
+
+
+
+    protected override async Task OnInitializedAsync()
+
+    {
+
+        var allOffers = await JobOfferService.GetJobOffersAsync(
+
+            null, null, "date_desc", null, null, null,
+
+            false, false, false, false, false
+
+        );
+
+
+
+        var published = allOffers.Where(o => o.Status == OfferStatus.Opublikowana).ToList();
+
+
+
+        offersCount = published.Count;
+
+        companiesCount = published.Select(o => o.CompanyName).Distinct().Count();
+
+        latestOffers = published.Take(5).ToList();
+
+    }
+
+
+
+    private async Task OnLocationInput(ChangeEventArgs e)
+
+    {
+
+        var text = e.Value?.ToString() ?? string.Empty;
+
+        searchLocation = text;
+
+
+
+        if (!string.IsNullOrWhiteSpace(text) && text.Length >= 2)
+
+        {
+
+            var suggestions = await GeoLocationService.SuggestLocationsAsync(text, 10);
+
+            locationSuggestions = suggestions.Select(s => s.DisplayName).Distinct().ToList();
+
+            showLocationSuggestions = locationSuggestions.Any();
+
+        }
+
+        else
+
+        {
+
+            locationSuggestions.Clear();
+
+            showLocationSuggestions = false;
+
+        }
+
+    }
+
+
+
+    private void ShowLocationSuggestions() { if (locationSuggestions.Any()) showLocationSuggestions = true; }
+
+
+
+    private async Task HideLocationSuggestionsDelayed()
+
+    {
+
+        await Task.Delay(200);
+
+        showLocationSuggestions = false;
+
+        StateHasChanged();
+
+    }
+
+
+
+    private void SelectLocationSuggestion(string suggestion)
+
+    {
+
+        searchLocation = suggestion;
+
+        showLocationSuggestions = false;
+
+    }
+
+
+
+    private void Search()
+
+    {
+
+        if (!string.IsNullOrWhiteSpace(searchLocation))
+
+        {
+
+            NavManager.NavigateTo($"/offers?location={searchLocation}");
+
+        }
+
+        else
+
+        {
+
+            NavManager.NavigateTo("/offers");
+
+        }
+
+    }
+
+
+
+    private void HandleEnter(KeyboardEventArgs e)
+
+    {
+
+        if (e.Key == "Enter") Search();
+
+    }
+}

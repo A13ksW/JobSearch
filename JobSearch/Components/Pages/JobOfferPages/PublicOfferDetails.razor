@@ -1,0 +1,263 @@
+﻿@page "/offer/{Id:int}"
+@rendermode InteractiveServer
+@using System.Security.Claims
+@using JobSearch.Data
+@using JobSearch.Services
+@using Microsoft.AspNetCore.Authorization
+@inject IJobOfferService JobOfferService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>@jobOffer?.Title</PageTitle>
+
+@if (jobOffer == null)
+
+{
+    <p><em>Ładowanie oferty...</em></p>
+}
+
+else
+
+{
+    <div class="card">
+        <div class="card-header">
+            <h4>@jobOffer.Title</h4>
+            <h6 class="text-muted">@jobOffer.CompanyName</h6>
+        </div>
+        <div class="card-body">
+
+            @if (!string.IsNullOrEmpty(feedbackMessage))
+
+            {
+                <div class="alert @(isError ? "alert-danger" : "alert-success")">@feedbackMessage</div>
+            }
+
+            <AuthorizeView>
+                <Authorized>
+                    @if (currentUserId != jobOffer.CreatedByUserId)
+                    {
+                        @if (hasApplied)
+
+                        {
+                            <button class="btn btn-success disabled w-100 mb-3">Zaaplikowano</button>
+                        }
+
+                        else
+
+                        {
+                            <button class="btn btn-primary w-100 mb-3" @onclick="Apply">Aplikuj teraz</button>
+                        }
+                    }
+                </Authorized>
+                <NotAuthorized>
+                    <div class="alert alert-info">
+                        <a href="@loginUrl">Zaloguj się</a>, aby móc aplikować na to stanowisko.
+                    </div>
+                </NotAuthorized>
+            </AuthorizeView>
+
+            <h5 class="mt-4">Szczegóły ogłoszenia</h5>
+            <dl class="row">
+                <dt class="col-sm-3">Lokalizacja</dt>
+                <dd class="col-sm-9">@jobOffer.Location</dd>
+
+                @if (jobOffer.IndustryCategory.HasValue)
+
+                {
+                    <dt class="col-sm-3">Branża</dt>
+                    <dd class="col-sm-9">@jobOffer.IndustryCategory</dd>
+                }
+
+                <dt class="col-sm-3">Wynagrodzenie</dt>
+                <dd class="col-sm-9">@jobOffer.SalaryRange</dd>
+
+                <dt class="col-sm-3">Rodzaj zatrudnienia</dt>
+                <dd class="col-sm-9">@jobOffer.EmplType</dd>
+
+                <dt class="col-sm-3">Tryb pracy</dt>
+                <dd class="col-sm-9">@jobOffer.JobType</dd>
+
+                <dt class="col-sm-3">Opis stanowiska</dt>
+                <dd class="col-sm-9">@((MarkupString)jobOffer.Description.Replace("\n", "<br />"))</dd>
+
+                <dt class="col-sm-3">Wymagania</dt>
+                <dd class="col-sm-9">@((MarkupString)jobOffer.Requirements.Replace("\n", "<br />"))</dd>
+
+                <dt class="col-sm-3">Wymagane doświadczenie</dt>
+                <dd class="col-sm-9">@(jobOffer.RequiresExperience ? "Tak" : "Nie")</dd>
+
+                <dt class="col-sm-3">Rekrutacja online</dt>
+                <dd class="col-sm-9">@(jobOffer.IsOnlineRecruitment ? "Tak" : "Nie")</dd>
+
+                <dt class="col-sm-3">Specjalne wymagania</dt>
+                <dd class="col-sm-9">
+                    @{
+                        var reqs = new List<string>();
+                        if (jobOffer.RequiresSanitaryBook) reqs.Add("Książeczka sanepidowska");
+                        if (jobOffer.RequiresStudentStatus) reqs.Add("Status studenta");
+                        if (jobOffer.RequiresDisabilityCertificate) reqs.Add("Orzeczenie o niepełnosprawności");
+                    }
+                    @if (reqs.Any())
+                    {
+                        @string.Join(", ", reqs)
+                    }
+                    else
+                    {
+                        <span class="text-muted">Brak</span>
+                    }
+                </dd>
+                @if (!string.IsNullOrEmpty(jobOffer.Benefits))
+
+                {
+                    <dt class="col-sm-3">Benefity</dt>
+                    <dd class="col-sm-9">@jobOffer.Benefits</dd>
+                }
+
+                <dt class="col-sm-3">Ważne do</dt>
+                <dd class="col-sm-9">
+                    @if (jobOffer.ApplicationDeadline.HasValue)
+                    {
+                        <span class="text-danger fw-bold">@jobOffer.ApplicationDeadline.Value.ToShortDateString()</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Bezterminowo</span>
+                    }
+                </dd>
+            </dl>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+            <a href="/offers" class="btn btn-secondary">Powrót do listy ofert</a>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+
+    public int Id { get; set; }
+
+
+
+    private JobOffer? jobOffer;
+
+    private string? currentUserId;
+
+    private bool hasApplied = false;
+
+    private string loginUrl = string.Empty;
+
+
+
+    private string? feedbackMessage;
+
+    private bool isError;
+
+
+
+    protected override async Task OnInitializedAsync()
+
+    {
+
+        loginUrl = $"Account/Login?returnUrl={NavigationManager.ToBaseRelativePath(NavigationManager.Uri)}";
+
+
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        currentUserId = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+
+
+        jobOffer = await JobOfferService.GetByIdAsync(Id);
+
+
+
+        if (jobOffer == null || (jobOffer.Status != OfferStatus.Opublikowana && jobOffer.CreatedByUserId != currentUserId && !authState.User.IsInRole("Admin")))
+
+        {
+
+            NavigationManager.NavigateTo("/offers");
+
+            return;
+
+        }
+
+
+
+        if (!string.IsNullOrEmpty(currentUserId))
+
+        {
+
+            hasApplied = await JobOfferService.HasUserAppliedAsync(Id, currentUserId);
+
+        }
+
+    }
+
+
+
+    private async Task Apply()
+
+    {
+
+        if (string.IsNullOrEmpty(currentUserId) || jobOffer == null)
+
+        {
+
+            NavigationManager.NavigateTo(loginUrl);
+
+            return;
+
+        }
+
+
+
+        try
+
+        {
+
+            bool success = await JobOfferService.ApplyForOfferAsync(jobOffer.Id, currentUserId);
+
+
+
+            if (success)
+
+            {
+
+                feedbackMessage = "Twoja aplikacja została wysłana!";
+
+                isError = false;
+
+                hasApplied = true;
+
+            }
+
+            else
+
+            {
+
+                feedbackMessage = "Wystąpił błąd (np. już aplikowałeś lub aplikujesz na własną ofertę).";
+
+                isError = true;
+
+            }
+
+        }
+
+        catch (Exception ex)
+
+        {
+
+            feedbackMessage = $"Wystąpił błąd serwera: {ex.Message}";
+
+            isError = true;
+
+        }
+
+
+
+        StateHasChanged();
+
+    }
+}

@@ -1,0 +1,269 @@
+﻿@page "/joboffers/details/{Id:int}"
+@using JobSearch.Services
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@inject NavigationManager NavigationManager
+@inject IJobOfferService JobOfferService
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "Admin,Moderator")]
+
+<PageTitle>Szczegóły Oferty (Moderator)</PageTitle>
+
+@if (jobOffer == null)
+
+{
+    <p><em>Ładowanie...</em></p>
+}
+
+else
+
+{
+    <div class="page-card p-4">
+        <div class="d-flex justify-content-between align-items-start mb-4">
+            <div>
+                <h3 class="m-0 text-primary fw-bold">@jobOffer.Title</h3>
+                <div class="text-muted fs-5">@jobOffer.CompanyName</div>
+            </div>
+            <span class="badge bg-secondary fs-6">ID: @jobOffer.Id</span>
+        </div>
+
+        <hr />
+
+        <div class="mb-4 p-3 rounded border @GetStatusBorderClass(jobOffer.Status)" style="background-color: rgba(255,255,255,0.5);">
+            <h5 class="fw-bold mb-3"><i class="bi bi-shield-lock"></i> Status Moderacji</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>Aktualny status:</strong>
+                    <span class="badge @GetStatusBadgeClass(jobOffer.Status) ms-2 fs-6">@jobOffer.Status.ToString()</span>
+                </div>
+
+                @if (jobOffer.Status == OfferStatus.Weryfikacja)
+
+                {
+                    <div class="col-md-12 mt-2 text-muted">
+                        <i class="bi bi-info-circle"></i> Ta oferta oczekuje na Twoją decyzję.
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(jobOffer.ModerationComment))
+
+                {
+                    <div class="col-md-12 mt-3">
+                        <strong>Komentarz moderacyjny:</strong>
+                        <div class="alert alert-warning mt-1 p-2">@jobOffer.ModerationComment</div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <h5 class="text-primary border-bottom pb-2 mb-3">Dane firmy</h5>
+        <div class="row mb-4">
+            <div class="col-md-6 mb-2">
+                <small class="text-muted d-block">Nazwa firmy</small>
+                <strong>@jobOffer.CompanyName</strong>
+            </div>
+            <div class="col-md-6 mb-2">
+                <small class="text-muted d-block">NIP</small>
+                <strong>@(string.IsNullOrEmpty(jobOffer.Nip) ? "Brak" : jobOffer.Nip)</strong>
+            </div>
+            <div class="col-md-6 mb-2">
+                <small class="text-muted d-block">Email kontaktowy</small>
+                <a href="mailto:@jobOffer.ContactInfo">@jobOffer.ContactInfo</a>
+            </div>
+            <div class="col-md-6 mb-2">
+                <small class="text-muted d-block">Branża</small>
+                <strong>@(jobOffer.IndustryCategory.HasValue ? jobOffer.IndustryCategory.ToString() : "Nie podano")</strong>
+            </div>
+        </div>
+
+        <h5 class="text-primary border-bottom pb-2 mb-3">Szczegóły ogłoszenia</h5>
+        <div class="row mb-4">
+            <div class="col-md-6 mb-2">
+                <small class="text-muted d-block">Lokalizacja</small>
+                <strong>@jobOffer.Location</strong>
+            </div>
+            <div class="col-md-6 mb-2">
+                <small class="text-muted d-block">Wynagrodzenie</small>
+                <strong>@jobOffer.SalaryRange</strong>
+            </div>
+            <div class="col-md-6 mb-2">
+                <small class="text-muted d-block">Rodzaj zatrudnienia</small>
+                <strong>@jobOffer.EmplType</strong>
+            </div>
+            <div class="col-md-6 mb-2">
+                <small class="text-muted d-block">Tryb pracy</small>
+                <strong>@jobOffer.JobType</strong>
+            </div>
+            <div class="col-md-6 mb-2">
+                <small class="text-muted d-block">Data publikacji</small>
+                <strong>@jobOffer.DatePosted.ToShortDateString()</strong>
+            </div>
+            <div class="col-md-6 mb-2">
+                <small class="text-muted d-block">Ważne do</small>
+                @if (jobOffer.ApplicationDeadline.HasValue)
+
+                {
+                    <span class="text-danger fw-bold">@jobOffer.ApplicationDeadline.Value.ToShortDateString()</span>
+                }
+
+                else
+
+                {
+                    <span class="text-muted">Bezterminowo</span>
+                }
+            </div>
+        </div>
+
+        <h5 class="text-primary border-bottom pb-2 mb-3">Treść ogłoszenia</h5>
+        <div class="mb-4">
+            <small class="text-muted d-block mb-1">Opis stanowiska</small>
+            <div class="p-3 bg-light rounded border">
+                @((MarkupString)jobOffer.Description.Replace("\n", "<br />"))
+            </div>
+        </div>
+        <div class="mb-4">
+            <small class="text-muted d-block mb-1">Wymagania</small>
+            <div class="p-3 bg-light rounded border">
+                @((MarkupString)jobOffer.Requirements.Replace("\n", "<br />"))
+            </div>
+        </div>
+
+        <h5 class="text-primary border-bottom pb-2 mb-3">Dodatkowe informacje</h5>
+        <div class="row mb-4">
+            <div class="col-md-6 mb-2">
+                <span class="text-muted">Wymagane doświadczenie:</span>
+                <span class="fw-bold ms-2">@(jobOffer.RequiresExperience ? "Tak" : "Nie")</span>
+            </div>
+            <div class="col-md-6 mb-2">
+                <span class="text-muted">Rekrutacja online:</span>
+                <span class="fw-bold ms-2">@(jobOffer.IsOnlineRecruitment ? "Tak" : "Nie")</span>
+            </div>
+            <div class="col-12 mb-2">
+                <span class="text-muted">Specjalne wymagania:</span>
+                <div class="mt-1">
+                    @{
+                        var reqs = new List<string>();
+                        if (jobOffer.RequiresSanitaryBook) reqs.Add("Książeczka sanepidowska");
+                        if (jobOffer.RequiresStudentStatus) reqs.Add("Status studenta");
+                        if (jobOffer.RequiresDisabilityCertificate) reqs.Add("Orzeczenie o niepełnosprawności");
+                    }
+                    @if (reqs.Any())
+                    {
+
+                        foreach (var req in reqs)
+
+                        {
+                            <span class="badge bg-info text-dark me-1">@req</span>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-muted small">Brak</span>
+                    }
+                </div>
+            </div>
+            @if (!string.IsNullOrEmpty(jobOffer.Benefits))
+
+            {
+                <div class="col-12 mt-2">
+                    <span class="text-muted">Benefity:</span>
+                    <span class="fw-bold ms-2">@jobOffer.Benefits</span>
+                </div>
+            }
+        </div>
+
+        <hr />
+        <div class="d-flex justify-content-between">
+            <a href="/joboffers" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Powrót do listy
+            </a>
+
+            <div class="d-flex gap-2">
+                <a href="@($"/joboffers/edit/{jobOffer.Id}")" class="btn btn-primary">
+                    <i class="bi bi-pencil"></i> Edytuj / Moderuj
+                </a>
+                <a href="@($"/joboffers/delete/{jobOffer.Id}")" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Usuń
+                </a>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+
+    public int Id { get; set; }
+
+
+
+    private JobOffer? jobOffer;
+
+
+
+    protected override async Task OnInitializedAsync()
+
+    {
+
+        jobOffer = await JobOfferService.GetByIdAsync(Id);
+
+
+
+        if (jobOffer == null)
+
+        {
+
+            NavigationManager.NavigateTo("/joboffers");
+
+        }
+
+    }
+
+
+
+    private string GetStatusBadgeClass(OfferStatus status)
+
+    {
+
+        return status switch
+
+        {
+
+            OfferStatus.Opublikowana => "bg-success",
+
+            OfferStatus.Weryfikacja => "bg-warning text-dark",
+
+            OfferStatus.Odrzucona => "bg-danger",
+
+            OfferStatus.Wygasła => "bg-secondary",
+
+            _ => "bg-secondary"
+
+        };
+
+    }
+
+
+
+    private string GetStatusBorderClass(OfferStatus status)
+
+    {
+
+        return status switch
+
+        {
+
+            OfferStatus.Opublikowana => "border-success",
+
+            OfferStatus.Weryfikacja => "border-warning",
+
+            OfferStatus.Odrzucona => "border-danger",
+
+            _ => "border-secondary"
+
+        };
+
+    }
+}

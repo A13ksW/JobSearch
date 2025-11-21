@@ -1,0 +1,227 @@
+﻿@page "/offers"
+@rendermode InteractiveServer
+@using JobSearch.Data
+@using JobSearch.Services
+@inject IJobOfferService JobOfferService
+
+<PageTitle>Oferty Pracy</PageTitle>
+
+<h1>Przeglądaj Oferty Pracy</h1>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Filtruj i sortuj</h5>
+        <div class="row g-3">
+            <div class="col-md-6 col-lg-3">
+                <label for="locationFilter" class="form-label">Lokalizacja</label>
+                <input id="locationFilter" @bind="locationFilter" class="form-control" placeholder="np. Warszawa" />
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <label for="employmentTypeFilter" class="form-label">Rodzaj zatrudnienia</label>
+                <InputSelect id="employmentTypeFilter" @bind-Value="employmentTypeFilter" class="form-select">
+                    <option value="">Wszystkie</option>
+                    @foreach (var type in Enum.GetValues(typeof(EmploymentType)))
+
+                    {
+                        <option value="@type">@type</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <label for="jobTypeFilter" class="form-label">Tryb pracy</label>
+                <InputSelect id="jobTypeFilter" @bind-Value="jobTypeFilter" class="form-select">
+                    <option value="">Wszystkie</option>
+                    @foreach (var type in Enum.GetValues(typeof(JobType)))
+
+                    {
+                        <option value="@type">@type</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <label for="salaryFilter" class="form-label">Minimalne wynagrodzenie</label>
+                <InputNumber id="salaryFilter" @bind-Value="minSalaryFilter" class="form-control" placeholder="np. 5000" />
+            </div>
+        </div>
+        <div class="row g-3 mt-2 align-items-end">
+            <div class="col-md-6 col-lg-4">
+                <label for="sortBy" class="form-label">Sortuj według</label>
+                <select id="sortBy" @bind="sortBy" class="form-select">
+                    <option value="date_desc">Najnowsze</option>
+                    <option value="salary_desc">Wynagrodzenie (najwyższe)</option>
+                    <option value="salary_asc">Wynagrodzenie (najniższe)</option>
+                </select>
+            </div>
+            <div class="col-md-3 col-lg-2">
+                <button class="btn btn-success w-100" @onclick="ApplyFilters">Filtruj</button>
+            </div>
+            <div class="col-md-3 col-lg-2">
+                <button class="btn btn-secondary w-100" @onclick="ClearFilters">Wyczyść</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@if (jobOffers == null)
+
+{
+    <p><em>Ładowanie...</em></p>
+}
+
+else if (!jobOffers.Any())
+
+{
+    <div class="alert alert-info">Brak ofert pracy spełniających podane kryteria.</div>
+}
+
+else
+
+{
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        @foreach (var offer in jobOffers)
+
+        {
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">@offer.Title</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">@offer.CompanyName</h6>
+
+                        <p class="card-text">
+                            <strong>Lokalizacja:</strong> @offer.Location<br />
+                            <strong>Wynagrodzenie:</strong> @offer.SalaryRange<br />
+
+                            <strong>Wygasa:</strong>
+                            @if (offer.ApplicationDeadline.HasValue)
+                            {
+                                <span class="text-danger fw-bold">@offer.ApplicationDeadline.Value.ToShortDateString()</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Bezterminowo</span>
+                            }
+                        </p>
+
+                        <a href="@($"/offer/{offer.Id}")" class="btn btn-secondary btn-sm">Zobacz szczegóły i aplikuj</a>
+                    </div>
+                    <div class="card-footer text-muted">
+                        Dodano: @offer.DatePosted.ToShortDateString()
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<JobOffer>? jobOffers;
+
+
+
+    // POPRAWKA: Zmieniono pole na Właściwość (Property) z { get; set; }
+
+    // Jest to wymagane przez atrybut [SupplyParameterFromQuery]
+
+    [SupplyParameterFromQuery(Name = "location")]
+
+    public string? locationFilter { get; set; }
+
+
+
+    private decimal? minSalaryFilter;
+
+    private string sortBy = "date_desc";
+
+    private EmploymentType? employmentTypeFilter;
+
+    private JobType? jobTypeFilter;
+
+
+
+    protected override async Task OnInitializedAsync()
+
+    {
+
+        await LoadOffers();
+
+    }
+
+
+
+    private async Task ApplyFilters()
+
+    {
+
+        await LoadOffers();
+
+    }
+
+
+
+    private async Task ClearFilters()
+
+    {
+
+        locationFilter = null;
+
+        minSalaryFilter = null;
+
+        employmentTypeFilter = null;
+
+        jobTypeFilter = null;
+
+        sortBy = "date_desc";
+
+        await LoadOffers();
+
+    }
+
+
+
+    private async Task LoadOffers()
+
+    {
+
+        // Przekazujemy parametry do serwisu.
+
+        // Uwaga: Tutaj zakładam, że metoda GetJobOffersAsync przyjmuje tyle argumentów,
+
+        // ile zdefiniowaliśmy w ostatniej wersji Twojego serwisu.
+
+        // Jeśli serwis ma więcej argumentów (np. IndustryCategory), przekaż tam 'null' lub 'false'.
+
+
+
+        var offersFromService = await JobOfferService.GetJobOffersAsync(
+
+            locationFilter,
+
+            minSalaryFilter,
+
+            sortBy,
+
+            employmentTypeFilter,
+
+            jobTypeFilter,
+
+            null, // IndustryCategory
+
+            false, false, false, false, false // Pozostałe filtry boolowskie
+
+        );
+
+
+
+        jobOffers = offersFromService
+
+            .Where(o => o.Status == OfferStatus.Opublikowana)
+
+            .ToList();
+
+
+
+        StateHasChanged();
+
+    }
+}

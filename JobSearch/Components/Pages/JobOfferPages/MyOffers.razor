@@ -1,0 +1,188 @@
+﻿@page "/my-offers"
+@rendermode InteractiveServer
+@using System.Security.Claims
+@using JobSearch.Data
+@using JobSearch.Services
+@using Microsoft.AspNetCore.Authorization
+@inject IJobOfferService JobOfferService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@attribute [Authorize]
+
+<PageTitle>Moje Oferty Pracy</PageTitle>
+
+<h1>Moje Oferty Pracy</h1>
+
+<p>
+    <a href="/joboffers/create" class="btn btn-primary">Dodaj nową ofertę</a>
+</p>
+
+@if (jobOffers == null)
+
+{
+    <p><em>Ładowanie...</em></p>
+}
+
+else if (!jobOffers.Any())
+
+{
+    <div class="alert alert-info">Nie dodałeś jeszcze żadnych ofert pracy.</div>
+}
+
+else
+
+{
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        @foreach (var offer in jobOffers)
+
+        {
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">@offer.Title</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">@offer.CompanyName</h6>
+                        <p class="card-text">
+                            @if (offer.IndustryCategory.HasValue)
+                            {
+                                <strong>Branża:</strong> @offer.IndustryCategory
+
+                                <br />
+                            }
+                            <strong>Lokalizacja:</strong> @offer.Location<br />
+                            <strong>Wynagrodzenie:</strong> @offer.SalaryRange
+                        </p>
+
+                        <span class="badge @GetStatusBadgeClass(offer.Status)">@offer.Status.ToString()</span>
+
+                        @if (offer.Status == OfferStatus.Wygasła)
+
+                        {
+                            <div class="mt-2">
+                                <button class="btn btn-warning btn-sm" @onclick="() => ExtendOffer(offer)">
+                                    <span class="bi bi-arrow-clockwise"></span> Przedłuż o 3 dni
+                                </button>
+                            </div>
+                        }
+                        @if (offer.Status == OfferStatus.Odrzucona && !string.IsNullOrEmpty(offer.ModerationComment))
+
+                        {
+                            <div class="alert alert-danger mt-2">
+                                <strong>Powód odrzucenia:</strong> @offer.ModerationComment
+                            </div>
+                        }
+
+                        <div class="mt-3">
+                            <a href="@($"/my-offers/details/{offer.Id}")" class="btn btn-secondary btn-sm">Zarządzaj / Zobacz aplikacje</a>
+                            <a href="@($"/my-offers/edit/{offer.Id}")" class="btn btn-primary btn-sm">Edytuj</a>
+                            <a href="@($"/my-offers/delete/{offer.Id}")" class="btn btn-danger btn-sm">Usuń</a>
+                        </div>
+                    </div>
+                    <div class="card-footer text-muted">
+                        Dodano: @offer.DatePosted.ToShortDateString()
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<JobOffer>? jobOffers;
+
+    private string? currentUserId;
+
+
+
+    protected override async Task OnInitializedAsync()
+
+    {
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        var user = authState.User;
+
+        currentUserId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+
+
+
+        if (!string.IsNullOrEmpty(currentUserId))
+
+        {
+
+            await LoadOffers();
+
+        }
+
+    }
+
+
+
+    private async Task LoadOffers()
+
+    {
+
+        if (string.IsNullOrEmpty(currentUserId)) return;
+
+        jobOffers = await JobOfferService.GetMyOffersAsync(currentUserId);
+
+        StateHasChanged();
+
+    }
+
+
+
+    private async Task ExtendOffer(JobOffer offer)
+
+    {
+
+        if (string.IsNullOrEmpty(currentUserId)) return;
+
+
+
+        try
+
+        {
+
+            // ### ZMIANA TUTAJ: Przekazujemy '3' zamiast '30' ###
+
+            await JobOfferService.ExtendOfferAsync(offer.Id, 3, currentUserId);
+
+
+
+            await LoadOffers();
+
+        }
+
+        catch (Exception ex)
+
+        {
+
+            Console.WriteLine($"Błąd podczas przedłużania: {ex.Message}");
+
+        }
+
+    }
+
+
+
+    private string GetStatusBadgeClass(OfferStatus status)
+
+    {
+
+        return status switch
+
+        {
+
+            OfferStatus.Opublikowana => "bg-success",
+
+            OfferStatus.Weryfikacja => "bg-warning text-dark",
+
+            OfferStatus.Odrzucona => "bg-danger",
+
+            OfferStatus.Wygasła => "bg-secondary",
+
+            _ => "bg-secondary"
+
+        };
+
+    }
+}

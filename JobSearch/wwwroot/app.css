@@ -1,0 +1,82 @@
+html, body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    height: 100%;
+    margin: 0;
+}
+
+/* === G£ÓWNE T£O APLIKACJI === */
+body {
+    /* Twój niebieski gradient */
+    background: linear-gradient(-45deg, #1e3c72, #2a5298, #2563eb, #6d28d9);
+    background-size: 400% 400%;
+    background-attachment: fixed;
+    color: white; /* Domyœlny tekst na bia³o */
+}
+
+/* === NAPRAWA KART I KONTENERÓW === */
+/* Wszystkie karty i menu maj¹ mieæ bia³e t³o i ciemny tekst */
+.card, .modal-content, .dropdown-menu {
+    background-color: #ffffff;
+    color: #212529; /* Ciemny tekst */
+    border: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Linki globalne (np. w menu) */
+a {
+    color: #e0e0e0;
+    text-decoration: none;
+}
+
+    a:hover {
+        color: white;
+        text-decoration: underline;
+    }
+
+/* Linki wewn¹trz kart (musz¹ byæ ciemne/niebieskie) */
+.card a, .dropdown-menu a, table a {
+    color: #0d6efd;
+}
+
+    .card a:hover, .dropdown-menu a:hover, table a:hover {
+        color: #0a58ca;
+    }
+
+/* Formularze wewn¹trz kart */
+.form-control, .form-select {
+    background-color: #fff;
+    color: #212529;
+    border: 1px solid #ced4da;
+}
+
+/* Przyciski */
+.btn-primary {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+.content {
+    padding-top: 1.1rem;
+}
+
+/* Walidacja */
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #26b050;
+}
+
+.invalid {
+    outline: 1px solid #e50000;
+}
+
+.validation-message {
+    color: #ff6b6b;
+}
+/* Jasnoczerwony dla czytelnoœci na ciemnym */
+
+/* B³êdy */
+.blazor-error-boundary {
+    background: lightyellow;
+    color: black;
+    padding: 1rem;
+}

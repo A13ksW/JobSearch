@@ -1,0 +1,102 @@
+﻿@page "/admin/users"
+@using JobSearch.Data
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "Admin")]
+@inject UserManager<ApplicationUser> UserManager
+@inject NavigationManager Nav
+
+<h1>Użytkownicy</h1>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="input-group">
+            <input @bind="search" class="form-control" placeholder="Szukaj email/nazwa" aria-label="Szukaj email lub nazwa" />
+            <button class="btn btn-success" @onclick="Load" type="button">Szukaj</button>
+            <button class="btn btn-primary" @onclick="Create" type="button">Dodaj</button>
+        </div>
+    </div>
+</div>
+
+<table class="table table-striped table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>Email</th>
+            <th>Nazwa</th>
+            <th>Typ konta</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th class="text-end">Akcje</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var u in users)
+        {
+            <tr>
+                <td>@u.Email</td>
+                <td>@u.DisplayName</td>
+                <td>@u.AccountType</td>
+                <td>@string.Join(", ", u.Roles)</td>
+                <td>
+                    @if (u.LockoutEnd.HasValue && u.LockoutEnd > DateTimeOffset.UtcNow)
+                    {
+                        <span class="badge bg-danger">Zablokowany</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Aktywny</span>
+                    }
+                </td>
+                <td class="text-end">
+                    <button class="btn btn-sm btn-secondary me-1" @onclick="() => Edit(u.Id)">Edytuj</button>
+                    <button class="btn btn-sm btn-danger" @onclick="() => Delete(u.Id)">Usuń</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private string search = string.Empty;
+    private List<UserRow> users = new();
+
+    protected override async Task OnInitializedAsync() => await Load();
+
+    private async Task Load()
+    {
+        var query = UserManager.Users.AsQueryable();
+        if (!string.IsNullOrWhiteSpace(search))
+            query = query.Where(x => x.Email!.Contains(search) || x.DisplayName!.Contains(search));
+        var list = await query.OrderBy(x => x.Email).Take(200).ToListAsync();
+        var result = new List<UserRow>();
+        foreach (var u in list)
+        {
+            var roles = await UserManager.GetRolesAsync(u);
+            result.Add(new UserRow { Id = u.Id, Email = u.Email!, DisplayName = u.DisplayName, AccountType = u.AccountType, Roles = roles.ToList(), LockoutEnd = u.LockoutEnd });
+        }
+        users = result;
+    }
+
+    private void Create() => Nav.NavigateTo("/admin/users/new");
+    private void Edit(string id) => Nav.NavigateTo($"/admin/users/{id}");
+    private async Task Delete(string id)
+    {
+        var u = await UserManager.FindByIdAsync(id);
+        if (u is null) return;
+        await UserManager.DeleteAsync(u);
+        await Load();
+    }
+
+    private sealed class UserRow
+    {
+        public string Id { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string? DisplayName { get; set; }
+        public string? AccountType { get; set; }
+        public List<string> Roles { get; set; } = new();
+        public DateTimeOffset? LockoutEnd { get; set; }
+    }
+}

@@ -1,0 +1,87 @@
+﻿@page "/my-offers/delete/{Id:int}"
+@using JobSearch.Data
+@using JobSearch.Services
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@inject IJobOfferService JobOfferService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@rendermode InteractiveServer
+@attribute [Authorize]
+
+<PageTitle>Usuń Ofertę</PageTitle>
+
+<h1>Usuń Ofertę</h1>
+
+<h3>Czy na pewno chcesz usunąć tę ofertę?</h3>
+<div>
+    <h2>JobOffer</h2>
+    <hr />
+    @if (joboffer is null)
+    {
+        <p><em>Ładowanie lub brak uprawnień...</em></p>
+    }
+    else
+    {
+        <dl class="row">
+            <dt class="col-sm-2">Title</dt>
+            <dd class="col-sm-10">@joboffer.Title</dd>
+
+            <dt class="col-sm-2">CompanyName</dt>
+            <dd class="col-sm-10">@joboffer.CompanyName</dd>
+        </dl>
+
+        <EditForm method="post" Model="joboffer" OnValidSubmit="DeleteJobOffer" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(joboffer is null)">Tak, usuń</button> |
+            <a href="/my-offers">Anuluj</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private JobOffer? joboffer;
+    private string? currentUserId;
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private bool busy;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        currentUserId = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(currentUserId))
+        {
+            NavigationManager.NavigateTo("Account/Login");
+            return;
+        }
+
+        joboffer = await JobOfferService.GetByIdAsync(Id);
+
+        if (joboffer is null || joboffer.CreatedByUserId != currentUserId)
+        {
+            joboffer = null;
+            NavigationManager.NavigateTo("/my-offers");
+        }
+    }
+
+    private async Task DeleteJobOffer()
+    {
+        if (joboffer is null) return;
+        busy = true;
+
+        try
+        {
+            await JobOfferService.DeleteAsync(joboffer.Id);
+            NavigationManager.NavigateTo("/my-offers");
+        }
+        catch (InvalidOperationException ex)
+        {
+            NavigationManager.NavigateTo("/my-offers");
+        }
+    }
+}

@@ -1,0 +1,128 @@
+﻿@page "/Account/Manage"
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Identity
+@using JobSearch.Data
+
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject IdentityUserAccessor UserAccessor
+@inject IdentityRedirectManager RedirectManager
+
+<PageTitle>Profil</PageTitle>
+
+<h3>Twój Profil</h3>
+<StatusMessage />
+
+<div class="row">
+    <div class="col-md-6">
+        <EditForm Model="Input" FormName="profile" OnValidSubmit="OnValidSubmitAsync" method="post">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert" />
+
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.DisplayName" class="form-control" placeholder="Wpisz swoje imię i nazwisko." />
+                <label for="display-name" class="form-label">Imię i Nazwisko</label>
+                <ValidationMessage For="() => Input.DisplayName" class="text-danger" />
+            </div>
+
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.PhoneNumber" class="form-control" placeholder="Wpisz swój numer telefonu." />
+                <label for="phone-number" class="form-label">Numer telefonu</label>
+                <ValidationMessage For="() => Input.PhoneNumber" class="text-danger" />
+            </div>
+
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Zapisz zmiany</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private ApplicationUser user = default!;
+
+    private string? phoneNumber;
+
+
+
+    [CascadingParameter]
+
+    private HttpContext HttpContext { get; set; } = default!;
+
+
+
+    [SupplyParameterFromForm]
+
+    private InputModel Input { get; set; } = new();
+
+
+
+    protected override async Task OnInitializedAsync()
+
+    {
+
+        user = await UserAccessor.GetRequiredUserAsync(HttpContext);
+
+        phoneNumber = await UserManager.GetPhoneNumberAsync(user);
+
+
+
+        Input.PhoneNumber ??= phoneNumber;
+
+        Input.DisplayName ??= user.DisplayName;
+
+    }
+
+
+
+    private async Task OnValidSubmitAsync()
+
+    {
+
+        user.PhoneNumber = Input.PhoneNumber;
+
+        user.DisplayName = Input.DisplayName ?? ""; // Aktualizujemy istniejące pole DisplayName
+
+
+
+        var updateResult = await UserManager.UpdateAsync(user);
+
+
+
+        if (!updateResult.Succeeded)
+
+        {
+
+            RedirectManager.RedirectToCurrentPageWithStatus("Błąd: Nie udało się zaktualizować profilu.", HttpContext);
+
+        }
+
+
+
+        await SignInManager.RefreshSignInAsync(user);
+
+        RedirectManager.RedirectToCurrentPageWithStatus("Twój profil został zaktualizowany", HttpContext);
+
+    }
+
+
+
+    private sealed class InputModel
+
+    {
+
+        [Phone]
+
+        [Display(Name = "Numer telefonu")]
+
+        public string? PhoneNumber { get; set; }
+
+
+
+        [Required(ErrorMessage = "Imię i Nazwisko jest wymagane")]
+
+        [Display(Name = "Imię i Nazwisko")]
+
+        public string? DisplayName { get; set; }
+
+    }
+}

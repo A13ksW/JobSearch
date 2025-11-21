@@ -1,0 +1,764 @@
+﻿@page "/salary-calculator"
+@rendermode InteractiveServer
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>Kalkulator Wynagrodzeń Premium</PageTitle>
+
+<div class="calculator-container">
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="card shadow-sm h-100">
+                <div class="card-body p-4">
+                    <h3 class="card-title mb-4">Kalkulator Wynagrodzeń</h3>
+                    <EditForm Model="Input" OnValidSubmit="Calculate" FormName="SalaryCalculatorForm" enhanced>
+                        <AntiforgeryToken />
+                        <DataAnnotationsValidator />
+
+                        <div class="mb-3">
+                            <label for="amount" class="form-label fw-bold">Wpisz kwotę wynagrodzenia</label>
+                            <div class="input-group">
+                                <InputNumber id="amount" @bind-Value="Input.Amount" class="form-control fs-5" placeholder="np. 10 000" />
+                                <span class="input-group-text">PLN</span>
+                            </div>
+                            <ValidationMessage For="@(() => Input.Amount)" />
+                        </div>
+
+                        <div class="btn-group w-100 mb-4" role="group" aria-label="Rodzaj kwoty">
+                            <button type="button" class="btn @(Input.AmountType == AmountType.Gross ? "btn-dark" : "btn-outline-dark")"
+                                    @onclick='() => Input.AmountType = AmountType.Gross'>
+                                Kwota brutto (na umowie)
+                            </button>
+                            <button type="button" class="btn @(Input.AmountType == AmountType.Net ? "btn-dark" : "btn-outline-dark")"
+                                    @onclick='() => Input.AmountType = AmountType.Net'>
+                                Kwota netto (na rękę)
+                            </button>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Rodzaj umowy</label>
+                            <div class="contract-type-selector">
+                                <div class="contract-option @(Input.ContractType == ContractType.UoP ? "active" : "")" @onclick="() => SetContractType(ContractType.UoP)">
+                                    <span>Umowa o pracę (UoP)</span>
+                                </div>
+                                <div class="contract-option @(Input.ContractType == ContractType.B2B ? "active" : "")" @onclick="() => SetContractType(ContractType.B2B)">
+                                    <span>Kontrakt B2B (działalność)</span>
+                                </div>
+                                <div class="contract-option @(Input.ContractType == ContractType.Zlecenie ? "active" : "")" @onclick="() => SetContractType(ContractType.Zlecenie)">
+                                    <span>Umowa zlecenie</span>
+                                </div>
+                                <div class="contract-option @(Input.ContractType == ContractType.Dzielo ? "active" : "")" @onclick="() => SetContractType(ContractType.Dzielo)">
+                                    <span>Umowa o dzieło</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <details class="advanced-options-details" open>
+                            <summary class="fw-bold">Ustawienia zaawansowane (opcjonalnie)</summary>
+                            <div class="options-box mt-2">
+                                @if (Input.ContractType == ContractType.UoP)
+                                {
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Wiek pracownika</label>
+                                            <InputSelect @bind-Value="Input.IsYoung" class="form-select">
+                                                <option value="false">Powyżej 26 lat</option>
+                                                <option value="true">Do 26 lat – ulga PIT-0</option>
+                                            </InputSelect>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Koszty uzyskania przychodu (KUP)</label>
+                                            <InputSelect @bind-Value="Input.WorkOutsideResidence" class="form-select">
+                                                <option value="false">Standardowe – miejscowe (250 zł/mies.)</option>
+                                                <option value="true">Podwyższone – dojazdy (300 zł/mies.)</option>
+                                            </InputSelect>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Kwota zmniejszająca podatek</label>
+                                            <InputSelect @bind-Value="Input.ApplyTaxFreeAmount" class="form-select">
+                                                <option value="true">Stosuj u tego pracodawcy</option>
+                                                <option value="false">Nie stosuj</option>
+                                            </InputSelect>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Pracownicze Plany Kapitałowe (PPK)</label>
+                                            <InputSelect @bind-Value="Input.UsePPK" class="form-select">
+                                                <option value="false">Nie uczestniczę</option>
+                                                <option value="true">Uczestniczę (wpłata pracownika 2%)</option>
+                                            </InputSelect>
+                                        </div>
+                                    </div>
+                                }
+                                @if (Input.ContractType == ContractType.B2B)
+                                {
+                                    <div class="mb-3">
+                                        <label class="form-label">Forma opodatkowania działalności</label>
+                                        <InputSelect @bind-Value="Input.B2B_TaxType" class="form-select">
+                                            <option value="@B2BTaxType.Progressive">Skala podatkowa 12%/32%</option>
+                                            <option value="@B2BTaxType.Flat" disabled>Podatek liniowy 19% (wkrótce)</option>
+                                            <option value="@B2BTaxType.LumpSum" disabled>Ryczałt (wkrótce)</option>
+                                        </InputSelect>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Rodzaj ZUS</label>
+                                        <InputSelect @bind-Value="Input.B2B_ZusType" class="form-select">
+                                            <option value="@B2BZusType.DuzyZus">Duży ZUS (standardowy)</option>
+                                            <option value="@B2BZusType.MalyZusPlus">Mały ZUS Plus</option>
+                                            <option value="@B2BZusType.Preferencyjny_2_lata">Preferencyjny (pierwsze 24 mies.)</option>
+                                            <option value="@B2BZusType.UlgaNaStart">Ulga na start (pierwsze 6 mies.)</option>
+                                        </InputSelect>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <InputCheckbox @bind-Value="Input.B2B_Sickness" class="form-check-input" id="b2bSickness" disabled="@(Input.B2B_ZusType == B2BZusType.UlgaNaStart)" />
+                                        <label class="form-check-label" for="b2bSickness">Dobrowolne ubezpieczenie chorobowe (nie dotyczy „ulgi na start”)</label>
+                                    </div>
+                                }
+                                @if (Input.ContractType == ContractType.Zlecenie)
+                                {
+                                    <div class="mb-3">
+                                        <label class="form-label">Status składek ZUS przy tej umowie</label>
+                                        <InputSelect @bind-Value="Input.Zlecenie_ZusStatus" class="form-select">
+                                            <option value="@ZlecenieZusStatus.ThisEmployer">Składki opłacam u tego zleceniodawcy</option>
+                                            <option value="@ZlecenieZusStatus.OtherEmployer">Składki opłacam u innego pracodawcy</option>
+                                            <option value="@ZlecenieZusStatus.Student">Jestem studentem/uczniem do 26 r.ż. (bez składek)</option>
+                                        </InputSelect>
+                                    </div>
+                                    <div class="form-check form-switch mb-2">
+                                        <InputCheckbox @bind-Value="Input.Zlecenie_Sickness" class="form-check-input" id="zlecenieSickness" disabled="@(Input.Zlecenie_ZusStatus != ZlecenieZusStatus.ThisEmployer)" />
+                                        <label class="form-check-label" for="zlecenieSickness">Dobrowolne ubezpieczenie chorobowe (tylko gdy składki u tego zleceniodawcy)</label>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Koszty uzyskania przychodu (KUP)</label>
+                                        <InputSelect @bind-Value="Input.KupType" class="form-select">
+                                            <option value="@KupType.Standard_20_Percent">20% – standardowe</option>
+                                            <option value="@KupType.Author_50_Percent">50% – twórcze</option>
+                                        </InputSelect>
+                                    </div>
+                                }
+                                @if (Input.ContractType == ContractType.Dzielo)
+                                {
+                                    <div class="mb-3">
+                                        <label class="form-label">Koszty uzyskania przychodu (KUP)</label>
+                                        <InputSelect @bind-Value="Input.KupType" class="form-select">
+                                            <option value="@KupType.Standard_20_Percent">20% – standardowe</option>
+                                            <option value="@KupType.Author_50_Percent">50% – twórcze</option>
+                                        </InputSelect>
+                                    </div>
+                                }
+                            </div>
+                        </details>
+
+                        <button type="submit" class="btn btn-success w-100 mt-4 py-2 fs-5">Oblicz wynagrodzenie</button>
+                    </EditForm>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            @if (Result is not null)
+            {
+                <div class="card shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="summary-grid mb-4">
+                            <div>
+                                <div class="text-muted small">Otrzymasz na rękę</div>
+                                <div class="fs-4 fw-bold text-success">@Result.Net.ToString("N2") zł</div>
+                            </div>
+                            <div>
+                                <div class="text-muted small">Całkowity koszt zatrudnienia</div>
+                                <div class="fs-4 fw-bold text-danger">@Result.TotalCost.ToString("N2") zł</div>
+                            </div>
+                        </div>
+                        <div class="progress-stack mb-4">
+                            <div class="progress" style="height: 25px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: @Result.NetPct%" title="Wynagrodzenie netto">Netto</div>
+                                <div class="progress-bar bg-warning text-dark" role="progressbar" style="width: @Result.TaxesPct%" title="Podatki i składka zdrowotna">Podatki</div>
+                                <div class="progress-bar bg-info text-dark" role="progressbar" style="width: @Result.ZusPct%" title="Składki ZUS">ZUS</div>
+                            </div>
+                        </div>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <h5 class="result-header">Składowe pensji</h5>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between">Wynagrodzenie brutto <span>@Result.Gross.ToString("N2")</span></li>
+                                    <li class="list-group-item d-flex justify-content-between text-danger">Składki ZUS (pracownik) <span>-@Result.EmployeeZusTotal.ToString("N2")</span></li>
+                                    <li class="list-group-item d-flex justify-content-between text-danger">Składka zdrowotna <span>-@Result.HealthContribution.ToString("N2")</span></li>
+                                    <li class="list-group-item d-flex justify-content-between text-danger">Zaliczka na PIT <span>-@Result.Tax.ToString("N2")</span></li>
+                                    <li class="list-group-item d-flex justify-content-between fw-bold bg-light">Wynagrodzenie netto <span>@Result.Net.ToString("N2")</span></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="result-header">Koszty pracodawcy</h5>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between">Wynagrodzenie brutto <span>@Result.Gross.ToString("N2")</span></li>
+                                    <li class="list-group-item d-flex justify-content-between text-danger">Składki ZUS (pracodawca) <span>+@Result.EmployerZusTotal.ToString("N2")</span></li>
+                                    <li class="list-group-item d-flex justify-content-between fw-bold bg-light">Łączny koszt <span>@Result.TotalCost.ToString("N2")</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card shadow-sm h-100">
+                    <div class="card-body p-5 d-flex justify-content-center align-items-center">
+                        <h4 class="text-muted text-center">Wprowadź dane i kliknij "Oblicz", aby zobaczyć wyniki.</h4>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    /* ====== Wygląd jak w Figmie – kalkulator wynagrodzeń ====== */
+
+    /* Tło strony */
+    :root {
+        --primary: #2563eb; /* niebieski */
+        --accent: #ba3eef; /* fiolet */
+        --text: #0f172a; /* szaroniebieski */
+        --muted: #64748b; /* opis/label */
+        --card-bg: rgba(255,255,255,0.78);
+        --border: rgba(255,255,255,0.55);
+        --shadow: 0 10px 25px rgba(37, 99, 235, .15), 0 6px 14px rgba(186, 62, 239, .12);
+        --radius: 18px;
+        --radius-pill: 999px;
+    }
+
+    html, body {
+        height: 100%;
+    }
+
+    body {
+        background: linear-gradient(180deg, rgba(37,99,235,0.48) 0%, rgba(186,62,239,0.35) 100%);
+        font-smooth: always;
+        -webkit-font-smoothing: antialiased;
+        color: var(--text);
+    }
+
+    /* Container */
+    .calculator-container {
+        max-width: min(1200px, 92vw);
+        margin: 32px auto 80px;
+        padding: 0 clamp(12px, 2vw, 24px);
+    }
+
+    /* Karty – glassmorphism */
+    .card {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--border);
+        border-radius: var(--radius) !important;
+        box-shadow: var(--shadow);
+    }
+
+    .card-body {
+        padding: clamp(16px, 2.2vw, 28px) !important;
+    }
+
+    /* Nagłówki i link-dialog (jak w makiecie) */
+    h3.card-title {
+        font-weight: 800;
+        letter-spacing: .2px;
+    }
+
+        h3.card-title .accent {
+            color: var(--primary);
+        }
+
+    /* Pole kwoty */
+    .form-label {
+        font-weight: 700;
+        color: var(--muted);
+        margin-bottom: .35rem;
+    }
+
+    .input-group .form-control {
+        font-size: clamp(1.05rem, 1.6vw, 1.35rem) !important;
+        padding: 0 1rem;
+        height: clamp(44px, 6vw, 52px);
+        border-radius: var(--radius);
+        border: 1px solid rgba(15, 23, 42, .08);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+    }
+
+    .input-group .input-group-text {
+        border-radius: var(--radius);
+        font-weight: 700;
+        background: rgba(15,23,42,.04);
+        height: clamp(44px, 6vw, 52px);
+        padding-inline: clamp(10px, 1.4vw, 14px);
+    }
+
+    /* Pigułki Netto/Brutto */
+    .btn-group {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+        .btn-group .btn {
+            border-radius: var(--radius-pill) !important;
+            height: clamp(40px, 6vw, 46px);
+            padding: 0 clamp(12px, 1.8vw, 18px);
+            font-weight: 700;
+            border-width: 2px;
+            white-space: nowrap;
+        }
+
+        .btn-group .btn-dark {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-color: transparent;
+        }
+
+        .btn-group .btn-outline-dark {
+            background: rgba(255,255,255,.6);
+            border-color: rgba(15,23,42,.12);
+            color: var(--text);
+        }
+
+        .btn-group .btn:hover {
+            filter: brightness(1.03);
+        }
+
+    /* Typ umowy – kafelki/pigułki */
+    .contract-type-selector {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(150px,1fr));
+        gap: clamp(8px, 1.2vw, 14px);
+    }
+
+    .contract-option {
+        border-radius: var(--radius-pill);
+        min-height: clamp(40px, 5.8vw, 46px);
+        padding: .6rem clamp(12px, 1.6vw, 18px);
+        border: 2px solid rgba(15,23,42,.10);
+        background: rgba(255,255,255,.6);
+        font-weight: 700;
+        transition: transform .12s ease, box-shadow .12s ease, background .2s ease;
+        box-shadow: 0 1px 0 rgba(255,255,255,.6);
+    }
+
+        .contract-option:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .contract-option.active {
+            color: #fff;
+            border-color: transparent;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+    /* „Parametry zaawansowane” – pasek jak w makiecie */
+    .advanced-options-details {
+        margin-top: .75rem;
+    }
+
+        .advanced-options-details summary {
+            list-style: none;
+            background: rgba(15,23,42,.06);
+            border: 1px solid rgba(15,23,42,.08);
+            padding: clamp(10px, 1.6vw, 14px) clamp(12px, 2vw, 18px);
+            border-radius: var(--radius-pill);
+            font-weight: 700;
+            position: relative;
+            color: var(--text);
+            user-select: none;
+            cursor: pointer;
+        }
+
+        .advanced-options-details[open] summary {
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .advanced-options-details summary::after {
+            content: "▾";
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%) rotate(0deg);
+            transition: transform .18s ease;
+            font-size: 1.05rem;
+            color: var(--text);
+        }
+
+        .advanced-options-details[open] summary::after {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+    .options-box {
+        border: 1px solid rgba(15,23,42,.08);
+        border-top: 0;
+        border-radius: 0 0 var(--radius) var(--radius);
+        padding: clamp(12px, 2vw, 16px);
+        background: rgba(255,255,255,.65);
+    }
+
+    /* Przyciski akcji */
+    .btn-success {
+        border-radius: var(--radius-pill);
+        height: clamp(42px, 6vw, 48px);
+        padding-inline: clamp(14px, 2.2vw, 22px);
+        font-weight: 800;
+        letter-spacing: .2px;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+        border: none;
+        box-shadow: var(--shadow);
+    }
+
+        .btn-success:hover {
+            filter: brightness(1.05);
+        }
+
+    /* Podsumowanie – kafelki i progress */
+    .summary-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(12px, 2vw, 18px);
+        text-align: center;
+    }
+
+        .summary-grid .fw-bold {
+            font-size: clamp(1.2rem, 2vw, 1.6rem);
+        }
+
+    .progress {
+        height: clamp(18px, 2.4vw, 22px) !important;
+        background: rgba(15,23,42,.08);
+        border-radius: var(--radius-pill);
+        overflow: hidden;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+    }
+
+    .progress-bar {
+        font-weight: 800;
+    }
+
+    /* Lista wyników */
+    .list-group-item {
+        background: transparent;
+        border: 0;
+        padding: clamp(8px, 1.4vw, 10px) clamp(6px, 1vw, 12px);
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        column-gap: 12px;
+    }
+
+        .list-group-item.bg-light {
+            background: rgba(15, 23, 42, .05) !important;
+            border-radius: 12px;
+            margin-top: .35rem;
+        }
+
+    /* Focus i dostępność */
+    .form-control:focus, .form-select:focus, .btn:focus, .contract-option:focus {
+        outline: 3px solid rgba(37,99,235,.35);
+        outline-offset: 1px;
+    }
+
+    /* Responsywność – tylko bezpieczne zmiany siatki */
+    /* Responsywność – tylko bezpieczne zmiany siatki */
+    @@media (max-width: 1200px) {
+        .contract-type-selector {
+            grid-template-columns: repeat(3, minmax(150px, 1fr));
+        }
+    }
+
+    @@media (max-width: 1100px) {
+        .contract-type-selector {
+            grid-template-columns: repeat(2, minmax(160px, 1fr));
+        }
+
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    }
+
+    /* Zapobieganie “rozpychaniu” wąskich elementów */
+    .progress, .list-group, .list-group-item span {
+        min-width: 0;
+    }
+
+
+
+</style>
+
+@code {
+    #region Enums & Models
+    public enum AmountType { Gross, Net }
+    public enum ContractType { UoP, B2B, Zlecenie, Dzielo }
+    public enum B2BTaxType { Progressive, Flat, LumpSum }
+    public enum B2BZusType { Brak, UlgaNaStart, Preferencyjny_2_lata, MalyZusPlus, DuzyZus }
+    public enum ZlecenieZusStatus { ThisEmployer, OtherEmployer, Student }
+    public enum KupType { Standard_20_Percent, Author_50_Percent }
+
+    [SupplyParameterFromForm]
+    private SalaryInput Input { get; set; } = new();
+    private CalculationResult? Result;
+
+    public class SalaryInput
+    {
+        [Required, Range(1, 2_000_000)] public decimal Amount { get; set; } = 10000;
+        public AmountType AmountType { get; set; } = AmountType.Gross;
+        public ContractType ContractType { get; set; } = ContractType.UoP;
+
+        // UoP
+        public bool IsYoung { get; set; }
+        public bool WorkOutsideResidence { get; set; } = false;
+        public bool ApplyTaxFreeAmount { get; set; } = true;
+        public bool UsePPK { get; set; }
+
+        // B2B
+        public B2BTaxType B2B_TaxType { get; set; } = B2BTaxType.Progressive;
+        public B2BZusType B2B_ZusType { get; set; } = B2BZusType.DuzyZus;
+        public bool B2B_Sickness { get; set; }
+
+        // Zlecenie & Dzieło
+        public ZlecenieZusStatus Zlecenie_ZusStatus { get; set; } = ZlecenieZusStatus.ThisEmployer;
+        public bool Zlecenie_Sickness { get; set; }
+        public KupType KupType { get; set; } = KupType.Standard_20_Percent;
+    }
+
+    public class CalculationResult
+    {
+        public decimal Gross { get; set; }
+        public decimal Net { get; set; }
+        public decimal TotalCost { get; set; }
+        public decimal EmployeeZusTotal { get; set; }
+        public decimal EmployerZusTotal { get; set; }
+        public decimal HealthContribution { get; set; }
+        public decimal Tax { get; set; }
+
+        public double NetPct => TotalCost > 0 ? (double)(Net / TotalCost * 100) : 0;
+        public double TaxesPct => TotalCost > 0 ? (double)((Tax + HealthContribution) / TotalCost * 100) : 0;
+        public double ZusPct => TotalCost > 0 ? (double)((EmployeeZusTotal + EmployerZusTotal) / TotalCost * 100) : 0;
+    }
+    #endregion
+
+    #region Constants (2024/2025)
+    private static class Rates
+    {
+        public const decimal ZusBaseLimit = 222780; public const decimal Pit0Limit = 85528;
+        public const decimal TaxBracket = 120000; public const decimal AuthorKupLimit = 120000;
+        public const decimal TaxReducingAmount = 3600;
+        public const decimal PensionRate = 0.0976m, DisabilityRate = 0.015m, SicknessRate = 0.0245m;
+        public const decimal EmployerPensionRate = 0.0976m, EmployerDisabilityRate = 0.065m, AccidentRate = 0.0167m;
+        public const decimal FpRate = 0.0245m, FgspRate = 0.001m;
+        public const decimal HealthRate = 0.09m;
+        public const decimal TaxLowerRate = 0.12m, TaxHigherRate = 0.32m;
+
+        // NOWE: minimalne wynagrodzenie – potrzebne do FP na B2B
+        public const decimal MinWage = 4242m;
+
+        public static readonly IReadOnlyDictionary<B2BZusType, decimal> B2B_SocialBases = new Dictionary<B2BZusType, decimal>
+        {
+            [B2BZusType.DuzyZus] = 4694.40m,
+            [B2BZusType.MalyZusPlus] = 1600.32m,
+            [B2BZusType.Preferencyjny_2_lata] = 1272.60m,
+            [B2BZusType.UlgaNaStart] = 0m,
+            [B2BZusType.Brak] = 0m
+        };
+
+        // Zostawiam, choć w nowej logice B2B zdrowotna jest liczona od dochodu
+        public const decimal B2B_HealthBase = 4242m;
+    }
+    #endregion
+
+    private void SetContractType(ContractType type) => Input.ContractType = type;
+
+    private void Calculate()
+    {
+        var context = new ValidationContext(Input);
+        if (!Validator.TryValidateObject(Input, context, null, true)) return;
+
+        decimal gross = Input.Amount;
+        if (Input.AmountType == AmountType.Net) { gross = FindGrossFromNet(Input.Amount); }
+
+        Result = Input.ContractType switch
+        {
+            ContractType.UoP => CalculateUoP(gross),
+            ContractType.B2B => CalculateB2B(gross),
+            ContractType.Zlecenie => CalculateZlecenie(gross),
+            ContractType.Dzielo => CalculateDzielo(gross),
+            _ => null
+        };
+    }
+
+    private decimal FindGrossFromNet(decimal net)
+    {
+        decimal low = 0, high = net * 3;
+        for (int i = 0; i < 100; i++)
+        {
+            decimal mid = low + (high - low) / 2;
+            if (mid <= 0) return 0;
+            var result = Input.ContractType switch
+            {
+                ContractType.UoP => CalculateUoP(mid),
+                ContractType.B2B => CalculateB2B(mid),
+                ContractType.Zlecenie => CalculateZlecenie(mid),
+                ContractType.Dzielo => CalculateDzielo(mid),
+                _ => new CalculationResult { Net = 0 }
+            };
+            if (Math.Abs(result.Net - net) < 0.01m) return mid;
+            if (result.Net > net) high = mid; else low = mid;
+        }
+        return high;
+    }
+
+    #region Calculation Methods
+    private CalculationResult CalculateUoP(decimal gross)
+    {
+        var res = new CalculationResult { Gross = gross };
+
+        decimal monthlyZusBase = Math.Min(gross, Rates.ZusBaseLimit / 12);
+        decimal empZusSocial = monthlyZusBase * (Rates.PensionRate + Rates.DisabilityRate) + gross * Rates.SicknessRate;
+        decimal employerZusSocial = monthlyZusBase * (Rates.EmployerPensionRate + Rates.EmployerDisabilityRate) + gross * (Rates.AccidentRate + Rates.FpRate + Rates.FgspRate);
+
+        decimal empPpk = Input.UsePPK ? gross * 0.02m : 0m;       // 2% pracownika
+        decimal employerPpk = Input.UsePPK ? gross * 0.015m : 0m; // 1.5% pracodawcy
+
+        res.EmployeeZusTotal = Math.Round(empZusSocial + empPpk, 2);
+        res.EmployerZusTotal = Math.Round(employerZusSocial + employerPpk, 2);
+
+        decimal healthBase = gross - empZusSocial;
+        res.HealthContribution = Math.Round(healthBase * Rates.HealthRate, 2);
+
+        decimal kup = Input.WorkOutsideResidence ? 300m : 250m;
+
+        decimal taxBase = Math.Max(0, gross - empZusSocial - kup);
+
+        // PIT-0 dla młodych – nie stosujemy PIT-2 (kwoty zmniejszającej)
+        if (Input.IsYoung)
+            taxBase = Math.Max(0, taxBase - (Rates.Pit0Limit / 12));
+
+        taxBase = Math.Round(taxBase);
+
+        decimal taxReduction = (!Input.IsYoung && Input.ApplyTaxFreeAmount) ? Rates.TaxReducingAmount / 12 : 0;
+
+        // Próg 32% liczony od rocznej PODSTAWY, nie od brutto
+        decimal annualTaxBase = taxBase * 12;
+        decimal annualTax = (annualTaxBase > Rates.TaxBracket)
+            ? (Rates.TaxBracket * Rates.TaxLowerRate) + ((annualTaxBase - Rates.TaxBracket) * Rates.TaxHigherRate) - Rates.TaxReducingAmount
+            : (annualTaxBase * Rates.TaxLowerRate) - Rates.TaxReducingAmount;
+
+        res.Tax = Math.Round(Math.Max(0, annualTax / 12));
+        res.Net = gross - res.EmployeeZusTotal - res.HealthContribution - res.Tax;
+        res.TotalCost = gross + res.EmployerZusTotal;
+        return res;
+    }
+
+    private CalculationResult CalculateB2B(decimal revenue)
+    {
+        var res = new CalculationResult { Gross = revenue };
+
+        decimal socialBase = Rates.B2B_SocialBases[Input.B2B_ZusType];
+
+        decimal socialContributions = 0m;
+        if (socialBase > 0m)
+        {
+            socialContributions = socialBase * (Rates.PensionRate + Rates.DisabilityRate)
+                                + (Input.B2B_Sickness ? socialBase * Rates.SicknessRate : 0m);
+        }
+
+        // FP tylko gdy: podlega E/R, nie Ulga na start, i podstawa >= minimalnego wynagrodzenia
+        decimal fpContribution = (Input.B2B_ZusType != B2BZusType.UlgaNaStart && socialBase >= Rates.MinWage && socialBase > 0m)
+            ? socialBase * Rates.FpRate
+            : 0m;
+
+        res.EmployeeZusTotal = Math.Round(socialContributions + fpContribution, 2);
+
+        // Dochód = przychód - ZUS społeczne - koszty (tu 0 – zostawiam jak u Ciebie)
+        decimal kosztStaly = 0m;
+        decimal dochod = Math.Max(0m, revenue - socialContributions - kosztStaly);
+
+        // Zdrowotna (skala) 9% od dochodu – bez odliczenia od PIT
+        res.HealthContribution = Math.Round(dochod * Rates.HealthRate, 2);
+
+        // PIT wg skali od dochodu (rocznie), z kwotą zmniejszającą 3600 zł
+        decimal annualTaxBase = dochod * 12m;
+        decimal annualTax = (annualTaxBase > Rates.TaxBracket)
+            ? (Rates.TaxBracket * Rates.TaxLowerRate) + ((annualTaxBase - Rates.TaxBracket) * Rates.TaxHigherRate) - Rates.TaxReducingAmount
+            : (annualTaxBase * Rates.TaxLowerRate) - Rates.TaxReducingAmount;
+
+        res.Tax = Math.Round(Math.Max(0m, annualTax / 12m));
+
+        res.Net = revenue - res.EmployeeZusTotal - res.HealthContribution - res.Tax;
+        res.TotalCost = revenue;     // B2B: brak kosztu pracodawcy
+        res.EmployerZusTotal = 0m;
+        return res;
+    }
+
+
+    private CalculationResult CalculateZlecenie(decimal gross)
+    {
+        var res = new CalculationResult { Gross = gross };
+
+        if (Input.Zlecenie_ZusStatus == ZlecenieZusStatus.Student)
+        {
+            // Student/uczeń do 26 r.ż. – brak ZUS; (PIT-0 w limicie – tu pozostawiam uproszczenie miesięczne)
+            res.Net = gross;
+            res.TotalCost = gross;
+            return res;
+        }
+
+        decimal empZusSum = 0m, employerZusSum = 0m;
+
+        if (Input.Zlecenie_ZusStatus == ZlecenieZusStatus.ThisEmployer)
+        {
+            empZusSum = gross * (Rates.PensionRate + Rates.DisabilityRate)
+                      + (Input.Zlecenie_Sickness ? gross * Rates.SicknessRate : 0m);
+
+            employerZusSum = gross * (Rates.EmployerPensionRate + Rates.EmployerDisabilityRate
+                                    + Rates.AccidentRate + Rates.FpRate + Rates.FgspRate);
+        }
+
+        res.EmployeeZusTotal = Math.Round(empZusSum, 2);
+        res.EmployerZusTotal = Math.Round(employerZusSum, 2);
+
+        // Zdrowotna tylko wtedy, gdy są społeczne z tej umowy
+        decimal healthBase = empZusSum > 0 ? (gross - empZusSum) : 0m;
+        res.HealthContribution = Math.Round(healthBase * Rates.HealthRate, 2);
+
+        decimal kupRate = Input.KupType == KupType.Author_50_Percent ? 0.5m : 0.2m;
+        decimal kupLimit = kupRate == 0.5m ? Rates.AuthorKupLimit / 12 : decimal.MaxValue;
+        decimal kupAmount = Math.Min((gross - empZusSum) * kupRate, kupLimit);
+
+        decimal taxBase = Math.Max(0, gross - empZusSum - kupAmount);
+
+        bool isYoungAndNotStudent = Input.IsYoung && Input.Zlecenie_ZusStatus != ZlecenieZusStatus.Student;
+        if (isYoungAndNotStudent)
+            taxBase = Math.Max(0, taxBase - (Rates.Pit0Limit / 12));
+
+        res.Tax = Math.Round(Math.Max(0, taxBase * Rates.TaxLowerRate));
+
+        res.Net = gross - res.EmployeeZusTotal - res.HealthContribution - res.Tax;
+        res.TotalCost = gross + res.EmployerZusTotal;
+        return res;
+    }
+
+
+    private CalculationResult CalculateDzielo(decimal gross)
+    {
+        var res = new CalculationResult { Gross = gross, TotalCost = gross };
+        decimal kupRate = Input.KupType == KupType.Author_50_Percent ? 0.5m : 0.2m;
+        decimal kupLimit = kupRate == 0.5m ? Rates.AuthorKupLimit / 12 : decimal.MaxValue;
+        decimal kupAmount = Math.Min(gross * kupRate, kupLimit);
+        decimal taxBase = Math.Max(0, gross - kupAmount);
+        res.Tax = Math.Round(taxBase * Rates.TaxLowerRate);
+        res.Net = gross - res.Tax;
+        return res;
+    }
+    #endregion
+}

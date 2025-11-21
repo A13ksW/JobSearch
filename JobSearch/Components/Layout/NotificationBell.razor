@@ -1,0 +1,154 @@
+﻿@implements IDisposable
+
+@using System.Security.Claims
+@using JobSearch.Data
+@using JobSearch.Services
+@inject INotificationService NotificationService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<div style="position: relative;">
+    <a class="nav-link position-relative top-row-bell" @onclick="ToggleDropdown" style="cursor: pointer;">
+        <span class="bi bi-bell-fill" aria-hidden="true"></span>
+
+        @if (unreadCount > 0)
+        {
+            <span class="position-absolute top-0 start-75 translate-middle-x p-1 badge rounded-circle bg-danger border border-light">
+                !
+                <span class="visually-hidden">unread messages</span>
+            </span>
+        }
+    </a>
+
+    @if (showDropdown)
+    {
+        <div class="dropdown-menu dropdown-menu-right shadow-lg show" style="position: absolute; top: 45px; right: 10px; width: 350px; z-index: 1050;">
+            <div class="px-3 py-2 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">Powiadomienia</h6>
+                @if (notifications.Any())
+                {
+                    <a href="#" @onclick="MarkAllAsRead" @onclick:preventDefault="true" style="font-size: 0.8rem;">Oznacz wszystkie jako przeczytane</a>
+                }
+            </div>
+            <div class="dropdown-divider m-0"></div>
+
+            <div style="max-height: 400px; overflow-y: auto;">
+                @if (isLoading)
+                {
+                    <div class="text-center p-3 text-muted">Ładowanie...</div>
+                }
+                else if (!notifications.Any())
+                {
+                    <div class="text-center p-3 text-muted">Brak nowych powiadomień.</div>
+                }
+                @foreach (var notification in notifications)
+                {
+                    <div class="dropdown-item-notification unread" @onclick="() => GoToNotification(notification)">
+                        <div class="text-dark fw-bold">@notification.Message</div>
+                        <div class="small text-muted">@notification.CreatedDate.ToLocalTime().ToString("g")</div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private string? currentUserId;
+    private int unreadCount = 0;
+    private bool isLoading = true;
+    private bool showDropdown = false;
+    private List<Notification> notifications = new();
+
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthStateTask { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateTask;
+        var user = authState.User;
+        currentUserId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        NotificationService.OnChange += HandleNotificationChange;
+
+        if (!string.IsNullOrEmpty(currentUserId))
+        {
+            await LoadNotificationData();
+        }
+        isLoading = false;
+    }
+
+    // Ta metoda jest wywoływana przez serwis (np. gdy powiadomienie przyjdzie w tle)
+    private async void HandleNotificationChange()
+    {
+        await InvokeAsync(async () =>
+        {
+            if (string.IsNullOrEmpty(currentUserId)) return;
+            await LoadNotificationData();
+            StateHasChanged();
+        });
+    }
+
+    // --- POPRAWKA LOGIKI ---
+    private async Task LoadNotificationData()
+    {
+        if (string.IsNullOrEmpty(currentUserId)) return;
+
+        unreadCount = await NotificationService.GetUnreadCountAsync(currentUserId);
+
+        // Teraz dzwoneczek pokazuje ZAWSZE tylko NIEPRZECZYTANE powiadomienia.
+        notifications = await NotificationService.GetNotificationsAsync(currentUserId, includeRead: false);
+        notifications = notifications.Take(10).ToList(); // Pokaż max 10
+    }
+
+    private async Task ToggleDropdown()
+    {
+        showDropdown = !showDropdown;
+        if (showDropdown && !string.IsNullOrEmpty(currentUserId))
+        {
+            isLoading = true;
+            StateHasChanged();
+            await LoadNotificationData(); // Przeładuj listę przy każdym otwarciu
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    // --- POPRAWKA LOGIKI ---
+    private async Task MarkAllAsRead()
+    {
+        if (string.IsNullOrEmpty(currentUserId)) return;
+
+        // 1. Zaktualizuj bazę danych (w tle)
+        await NotificationService.MarkAsReadAsync(currentUserId);
+
+        // 2. Serwis powiadomień (NotificationService) wywoła zdarzenie OnChange.
+        // 3. Zdarzenie OnChange uruchomi HandleNotificationChange().
+        // 4. HandleNotificationChange() uruchomi LoadNotificationData().
+        // 5. LoadNotificationData() pobierze 0 nieprzeczytanych powiadomień.
+        // 6. UI automatycznie się odświeży i pokaże pustą listę.
+
+        // Dodatkowo zamykamy menu
+        showDropdown = false;
+    }
+
+    // --- POPRAWKA LOGIKI ---
+    private async Task GoToNotification(Notification notification)
+    {
+        if (string.IsNullOrEmpty(currentUserId)) return;
+
+        // 1. Zaktualizuj bazę danych (w tle)
+        await NotificationService.MarkAsReadAsync(currentUserId, notification.Id);
+
+        // 2. Logika OnChange (jak wyżej) automatycznie odświeży listę
+
+        // 3. Zamykamy menu i przechodzimy do linku
+        showDropdown = false;
+        NavigationManager.NavigateTo(notification.LinkUrl ?? "/");
+    }
+
+    public void Dispose()
+    {
+        NotificationService.OnChange -= HandleNotificationChange;
+    }
+}

@@ -1,0 +1,297 @@
+﻿@page "/Account/Manage/MyCV"
+@rendermode InteractiveServer
+
+@using System.Security.Claims
+@using JobSearch.Data
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.Forms
+
+@inject IDbContextFactory<ApplicationDbContext> DbContextFactory
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Moje CV</PageTitle>
+
+<h3>Kreator CV</h3>
+
+@if (isLoading)
+{
+    <p><em>Ładowanie...</em></p>
+}
+else if (cv == null)
+{
+    <div class="alert alert-info">Nie masz jeszcze utworzonego profilu CV.</div>
+    <button class="btn btn-primary" @onclick="CreateCvProfile">Stwórz profil CV</button>
+}
+else
+{
+    <EditForm Model="cv" OnValidSubmit="SaveProfile" FormName="cv-profile">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" />
+
+        @if (!string.IsNullOrEmpty(saveStatusMessage))
+        {
+            <div class="alert alert-success" role="alert">@saveStatusMessage</div>
+        }
+
+        <h4 class="mt-4">Dane do e-CV</h4>
+        <div class="card card-body">
+
+            <label class="form-label fw-bold">Lata doświadczenia</label>
+            <div class="cv-button-group mb-3">
+                <label class="btn cv-btn-outline @(cv.ExperienceYears == ExperienceYearsRange.Zero ? "active" : "")" @onclick="() => { cv.ExperienceYears = ExperienceYearsRange.Zero; StateHasChanged(); }"><strong>0</strong> lat</label>
+                <label class="btn cv-btn-outline @(cv.ExperienceYears == ExperienceYearsRange.LessThanOne ? "active" : "")" @onclick="() => { cv.ExperienceYears = ExperienceYearsRange.LessThanOne; StateHasChanged(); }"><strong>&lt;1</strong> rok</label>
+                <label class="btn cv-btn-outline @(cv.ExperienceYears == ExperienceYearsRange.OneToThree ? "active" : "")" @onclick="() => { cv.ExperienceYears = ExperienceYearsRange.OneToThree; StateHasChanged(); }"><strong>1-3</strong> lata</label>
+                <label class="btn cv-btn-outline @(cv.ExperienceYears == ExperienceYearsRange.ThreePlus ? "active" : "")" @onclick="() => { cv.ExperienceYears = ExperienceYearsRange.ThreePlus; StateHasChanged(); }"><strong>3+</strong> lat</label>
+            </div>
+
+            <label class="form-label fw-bold">Status edukacji</label>
+            <div class="cv-button-group mb-3">
+                <label class="btn cv-btn-outline @(cv.EducationStatus == EducationStatus.Student ? "active" : "")" @onclick="() => { cv.EducationStatus = EducationStatus.Student; StateHasChanged(); }"><strong>Student</strong></label>
+                <label class="btn cv-btn-outline @(cv.EducationStatus == EducationStatus.Absolwent ? "active" : "")" @onclick="() => { cv.EducationStatus = EducationStatus.Absolwent; StateHasChanged(); }"><strong>Absolwent</strong></label>
+                <label class="btn cv-btn-outline @(cv.EducationStatus == EducationStatus.Inne ? "active" : "")" @onclick="() => { cv.EducationStatus = EducationStatus.Inne; StateHasChanged(); }"><strong>Inne</strong></label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="cv.FieldOfStudy" class="form-control" placeholder="Kierunek studiów" />
+                <label>Kierunek studiów</label>
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="cv.University" class="form-control" placeholder="Uczelnia" />
+                <label>Uczelnia</label>
+            </div>
+
+            <label class="form-label fw-bold">Znajomość języków i umiejętności</label>
+            @foreach (var lang in cv.Languages.ToList())
+            {
+                <div class="d-flex gap-2 mb-2">
+                    <input value="@lang.LanguageName" class="form-control" readonly />
+                    <input value="@lang.LanguageLevel" class="form-control" readonly />
+                    <button type="button" class="btn btn-danger" @onclick="() => DeleteLanguage(lang)">Usuń</button>
+                </div>
+            }
+
+            <div class="d-flex gap-2 mb-3">
+                <InputSelect @bind-Value="newLanguage.LanguageName" class="form-select">
+                    <option value="">-- Wybierz język --</option>
+                    @foreach (var lang in commonLanguages)
+                    {
+                        <option value="@lang">@lang</option>
+                    }
+                </InputSelect>
+
+                <InputSelect @bind-Value="newLanguage.LanguageLevel" class="form-select">
+                    <option value="">-- Wybierz poziom --</option>
+                    @foreach (var level in languageLevels)
+                    {
+                        <option value="@level">@level</option>
+                    }
+                </InputSelect>
+                <button type="button" class="btn btn-success" @onclick="SaveNewLanguage">Dodaj</button>
+            </div>
+            <label class="form-label fw-bold">Dodatkowe umiejętności</label>
+            <div class="d-flex flex-wrap gap-2 mb-2">
+                @foreach (var skill in cv.Skills.ToList())
+                {
+                    <span class="badge bg-secondary d-flex align-items-center gap-1 fs-6">
+                        @skill.SkillName
+                        <button type="button" class="btn-close btn-close-white" style="font-size: 0.5rem;" @onclick="() => DeleteSkill(skill)"></button>
+                    </span>
+                }
+            </div>
+            <div class="input-group mb-3">
+                <InputText @bind-Value="newSkillName" class="form-control" placeholder="Wpisz umiejętność (np. C#) i kliknij Dodaj" />
+                <button type="button" class="btn btn-success" @onclick="SaveNewSkill">Dodaj</button>
+            </div>
+        </div>
+
+        <h4 class="mt-4">Preferencje</h4>
+        <div class="card card-body">
+            <div class="mb-3">
+                <label class="form-label">Preferowane kategorie (oddzielone przecinkami)</label>
+                <InputTextArea @bind-Value="cv.PreferredCategories" class="form-control" placeholder="IT - Mobile, IT - PM, IT - BI & Data" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Preferowane działy (oddzielone przecinkami)</label>
+                <InputTextArea @bind-Value="cv.PreferredDepartments" class="form-control" placeholder="IT, Finanse, HR" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Preferowane lokalizacje (oddzielone przecinkami)</label>
+                <InputTextArea @bind-Value="cv.PreferredLocations" class="form-control" placeholder="Poznań, Zdalnie" />
+            </div>
+
+            <label class="form-label fw-bold">Czy chcesz pracować zdalnie?</label>
+            <div class="cv-button-group mb-3">
+                <label class="btn cv-btn-outline @(cv.RemoteWork == WorkPreference.Nie ? "active" : "")" @onclick="() => { cv.RemoteWork = WorkPreference.Nie; StateHasChanged(); }">Nie</label>
+                <label class="btn cv-btn-outline @(cv.RemoteWork == WorkPreference.Tak ? "active" : "")" @onclick="() => { cv.RemoteWork = WorkPreference.Tak; StateHasChanged(); }">Tak</label>
+                <label class="btn cv-btn-outline @(cv.RemoteWork == WorkPreference.Obojętnie ? "active" : "")" @onclick="() => { cv.RemoteWork = WorkPreference.Obojętnie; StateHasChanged(); }">Obojętnie</label>
+            </div>
+
+            <label class="form-label fw-bold">Czy dopuszczasz możliwość relokacji?</label>
+            <div class="cv-button-group mb-3">
+                <label class="btn cv-btn-outline @(cv.Relocation == WorkPreference.Nie ? "active" : "")" @onclick="() => { cv.Relocation = WorkPreference.Nie; StateHasChanged(); }">Nie</label>
+                <label class="btn cv-btn-outline @(cv.Relocation == WorkPreference.Tak ? "active" : "")" @onclick="() => { cv.Relocation = WorkPreference.Tak; StateHasChanged(); }">Tak</label>
+                <label class="btn cv-btn-outline @(cv.Relocation == WorkPreference.Obojętnie ? "active" : "")" @onclick="() => { cv.Relocation = WorkPreference.Obojętnie; StateHasChanged(); }">Obojętnie</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="cv.LinkedInUrl" class="form-control" placeholder="Link do LinkedIn" />
+                <label>Link do LinkedIn</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="cv.CvFileUrl" class="form-control" placeholder="Link do pliku CV (np. Dropbox, Google Drive)" />
+                <label>Link do pliku CV (np. Dropbox, Google Drive)</label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg w-100 mt-4">Zapisz cały profil CV</button>
+    </EditForm>
+}
+
+@code {
+    private bool isLoading = true;
+    private string? currentUserId;
+    private UserProfileCV? cv;
+    private string? saveStatusMessage;
+
+    private CVLanguage newLanguage = new();
+    private string newSkillName = string.Empty;
+
+    // --- DODANO LISTY DLA DROPDOWNÓW ---
+    private List<string> languageLevels = new List<string> { "A1", "A2", "B1", "B2", "C1", "C2" };
+    private List<string> commonLanguages = new List<string>
+    {
+        "Polski", "Angielski", "Niemiecki", "Francuski", "Hiszpański",
+        "Włoski", "Ukraiński", "Rosyjski", "Czeski", "Słowacki",
+        "Niderlandzki", "Szwedzki", "Norweski", "Duński", "Portugalski"
+    };
+
+    // Metoda pomocnicza do ładowania danych
+    private async Task LoadCvData()
+    {
+        if (string.IsNullOrEmpty(currentUserId)) return;
+
+        await using var context = await DbContextFactory.CreateDbContextAsync();
+        cv = await context.UserProfileCVs
+            .Include(c => c.Languages)
+            .Include(c => c.Skills)
+            .FirstOrDefaultAsync(c => c.UserId == currentUserId);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        currentUserId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(currentUserId))
+        {
+            NavigationManager.NavigateTo("Account/Login");
+            return;
+        }
+
+        await LoadCvData();
+        isLoading = false;
+    }
+
+    private async Task CreateCvProfile()
+    {
+        if (string.IsNullOrEmpty(currentUserId)) return;
+
+        await using var context = await DbContextFactory.CreateDbContextAsync();
+
+        var newCv = new UserProfileCV
+            {
+                UserId = currentUserId
+            };
+        context.UserProfileCVs.Add(newCv);
+        await context.SaveChangesAsync();
+
+        cv = newCv;
+        cv.Languages = new List<CVLanguage>();
+        cv.Skills = new List<CVSkill>();
+    }
+
+    private async Task SaveProfile()
+    {
+        if (cv == null) return;
+
+        await using var context = await DbContextFactory.CreateDbContextAsync();
+
+        context.UserProfileCVs.Update(cv);
+
+        await context.SaveChangesAsync();
+        saveStatusMessage = "Profil CV został zaktualizowany!";
+
+        await LoadCvData();
+    }
+
+    private async Task SaveNewLanguage()
+    {
+        if (cv == null || string.IsNullOrWhiteSpace(newLanguage.LanguageName) || string.IsNullOrWhiteSpace(newLanguage.LanguageLevel)) return;
+
+        await using var context = await DbContextFactory.CreateDbContextAsync();
+
+        var lang = new CVLanguage
+            {
+                UserProfileCVId = cv.Id,
+                LanguageName = newLanguage.LanguageName,
+                LanguageLevel = newLanguage.LanguageLevel
+            };
+
+        context.CVLanguages.Add(lang);
+        await context.SaveChangesAsync();
+
+        newLanguage = new();
+        await LoadCvData();
+        StateHasChanged();
+    }
+
+    private async Task DeleteLanguage(CVLanguage lang)
+    {
+        if (cv == null) return;
+
+        await using var context = await DbContextFactory.CreateDbContextAsync();
+
+        context.CVLanguages.Remove(lang);
+        await context.SaveChangesAsync();
+
+        await LoadCvData();
+        StateHasChanged();
+    }
+
+    private async Task SaveNewSkill()
+    {
+        if (cv == null || string.IsNullOrWhiteSpace(newSkillName)) return;
+
+        await using var context = await DbContextFactory.CreateDbContextAsync();
+
+        var skill = new CVSkill
+            {
+                UserProfileCVId = cv.Id,
+                SkillName = newSkillName
+            };
+
+        context.CVSkills.Add(skill);
+        await context.SaveChangesAsync();
+
+        newSkillName = string.Empty;
+        await LoadCvData();
+        StateHasChanged();
+    }
+
+    private async Task DeleteSkill(CVSkill skill)
+    {
+        if (cv == null) return;
+
+        await using var context = await DbContextFactory.CreateDbContextAsync();
+
+        context.CVSkills.Remove(skill);
+        await context.SaveChangesAsync();
+
+        await LoadCvData();
+        StateHasChanged();
+    }
+}

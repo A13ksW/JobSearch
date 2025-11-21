@@ -1,0 +1,418 @@
+﻿@page "/my-offers/edit/{Id:int}"
+@using JobSearch.Data
+@using JobSearch.Services
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+
+@inject IJobOfferService JobOfferService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IGeoLocationService GeoLocationService
+
+@rendermode InteractiveServer
+@attribute [Authorize]
+
+<PageTitle>Edytuj Ofertę</PageTitle>
+
+@if (JobOffer is null)
+
+{
+    <p><em>Ładowanie...</em></p>
+}
+
+else
+
+{
+    <div class="page-card p-4">
+        <h3 class="card-title mb-4">Edytuj ofertę pracy</h3>
+        <hr />
+
+        <EditForm method="post" Model="JobOffer" OnValidSubmit="UpdateJobOffer" FormName="edit" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert" />
+            <input type="hidden" name="JobOffer.Id" value="@JobOffer.Id" />
+
+            <h5 class="mb-3 text-primary">Dane firmy</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="nip" class="form-label">NIP Firmy (nieedytowalny):</label>
+                    <InputText id="nip" @bind-Value="JobOffer.Nip" class="form-control" ReadOnly="true" />
+                </div>
+                <div class="col-md-6">
+                    <label for="companyname" class="form-label">Nazwa firmy (nieedytowalna):</label>
+                    <InputText id="companyname" @bind-Value="JobOffer.CompanyName" class="form-control" ReadOnly="true" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Branża</label>
+                    <InputSelect class="form-select" @bind-Value="JobOffer.IndustryCategory">
+                        <option value="">-- wybierz branżę --</option>
+                        @foreach (IndustryCategory category in Enum.GetValues(typeof(IndustryCategory)))
+                        {
+
+                            if (category == IndustryCategory.None) continue;
+                            <option value="@category">@GetIndustryLabel(category)</option>
+                        }
+                    </InputSelect>
+                </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <h5 class="mb-3 text-primary">Szczegóły oferty</h5>
+            <div class="mb-3">
+                <label for="title" class="form-label">Tytuł stanowiska</label>
+                <InputText id="title" @bind-Value="JobOffer.Title" class="form-control" aria-required="true" maxlength="80" />
+                <ValidationMessage For="() => JobOffer.Title" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">Opis stanowiska</label>
+                <InputTextArea id="description" @bind-Value="JobOffer.Description" class="form-control" rows="5" aria-required="true" maxlength="500" />
+                <ValidationMessage For="() => JobOffer.Description" class="text-danger" />
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label for="offerLocation" class="form-label">Lokalizacja</label>
+                    <div class="position-relative">
+                        <input id="offerLocation"
+                               class="form-control"
+                               value="@JobOffer.Location"
+                               placeholder="np. Warszawa lub Zdalnie"
+                               maxlength="100"
+                               @oninput="OnOfferLocationInput"
+                               @onfocus="ShowOfferLocationSuggestions"
+                               @onblur="HideOfferLocationSuggestionsDelayed" />
+
+                        @if (showOfferLocationSuggestions && offerLocationSuggestions.Any())
+
+                        {
+                            <ul class="list-group position-absolute w-100 shadow-sm" style="z-index:1000; max-height:250px; overflow-y:auto;">
+                                @foreach (var suggestion in offerLocationSuggestions)
+
+                                {
+                                    <li class="list-group-item list-group-item-action" style="cursor:pointer" @onclick="@(() => SelectOfferLocationSuggestion(suggestion))">
+                                        @suggestion
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                    <ValidationMessage For="() => JobOffer.Location" class="text-danger" />
+                </div>
+
+                <div class="col-md-6">
+                    <label for="contactinfo" class="form-label">Email kontaktowy</label>
+                    <InputText id="contactinfo" @bind-Value="JobOffer.ContactInfo" class="form-control" aria-required="true" maxlength="250" />
+                    <ValidationMessage For="() => JobOffer.ContactInfo" class="text-danger" />
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <label for="empltype" class="form-label">Rodzaj zatrudnienia</label>
+                    <InputSelect id="empltype" @bind-Value="JobOffer.EmplType" class="form-control" aria-required="true">
+                        <option value="">-- wybierz --</option>
+                        @foreach (var type in Enum.GetValues(typeof(EmploymentType)).Cast<EmploymentType>())
+                        {
+                            <option value="@type">@type</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => JobOffer.EmplType" class="text-danger" />
+                </div>
+                <div class="col-md-4">
+                    <label for="jobtype" class="form-label">Tryb pracy</label>
+                    <InputSelect id="jobtype" @bind-Value="JobOffer.JobType" class="form-control" aria-required="true">
+                        <option value="">-- wybierz --</option>
+                        @foreach (var type in Enum.GetValues(typeof(JobType)).Cast<JobType>())
+                        {
+                            <option value="@type">@type</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => JobOffer.JobType" class="text-danger" />
+                </div>
+                <div class="col-md-4">
+                    <label for="applicationdeadline" class="form-label">Ważna do</label>
+                    <InputDate id="applicationdeadline" @bind-Value="JobOffer.ApplicationDeadline" class="form-control" min="@today" />
+                    <ValidationMessage For="() => JobOffer.ApplicationDeadline" class="text-danger" />
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label for="salarymin" class="form-label">Wynagrodzenie (min)</label>
+                    <InputNumber id="salarymin" @bind-Value="JobOffer.SalaryMin" class="form-control" />
+                    <ValidationMessage For="() => JobOffer.SalaryMin" class="text-danger" />
+                </div>
+                <div class="col-md-6">
+                    <label for="salarymax" class="form-label">Wynagrodzenie (max)</label>
+                    <InputNumber id="salarymax" @bind-Value="JobOffer.SalaryMax" class="form-control" />
+                    <ValidationMessage For="() => JobOffer.SalaryMax" class="text-danger" />
+                </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <h5 class="mb-3 text-primary">Wymagania i Benefity</h5>
+
+            <div class="mb-3">
+                <label for="requirements" class="form-label">Wymagania</label>
+                <InputTextArea id="requirements" @bind-Value="JobOffer.Requirements" class="form-control" rows="5" aria-required="true" maxlength="500" />
+                <ValidationMessage For="() => JobOffer.Requirements" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Dodatkowe opcje (zaznacz):</label>
+                <div class="d-flex flex-wrap gap-3">
+                    <div class="form-check">
+                        <InputCheckbox id="reqExp" @bind-Value="JobOffer.RequiresExperience" class="form-check-input" />
+                        <label class="form-check-label" for="reqExp">Wymagane doświadczenie</label>
+                    </div>
+                    <div class="form-check">
+                        <InputCheckbox id="isOnline" @bind-Value="JobOffer.IsOnlineRecruitment" class="form-check-input" />
+                        <label class="form-check-label" for="isOnline">Rekrutacja online</label>
+                    </div>
+                    <div class="form-check">
+                        <InputCheckbox id="reqSanitary" @bind-Value="JobOffer.RequiresSanitaryBook" class="form-check-input" />
+                        <label class="form-check-label" for="reqSanitary">Książeczka sanepid.</label>
+                    </div>
+                    <div class="form-check">
+                        <InputCheckbox id="reqStudent" @bind-Value="JobOffer.RequiresStudentStatus" class="form-check-input" />
+                        <label class="form-check-label" for="reqStudent">Status studenta</label>
+                    </div>
+                    <div class="form-check">
+                        <InputCheckbox id="reqDisability" @bind-Value="JobOffer.RequiresDisabilityCertificate" class="form-check-input" />
+                        <label class="form-check-label" for="reqDisability">Orzeczenie o niepełnosp.</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="benefits" class="form-label">Benefity (opcjonalnie)</label>
+                <InputText id="benefits" @bind-Value="JobOffer.Benefits" class="form-control" maxlength="200" />
+                <ValidationMessage For="() => JobOffer.Benefits" class="text-danger" />
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                <a href="/my-offers" class="btn btn-outline-secondary me-md-2">Anuluj</a>
+                <button type="submit" class="btn btn-primary">Zapisz zmiany i wyślij do weryfikacji</button>
+            </div>
+        </EditForm>
+    </div>
+}
+
+@code {
+    [Parameter]
+
+    public int Id { get; set; }
+
+
+
+    [SupplyParameterFromForm]
+
+    private JobOffer? JobOffer { get; set; }
+
+
+
+    private string? currentUserId;
+
+    private string today = DateTime.Now.ToString("yyyy-MM-dd");
+
+
+
+    private List<string> offerLocationSuggestions = new();
+
+    private bool showOfferLocationSuggestions = false;
+
+
+
+    protected override async Task OnParametersSetAsync()
+
+    {
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        currentUserId = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+
+
+        if (string.IsNullOrEmpty(currentUserId))
+
+        {
+
+            NavigationManager.NavigateTo("Account/Login");
+
+            return;
+
+        }
+
+
+
+        JobOffer ??= await JobOfferService.GetByIdAsync(Id);
+
+
+
+        if (JobOffer is null || JobOffer.CreatedByUserId != currentUserId)
+
+        {
+
+            NavigationManager.NavigateTo("/my-offers");
+
+            return;
+
+        }
+
+    }
+
+
+
+    private async Task UpdateJobOffer()
+
+    {
+
+        if (JobOffer is null) return;
+
+
+
+        // Serwis sam zmieni status na Weryfikacja
+
+        await JobOfferService.UpdateAsync(JobOffer);
+
+        NavigationManager.NavigateTo("/my-offers");
+
+    }
+
+
+
+    // --- HELPER BRANŻY ---
+
+    private string GetIndustryLabel(IndustryCategory category) => category switch
+
+    {
+
+        IndustryCategory.Sprzedaz => "Sprzedaż",
+
+        IndustryCategory.Marketing => "Marketing",
+
+        IndustryCategory.Finanse => "Finanse",
+
+        IndustryCategory.Bankowosc => "Bankowość",
+
+        IndustryCategory.ObslugaKlienta => "Obsługa klienta",
+
+        IndustryCategory.ZdrowieIUroda => "Zdrowie i uroda",
+
+        IndustryCategory.Gastronomia => "Gastronomia",
+
+        IndustryCategory.Turystyka => "Turystyka",
+
+        IndustryCategory.Zarzadzanie => "Zarządzanie",
+
+        IndustryCategory.PracaWSklepie => "Praca w sklepie",
+
+        IndustryCategory.Budownictwo => "Budownictwo",
+
+        IndustryCategory.Produkcja => "Produkcja",
+
+        IndustryCategory.Nieruchomosci => "Nieruchomości",
+
+        IndustryCategory.Edukacja => "Edukacja",
+
+        IndustryCategory.Logistyka => "Logistyka",
+
+        IndustryCategory.HR => "HR",
+
+        IndustryCategory.Design => "Design",
+
+        IndustryCategory.BIData => "BI & Data",
+
+        IndustryCategory.PracaBiurowa => "Praca biurowa",
+
+        IndustryCategory.Consulting => "Consulting",
+
+        IndustryCategory.Media => "Media",
+
+        IndustryCategory.Prawo => "Prawo",
+
+        IndustryCategory.IT => "IT",
+
+        _ => category.ToString()
+
+    };
+
+
+
+    // --- AUTOCOMPLETE LOKALIZACJI ---
+
+    private async Task OnOfferLocationInput(ChangeEventArgs e)
+
+    {
+
+        var text = e.Value?.ToString() ?? string.Empty;
+
+        if (JobOffer is not null) JobOffer.Location = text;
+
+
+
+        if (!string.IsNullOrWhiteSpace(text) && text.Length >= 2)
+
+        {
+
+            var suggestions = await GeoLocationService.SuggestLocationsAsync(text, 10);
+
+            offerLocationSuggestions = suggestions.Select(s => s.DisplayName).Distinct().ToList();
+
+            showOfferLocationSuggestions = offerLocationSuggestions.Any();
+
+        }
+
+        else
+
+        {
+
+            offerLocationSuggestions.Clear();
+
+            showOfferLocationSuggestions = false;
+
+        }
+
+    }
+
+
+
+    private void ShowOfferLocationSuggestions()
+
+    {
+
+        if (offerLocationSuggestions.Any()) showOfferLocationSuggestions = true;
+
+    }
+
+
+
+    private async Task HideOfferLocationSuggestionsDelayed()
+
+    {
+
+        await Task.Delay(200);
+
+        showOfferLocationSuggestions = false;
+
+        StateHasChanged();
+
+    }
+
+
+
+    private void SelectOfferLocationSuggestion(string suggestion)
+
+    {
+
+        if (JobOffer is not null) JobOffer.Location = suggestion;
+
+        showOfferLocationSuggestions = false;
+
+    }
+}

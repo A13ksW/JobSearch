@@ -1,0 +1,62 @@
+﻿.bi-bell-fill {
+    display: inline-block;
+    position: relative;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.75rem;
+    top: -1px;
+    background-size: cover;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' class='bi bi-bell-fill' viewBox='0 0 16 16'%3E%3Cpath d='M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2m.995-14.901a1 1 0 1 0-1.99 0A5 5 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901'/%3E%3C/svg%3E");
+}
+
+.top-row-bell {
+    color: #ffffff;
+    text-decoration: none;
+    padding-top: 0.25rem;
+    transition: color 0.2s;
+}
+
+    .top-row-bell:hover {
+        text-decoration: none;
+        color: #e0e0e0;
+    }
+
+/* --- Styl dla menu powiadomień --- */
+.dropdown-menu-right {
+    right: 0;
+    left: auto;
+    border-radius: 0.25rem;
+    /* POPRAWKA: Wymuszenie ciemnego tekstu w menu */
+    color: #212529 !important;
+}
+
+.dropdown-item-notification {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e9ecef;
+    cursor: pointer;
+    white-space: normal;
+    color: #212529; /* Ciemny tekst */
+}
+
+    .dropdown-item-notification:hover {
+        background-color: #f8f9fa;
+    }
+
+/* Link "Oznacz wszystkie jako przeczytane" */
+.dropdown-menu-right a {
+    color: #0d6efd !important; /* Niebieski link */
+    text-decoration: none;
+}
+
+    .dropdown-menu-right a:hover {
+        text-decoration: underline;
+    }
+
+/* Podświetlenie nieprzeczytanych */
+.dropdown-item-notification.unread {
+    background-color: #f0f8ff;
+}
+
+.dropdown-item-notification:last-child {
+    border-bottom: 0;
+}

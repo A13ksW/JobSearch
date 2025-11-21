@@ -1,0 +1,26 @@
+﻿.cv-button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+    /* Styl dla 'guzika' który jest labelką */
+    .cv-button-group .cv-btn-outline {
+        border: 1px solid #ced4da;
+        border-radius: 20px;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+        background-color: #fff;
+    }
+
+        .cv-button-group .cv-btn-outline:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Kiedy labelka ma klasę .active (nadawaną przez @onclick), zmienia styl */
+        .cv-button-group .cv-btn-outline.active {
+            background-color: #212529; /* Ciemny (jak na zrzucie) */
+            color: #fff;
+            border-color: #212529;
+        }

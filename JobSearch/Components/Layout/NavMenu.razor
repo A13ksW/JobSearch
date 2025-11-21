@@ -1,0 +1,146 @@
+﻿@implements IDisposable
+@using Microsoft.AspNetCore.Identity
+@using JobSearch.Data
+@using JobSearch.Components.Layout
+
+@inject NavigationManager NavigationManager
+@inject SignInManager<ApplicationUser> SignInManager
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">JobSearch</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="flex-column">
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Strona Główna
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="offers">
+                <span class="bi bi-search" aria-hidden="true"></span> Przeglądaj Oferty
+            </NavLink>
+        </div>
+
+        <AuthorizeView>
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="my-offers">
+                        <span class="bi bi-briefcase-fill-nav-menu" aria-hidden="true"></span> Moje Oferty
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="my-applications">
+                        <span class="bi bi-file-earmark-text-fill" aria-hidden="true"></span> Moje Aplikacje
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="Account/Manage">
+                        <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Mój Profil
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="salary-calculator">
+                        <span class="bi bi-calculator-fill-nav-menu" aria-hidden="true"></span> Kalkulator
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <form action="Account/Logout" method="post">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                        <button type="submit" class="nav-link">
+                            <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Wyloguj
+                        </button>
+                    </form>
+                </div>
+            </Authorized>
+
+            <NotAuthorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="Account/Register">
+                        <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Rejestracja
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="Account/Login">
+                        <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Logowanie
+                    </NavLink>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
+
+        <AuthorizeView Roles="Admin,Moderator">
+            <div class="nav-item px-3 mt-4 border-top border-secondary pt-2">
+                <small class="text-muted ms-3 text-uppercase fw-bold" style="font-size: 0.7rem;">Moderacja</small>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/joboffers">
+                    <span class="bi bi-briefcase-fill-nav-menu" aria-hidden="true"></span> Zarządzaj Ofertami
+                </NavLink>
+            </div>
+        </AuthorizeView>
+
+        <AuthorizeView Roles="Admin">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="Admin/Users">
+                    <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Użytkownicy
+                </NavLink>
+            </div>
+        </AuthorizeView>
+
+    </nav>
+</div>
+
+@code {
+    private string? currentUrl;
+
+    private bool hasExternalLogins;
+
+
+
+    protected override async Task OnInitializedAsync()
+
+    {
+
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+
+        NavigationManager.LocationChanged += OnLocationChanged;
+
+        hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+
+    }
+
+
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+
+    {
+
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+
+        StateHasChanged();
+
+    }
+
+
+
+    public void Dispose()
+
+    {
+
+        NavigationManager.LocationChanged -= OnLocationChanged;
+
+    }
+}

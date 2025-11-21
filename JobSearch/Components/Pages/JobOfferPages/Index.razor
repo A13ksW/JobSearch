@@ -1,0 +1,514 @@
+﻿@page "/joboffers"
+@rendermode InteractiveServer
+@using JobSearch.Data
+@using JobSearch.Services
+@using Microsoft.AspNetCore.Authorization
+@inject IJobOfferService JobOfferService
+@inject IGeoLocationService GeoLocationService
+@attribute [Authorize(Roles = "Admin,Moderator")]
+
+<PageTitle>Panel Moderacji Ofert</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Panel Moderacji Ofert</h1>
+    <a href="/joboffers/create" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Dodaj nową ofertę
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">Filtruj i sortuj</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6 col-lg-3">
+                <label for="locationFilter" class="form-label">Lokalizacja</label>
+                <div class="position-relative">
+                    <input id="locationFilter"
+                           class="form-control"
+                           value="@locationFilter"
+                           placeholder="np. Warszawa"
+                           @oninput="OnLocationInput"
+                           @onfocus="ShowLocationSuggestions"
+                           @onblur="HideLocationSuggestionsDelayed" />
+
+                    @if (showLocationSuggestions && locationSuggestions.Any())
+
+                    {
+                        <ul class="list-group position-absolute w-100 shadow-sm"
+                            style="z-index:1000; max-height:250px; overflow-y:auto;">
+                            @foreach (var suggestion in locationSuggestions)
+
+                            {
+                                <li class="list-group-item list-group-item-action"
+                                    style="cursor: pointer;"
+                                    @onclick="@(() => SelectLocationSuggestion(suggestion))">
+                                    @suggestion
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <label for="employmentTypeFilter" class="form-label">Rodzaj zatrudnienia</label>
+                <InputSelect id="employmentTypeFilter" @bind-Value="employmentTypeFilter" class="form-select">
+                    <option value="">Wszystkie</option>
+                    @foreach (var type in Enum.GetValues(typeof(EmploymentType)))
+
+                    {
+                        <option value="@type">@type</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <label for="industryFilter" class="form-label">Branża</label>
+                <InputSelect id="industryFilter" class="form-select" @bind-Value="selectedIndustryCategory">
+                    <option value="">Wszystkie branże</option>
+                    @foreach (var category in Enum.GetValues(typeof(IndustryCategory)).Cast<IndustryCategory>())
+
+                    {
+                        if (category == IndustryCategory.None) continue;
+                        <option value="@category">@GetIndustryLabel(category)</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <label for="jobTypeFilter" class="form-label">Tryb pracy</label>
+                <InputSelect id="jobTypeFilter" @bind-Value="jobTypeFilter" class="form-select">
+                    <option value="">Wszystkie</option>
+                    @foreach (var type in Enum.GetValues(typeof(JobType)))
+
+                    {
+                        <option value="@type">@type</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <label for="statusFilter" class="form-label">Status oferty</label>
+                <InputSelect id="statusFilter" @bind-Value="statusFilter" class="form-select">
+                    <option value="">Wszystkie</option>
+                    @foreach (var status in Enum.GetValues(typeof(OfferStatus)))
+
+                    {
+                        <option value="@status">@status</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <label for="salaryFilter" class="form-label">Min. wynagrodzenie</label>
+                <InputNumber id="salaryFilter" @bind-Value="minSalaryFilter" class="form-control" placeholder="np. 5000" />
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <label for="sortBy" class="form-label">Sortuj według</label>
+                <select id="sortBy" @bind="sortBy" class="form-select">
+                    <option value="date_desc">Najnowsze</option>
+                    <option value="salary_desc">Wynagrodzenie (najwyższe)</option>
+                    <option value="salary_asc">Wynagrodzenie (najniższe)</option>
+                </select>
+            </div>
+
+            <div class="col-md-6 col-lg-3 align-self-end">
+                <div class="d-grid gap-2 d-md-flex">
+                    <button class="btn btn-success flex-fill" @onclick="ApplyFilters">Filtruj</button>
+                    <button class="btn btn-secondary flex-fill" @onclick="ClearFilters">Wyczyść</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <button type="button" class="btn btn-link p-0 text-decoration-none" @onclick="ToggleAdvancedFilters">
+                @(showAdvancedFilters ? "▲ Ukryj dodatkowe filtry" : "▼ Pokaż dodatkowe filtry")
+            </button>
+        </div>
+
+        @if (showAdvancedFilters)
+
+        {
+            <div class="row g-3 mt-1 border-top pt-3">
+                <div class="col-md-4">
+                    <div class="form-check">
+                        <InputCheckbox id="filterExperience" class="form-check-input" @bind-Value="onlyWithExperience" />
+                        <label class="form-check-label" for="filterExperience">Wymagane doświadczenie</label>
+                    </div>
+                    <div class="form-check">
+                        <InputCheckbox id="filterOnlineRecruitment" class="form-check-input" @bind-Value="onlyOnlineRecruitment" />
+                        <label class="form-check-label" for="filterOnlineRecruitment">Rekrutacja online</label>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label d-block fw-bold">Specjalne wymagania:</label>
+                    <div class="d-flex flex-wrap gap-3">
+                        <div class="form-check">
+                            <InputCheckbox id="filterSanitaryBook" class="form-check-input" @bind-Value="onlyWithSanitaryBook" />
+                            <label class="form-check-label" for="filterSanitaryBook">Książeczka sanepid.</label>
+                        </div>
+                        <div class="form-check">
+                            <InputCheckbox id="filterStudentStatus" class="form-check-input" @bind-Value="onlyWithStudentStatus" />
+                            <label class="form-check-label" for="filterStudentStatus">Status studenta</label>
+                        </div>
+                        <div class="form-check">
+                            <InputCheckbox id="filterDisability" class="form-check-input" @bind-Value="onlyWithDisabilityCertificate" />
+                            <label class="form-check-label" for="filterDisability">Orzeczenie o niepełnosp.</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@if (jobOffers == null)
+
+{
+    <p class="text-center py-5"><em>Ładowanie ofert...</em></p>
+}
+
+else if (!jobOffers.Any())
+
+{
+    <div class="alert alert-info text-center">Brak ofert pracy spełniających podane kryteria.</div>
+}
+
+else
+
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+        @foreach (var offer in jobOffers)
+
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title text-primary fw-bold mb-0">@offer.Title</h5>
+                            <span class="badge @GetStatusBadgeClass(offer.Status)">@offer.Status.ToString()</span>
+                        </div>
+                        <h6 class="card-subtitle text-muted mb-3">@offer.CompanyName</h6>
+
+                        <ul class="list-unstyled small mb-3">
+                            <li class="mb-1">
+                                <i class="bi bi-geo-alt-fill text-secondary"></i> <strong>Lokalizacja:</strong> @offer.Location
+                            </li>
+                            <li class="mb-1">
+                                <i class="bi bi-cash-stack text-success"></i> <strong>Płaca:</strong> @offer.SalaryRange
+                            </li>
+                            @if (offer.IndustryCategory.HasValue)
+                            {
+                                <li>
+                                    <i class="bi bi-briefcase text-info"></i> <strong>Branża:</strong> @GetIndustryLabel(offer.IndustryCategory.Value)
+                                </li>
+                            }
+                        </ul>
+
+                        <div class="d-grid">
+                            <a href="@($"/joboffers/details/{offer.Id}")" class="btn btn-outline-primary btn-sm">
+                                Szczegóły / Edytuj
+                            </a>
+                        </div>
+                    </div>
+
+                    @if (offer.Status == OfferStatus.Weryfikacja)
+
+                    {
+                        <div class="card-footer bg-light border-top-0">
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-success btn-sm flex-fill" @onclick="() => ApproveOffer(offer.Id)">
+                                    <i class="bi bi-check-lg"></i> Zatwierdź
+                                </button>
+                                <button class="btn btn-danger btn-sm flex-fill" @onclick="() => RejectOffer(offer.Id)">
+                                    <i class="bi bi-x-lg"></i> Odrzuć
+                                </button>
+                            </div>
+                        </div>
+                    }
+
+                    else
+
+                    {
+                        <div class="card-footer text-muted small">
+                            Dodano: @offer.DatePosted.ToShortDateString()
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<JobOffer>? jobOffers;
+
+
+
+    // Filtry
+
+    private string? locationFilter;
+
+    private decimal? minSalaryFilter;
+
+    private string sortBy = "date_desc";
+
+    private EmploymentType? employmentTypeFilter;
+
+    private JobType? jobTypeFilter;
+
+    private OfferStatus? statusFilter = null; // Domyślnie WSZYSTKIE
+
+
+
+    // Filtry zaawansowane
+
+    private IndustryCategory? selectedIndustryCategory;
+
+    private bool onlyWithExperience;
+
+    private bool onlyOnlineRecruitment;
+
+    private bool onlyWithSanitaryBook;
+
+    private bool onlyWithStudentStatus;
+
+    private bool onlyWithDisabilityCertificate;
+
+    private bool showAdvancedFilters = false;
+
+
+
+    // Autocomplete
+
+    private List<string> locationSuggestions = new();
+
+    private bool showLocationSuggestions = false;
+
+
+
+    private string GetIndustryLabel(IndustryCategory category) => category switch
+
+    {
+
+        IndustryCategory.Sprzedaz => "Sprzedaż",
+
+        IndustryCategory.Marketing => "Marketing",
+
+        IndustryCategory.Finanse => "Finanse",
+
+        IndustryCategory.IT => "IT",
+
+        // ... (reszta mapowań) ...
+
+        _ => category.ToString()
+
+    };
+
+
+
+    protected override async Task OnInitializedAsync()
+
+    {
+
+        await LoadOffers();
+
+    }
+
+
+
+    private async Task OnLocationInput(ChangeEventArgs e)
+
+    {
+
+        var text = e.Value?.ToString() ?? string.Empty;
+
+        locationFilter = text;
+
+
+
+        if (!string.IsNullOrWhiteSpace(text) && text.Length >= 2)
+
+        {
+
+            var suggestions = await GeoLocationService.SuggestLocationsAsync(text, 10);
+
+            locationSuggestions = suggestions.Select(s => s.DisplayName).Distinct().ToList();
+
+            showLocationSuggestions = locationSuggestions.Any();
+
+        }
+
+        else
+
+        {
+
+            locationSuggestions.Clear();
+
+            showLocationSuggestions = false;
+
+        }
+
+    }
+
+
+
+    private void ShowLocationSuggestions() { if (locationSuggestions.Any()) showLocationSuggestions = true; }
+
+
+
+    private async Task HideLocationSuggestionsDelayed()
+
+    {
+
+        await Task.Delay(200);
+
+        showLocationSuggestions = false;
+
+        StateHasChanged();
+
+    }
+
+
+
+    private void SelectLocationSuggestion(string suggestion)
+
+    {
+
+        locationFilter = suggestion;
+
+        showLocationSuggestions = false;
+
+    }
+
+
+
+    private void ToggleAdvancedFilters() => showAdvancedFilters = !showAdvancedFilters;
+
+
+
+    private async Task ApplyFilters() => await LoadOffers();
+
+
+
+    private async Task ClearFilters()
+
+    {
+
+        locationFilter = null;
+
+        minSalaryFilter = null;
+
+        employmentTypeFilter = null;
+
+        jobTypeFilter = null;
+
+        selectedIndustryCategory = null;
+
+
+
+        onlyWithExperience = false;
+
+        onlyOnlineRecruitment = false;
+
+        onlyWithSanitaryBook = false;
+
+        onlyWithStudentStatus = false;
+
+        onlyWithDisabilityCertificate = false;
+
+
+
+        locationSuggestions.Clear();
+
+        statusFilter = null;
+
+        sortBy = "date_desc";
+
+
+
+        await LoadOffers();
+
+    }
+
+
+
+    private async Task LoadOffers()
+
+    {
+
+        var allOffers = await JobOfferService.GetJobOffersAsync(
+
+            locationFilter, minSalaryFilter, sortBy, employmentTypeFilter, jobTypeFilter, selectedIndustryCategory,
+
+            onlyWithExperience, onlyOnlineRecruitment, onlyWithSanitaryBook, onlyWithStudentStatus, onlyWithDisabilityCertificate
+
+        );
+
+
+
+        if (statusFilter.HasValue)
+
+        {
+
+            jobOffers = allOffers.Where(o => o.Status == statusFilter.Value).ToList();
+
+        }
+
+        else
+
+        {
+
+            jobOffers = allOffers;
+
+        }
+
+        StateHasChanged();
+
+    }
+
+
+
+    private string GetStatusBadgeClass(OfferStatus status) => status switch
+
+    {
+
+        OfferStatus.Opublikowana => "bg-success",
+
+        OfferStatus.Weryfikacja => "bg-warning text-dark",
+
+        OfferStatus.Odrzucona => "bg-danger",
+
+        OfferStatus.Wygasła => "bg-secondary",
+
+        _ => "bg-secondary"
+
+    };
+
+
+
+    private async Task ApproveOffer(int offerId)
+
+    {
+
+        await JobOfferService.ApproveOfferAsync(offerId);
+
+        await LoadOffers();
+
+    }
+
+
+
+    private async Task RejectOffer(int offerId)
+
+    {
+
+        await JobOfferService.RejectOfferAsync(offerId);
+
+        await LoadOffers();
+
+    }
+}
