@@ -98,7 +98,7 @@
                     <label for="location" class="form-label">Lokalizacja</label>
                     <div class="position-relative">
                         <input id="location"
-                               class="form-control"
+                               class="form-control @(!string.IsNullOrEmpty(locationValidationMessage) ? "is-invalid" : "")"
                                value="@JobOffer.Location"
                                placeholder="np. Warszawa"
                                maxlength="100"
@@ -113,11 +113,16 @@
                                 @foreach (var suggestion in offerLocationSuggestions)
 
                                 {
-                                    <li class="list-group-item list-group-item-action" style="cursor:pointer" @onclick="@(() => SelectOfferLocationSuggestion(suggestion))">
+                                    <li class="list-group-item list-group-item-action" style="cursor:pointer" @onmousedown="@(() => SelectOfferLocationSuggestion(suggestion))">
                                         @suggestion
                                     </li>
                                 }
                             </ul>
+                        }
+                        @if (!string.IsNullOrEmpty(locationValidationMessage))
+
+                        {
+                            <div class="invalid-feedback d-block">@locationValidationMessage</div>
                         }
                     </div>
                     <ValidationMessage For="() => JobOffer.Location" class="text-danger" />
@@ -131,8 +136,9 @@
 
             <div class="row g-3 mb-3">
                 <div class="col-md-4">
-                    <label for="dateposted" class="form-label">Data dodania (nieedytowalna)</label>
+                    <label for="dateposted" class="form-label">Data dodania</label>
                     <InputDate id="dateposted" @bind-Value="JobOffer.DatePosted" class="form-control bg-light" ReadOnly="true" />
+                    <ValidationMessage For="() => JobOffer.DatePosted" class="text-danger" />
                 </div>
                 <div class="col-md-4">
                     <label for="applicationdeadline" class="form-label">Ważna do</label>
@@ -243,6 +249,8 @@
 
     private bool showOfferLocationSuggestions = false;
 
+    private string? locationValidationMessage;
+
 
 
     private string GetIndustryLabel(IndustryCategory category) => category switch
@@ -253,47 +261,9 @@
 
         IndustryCategory.Marketing => "Marketing",
 
-        IndustryCategory.Finanse => "Finanse",
-
-        IndustryCategory.Bankowosc => "Bankowość",
-
-        IndustryCategory.ObslugaKlienta => "Obsługa klienta",
-
-        IndustryCategory.ZdrowieIUroda => "Zdrowie i uroda",
-
-        IndustryCategory.Gastronomia => "Gastronomia",
-
-        IndustryCategory.Turystyka => "Turystyka",
-
-        IndustryCategory.Zarzadzanie => "Zarządzanie",
-
-        IndustryCategory.PracaWSklepie => "Praca w sklepie",
-
-        IndustryCategory.Budownictwo => "Budownictwo",
-
-        IndustryCategory.Produkcja => "Produkcja",
-
-        IndustryCategory.Nieruchomosci => "Nieruchomości",
-
-        IndustryCategory.Edukacja => "Edukacja",
-
-        IndustryCategory.Logistyka => "Logistyka",
-
-        IndustryCategory.HR => "HR",
-
-        IndustryCategory.Design => "Design",
-
-        IndustryCategory.BIData => "BI & Data",
-
-        IndustryCategory.PracaBiurowa => "Praca biurowa",
-
-        IndustryCategory.Consulting => "Consulting",
-
-        IndustryCategory.Media => "Media",
-
-        IndustryCategory.Prawo => "Prawo",
-
         IndustryCategory.IT => "IT",
+
+        IndustryCategory.Finanse => "Finanse",
 
         _ => category.ToString()
 
@@ -323,6 +293,40 @@
 
 
 
+        // --- WALIDACJA LOKALIZACJI ---
+
+        if (string.IsNullOrWhiteSpace(JobOffer.Location))
+
+        {
+
+            locationValidationMessage = "Lokalizacja jest wymagana.";
+
+            return;
+
+        }
+
+
+
+        var suggestions = await GeoLocationService.SuggestLocationsAsync(JobOffer.Location, 10);
+
+        var isValidLocation = suggestions.Any(s => s.DisplayName.Equals(JobOffer.Location, StringComparison.OrdinalIgnoreCase));
+
+
+
+        if (!isValidLocation)
+
+        {
+
+            locationValidationMessage = "Wybierz poprawną miejscowość z listy podpowiedzi.";
+
+            return;
+
+        }
+
+        // ----------------------------
+
+
+
         if (JobOffer.Status != OfferStatus.Odrzucona)
 
         {
@@ -348,6 +352,8 @@
         var text = e.Value?.ToString() ?? string.Empty;
 
         if (JobOffer is not null) JobOffer.Location = text;
+
+        locationValidationMessage = null;
 
 
 
@@ -408,6 +414,8 @@
         if (JobOffer is not null) JobOffer.Location = suggestion;
 
         showOfferLocationSuggestions = false;
+
+        locationValidationMessage = null;
 
     }
 }
