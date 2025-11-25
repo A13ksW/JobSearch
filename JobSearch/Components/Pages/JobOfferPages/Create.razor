@@ -15,218 +15,193 @@
 
 <PageTitle>Stwórz nową ofertę</PageTitle>
 
-<div class="page-card p-4">
-    <h3 class="card-title mb-4">Dodaj nową ofertę pracy</h3>
-    <p class="text-muted">Po dodaniu, Twoja oferta zostanie przesłana do weryfikacji przez moderatora.</p>
-    <hr />
+<div class="page-container">
+    <div class="create-card animate-fade-up">
 
-    <EditForm method="post" Model="JobOffer" OnValidSubmit="AddJobOffer" FormName="create" Enhance>
-        <DataAnnotationsValidator />
-        <ValidationSummary class="text-danger" role="alert" />
+        <div class="card-header-block">
+            <h1 class="card-title">Nowa Oferta Pracy</h1>
+            <p class="card-subtitle">Wypełnij dane poniżej, aby rozpocząć rekrutację.</p>
+        </div>
 
-        <h5 class="mb-3 text-primary">1. Dane firmy</h5>
-        <div class="row g-3 mb-4">
-            <div class="col-md-6">
-                <label for="nip" class="form-label">NIP Firmy</label>
-                <div class="input-group">
-                    <InputText id="nip" @bind-Value="JobOffer.Nip" class="form-control" aria-required="true" maxlength="10" ReadOnly="@isNipVerified" placeholder="Wpisz NIP..." />
-                    <button class="btn btn-secondary" type="button" @onclick="HandleNipValidation" disabled="@(isNipValidating || isNipVerified)">
-                        @if (isNipValidating)
-                        {
-                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                        }
-                        else
-                        {
-                            <span>Weryfikuj</span>
-                        }
-                    </button>
-                </div>
-                <ValidationMessage For="() => JobOffer.Nip" class="text-danger" />
-                @if (!string.IsNullOrEmpty(nipValidationMessage))
-                {
-                    <div class="alert @(isNipVerified ? "alert-success" : "alert-danger") mt-2 p-2 small">
-                        @nipValidationMessage
+        <EditForm method="post" Model="JobOffer" OnValidSubmit="AddJobOffer" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <div class="section-label">1. Dane Firmy</div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <label for="nip" class="form-label">NIP Firmy</label>
+                    <div class="input-group">
+                        <InputText id="nip" @bind-Value="JobOffer.Nip" class="form-control" aria-required="true" maxlength="10" ReadOnly="@isNipVerified" placeholder="Wpisz NIP" />
+                        <button class="btn btn-verify" type="button" @onclick="HandleNipValidation" disabled="@(isNipValidating || isNipVerified)">
+                            @(isNipValidating ? "..." : "Weryfikuj")
+                        </button>
                     </div>
-                }
-            </div>
-
-            <div class="col-md-6">
-                <label for="companyname" class="form-label">Nazwa firmy (pobierana automatycznie)</label>
-                <InputText id="companyname" @bind-Value="JobOffer.CompanyName" class="form-control bg-light" aria-required="true" maxlength="500" ReadOnly="true" />
-                <ValidationMessage For="() => JobOffer.CompanyName" class="text-danger" />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">Branża</label>
-                <InputSelect class="form-select" @bind-Value="JobOffer.IndustryCategory">
-                    <option value="">-- wybierz branżę --</option>
-                    @foreach (IndustryCategory category in Enum.GetValues(typeof(IndustryCategory)))
+                    <ValidationMessage For="() => JobOffer.Nip" class="text-danger small" />
+                    @if (!string.IsNullOrEmpty(nipValidationMessage))
                     {
-                        if (category == IndustryCategory.None) continue;
-                        <option value="@category">@GetIndustryLabel(category)</option>
-                    }
-                </InputSelect>
-            </div>
-        </div>
-
-        <h5 class="mb-3 text-primary">2. Szczegóły oferty</h5>
-        <div class="mb-3">
-            <label for="title" class="form-label">Tytuł stanowiska</label>
-            <InputText id="title" @bind-Value="JobOffer.Title" class="form-control" aria-required="true" maxlength="80" placeholder="np. Junior .NET Developer" />
-            <ValidationMessage For="() => JobOffer.Title" class="text-danger" />
-        </div>
-
-        <div class="mb-3">
-            <label for="description" class="form-label">Opis stanowiska</label>
-            <InputTextArea id="description" @bind-Value="JobOffer.Description" class="form-control" rows="5" aria-required="true" maxlength="500" />
-            <ValidationMessage For="() => JobOffer.Description" class="text-danger" />
-        </div>
-
-        <div class="row g-3 mb-3">
-            <div class="col-md-6">
-                <label for="offerLocation" class="form-label">Lokalizacja (zacznij wpisywać)</label>
-                <div class="position-relative">
-                    <input id="offerLocation"
-                           class="form-control @(!string.IsNullOrEmpty(locationValidationMessage) ? "is-invalid" : "")"
-                           value="@JobOffer.Location"
-                           placeholder="np. Warszawa"
-                           maxlength="100"
-                           @oninput="OnOfferLocationInput"
-                           @onfocus="ShowOfferLocationSuggestions"
-                           @onblur="HideOfferLocationSuggestionsDelayed" />
-
-                    @if (showOfferLocationSuggestions && offerLocationSuggestions.Any())
-                    {
-                        <ul class="list-group position-absolute w-100 shadow-sm" style="z-index:1000; max-height:250px; overflow-y:auto;">
-                            @foreach (var suggestion in offerLocationSuggestions)
-                            {
-                                <li class="list-group-item list-group-item-action" style="cursor:pointer" @onmousedown="@(() => SelectOfferLocationSuggestion(suggestion))">
-                                    @suggestion
-                                </li>
-                            }
-                        </ul>
-                    }
-                    @if (!string.IsNullOrEmpty(locationValidationMessage))
-                    {
-                        <div class="invalid-feedback d-block">@locationValidationMessage</div>
+                        <div class="text-success small mt-1 fw-bold">@nipValidationMessage</div>
                     }
                 </div>
-                <ValidationMessage For="() => JobOffer.Location" class="text-danger" />
-            </div>
-
-            <div class="col-md-6">
-                <label for="contactinfo" class="form-label">Email kontaktowy</label>
-                <InputText id="contactinfo" @bind-Value="JobOffer.ContactInfo" class="form-control" aria-required="true" maxlength="250" />
-                <ValidationMessage For="() => JobOffer.ContactInfo" class="text-danger" />
-            </div>
-        </div>
-
-        <h5 class="mb-3 text-primary mt-4">3. Warunki i płaca</h5>
-        <div class="row g-3 mb-3">
-            <div class="col-md-4">
-                <label for="empltype" class="form-label">Rodzaj zatrudnienia</label>
-                <InputSelect id="empltype" @bind-Value="JobOffer.EmplType" class="form-control" aria-required="true">
-                    <option value="">-- wybierz --</option>
-                    @foreach (var type in Enum.GetValues(typeof(EmploymentType)).Cast<EmploymentType>())
-                    {
-                        <option value="@type">@type</option>
-                    }
-                </InputSelect>
-                <ValidationMessage For="() => JobOffer.EmplType" class="text-danger" />
-            </div>
-
-            <div class="col-md-4">
-                <label for="jobtype" class="form-label">Tryb pracy</label>
-                <InputSelect id="jobtype" @bind-Value="JobOffer.JobType" class="form-control">
-                    <option value="">-- wybierz --</option>
-                    @foreach (var type in Enum.GetValues(typeof(JobType)).Cast<JobType>())
-                    {
-                        <option value="@type">@type</option>
-                    }
-                </InputSelect>
-                <ValidationMessage For="() => JobOffer.JobType" class="text-danger" />
-            </div>
-
-            <div class="col-md-4">
-                <label for="applicationdeadline" class="form-label">Oferta ważna do</label>
-                <InputDate id="applicationdeadline" @bind-Value="JobOffer.ApplicationDeadline" class="form-control" min="@today" />
-                <ValidationMessage For="() => JobOffer.ApplicationDeadline" class="text-danger" />
-            </div>
-        </div>
-
-        <div class="row g-3 mb-4">
-            <div class="col-md-6">
-                <label for="salarymin" class="form-label">Wynagrodzenie (min)</label>
-                <div class="input-group">
-                    <InputNumber id="salarymin" @bind-Value="JobOffer.SalaryMin" class="form-control" />
-                    <span class="input-group-text">PLN</span>
+                <div class="col-md-4">
+                    <label class="form-label">Nazwa Firmy</label>
+                    <InputText @bind-Value="JobOffer.CompanyName" class="form-control" ReadOnly="true" placeholder="Uzupełni się automatycznie" />
+                    <ValidationMessage For="() => JobOffer.CompanyName" class="text-danger small" />
                 </div>
-                <ValidationMessage For="() => JobOffer.SalaryMin" class="text-danger" />
-            </div>
-            <div class="col-md-6">
-                <label for="salarymax" class="form-label">Wynagrodzenie (max)</label>
-                <div class="input-group">
-                    <InputNumber id="salarymax" @bind-Value="JobOffer.SalaryMax" class="form-control" />
-                    <span class="input-group-text">PLN</span>
-                </div>
-                <ValidationMessage For="() => JobOffer.SalaryMax" class="text-danger" />
-            </div>
-        </div>
-
-        <h5 class="mb-3 text-primary">4. Wymagania i Benefity</h5>
-
-        <div class="mb-3">
-            <label for="requirements" class="form-label">Wymagania szczegółowe</label>
-            <InputTextArea id="requirements" @bind-Value="JobOffer.Requirements" class="form-control" rows="5" aria-required="true" maxlength="500" />
-            <ValidationMessage For="() => JobOffer.Requirements" class="text-danger" />
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label fw-bold">Dodatkowe opcje (zaznacz):</label>
-            <div class="d-flex flex-wrap gap-3 p-3 bg-light rounded border">
-                <div class="form-check">
-                    <InputCheckbox id="reqExp" @bind-Value="JobOffer.RequiresExperience" class="form-check-input" />
-                    <label class="form-check-label" for="reqExp">Wymagane doświadczenie</label>
-                </div>
-                <div class="form-check">
-                    <InputCheckbox id="isOnline" @bind-Value="JobOffer.IsOnlineRecruitment" class="form-check-input" />
-                    <label class="form-check-label" for="isOnline">Rekrutacja online</label>
-                </div>
-                <div class="form-check">
-                    <InputCheckbox id="reqSanitary" @bind-Value="JobOffer.RequiresSanitaryBook" class="form-check-input" />
-                    <label class="form-check-label" for="reqSanitary">Książeczka sanepid.</label>
-                </div>
-                <div class="form-check">
-                    <InputCheckbox id="reqStudent" @bind-Value="JobOffer.RequiresStudentStatus" class="form-check-input" />
-                    <label class="form-check-label" for="reqStudent">Status studenta</label>
-                </div>
-                <div class="form-check">
-                    <InputCheckbox id="reqDisability" @bind-Value="JobOffer.RequiresDisabilityCertificate" class="form-check-input" />
-                    <label class="form-check-label" for="reqDisability">Orzeczenie o niepełnosp.</label>
+                <div class="col-md-4">
+                    <label class="form-label">Branża</label>
+                    <InputSelect class="form-select" @bind-Value="JobOffer.IndustryCategory">
+                        <option value="">-- Wybierz --</option>
+                        @foreach (IndustryCategory category in Enum.GetValues(typeof(IndustryCategory)))
+                        {
+                            if (category == IndustryCategory.None) continue;
+                            <option value="@category">@GetIndustryLabel(category)</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => JobOffer.IndustryCategory" class="text-danger small" />
                 </div>
             </div>
-        </div>
 
-        <div class="mb-3">
-            <label for="benefits" class="form-label">Benefity (opcjonalnie)</label>
-            <InputText id="benefits" @bind-Value="JobOffer.Benefits" class="form-control" maxlength="200" placeholder="np. Owocowe czwartki, Multisport" />
-            <ValidationMessage For="() => JobOffer.Benefits" class="text-danger" />
-        </div>
+            <div class="section-label">2. Szczegóły Oferty</div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <label class="form-label">Tytuł Stanowiska</label>
+                    <InputText @bind-Value="JobOffer.Title" class="form-control fw-bold" placeholder="np. Senior .NET Developer" />
+                    <ValidationMessage For="() => JobOffer.Title" class="text-danger small" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Lokalizacja</label>
+                    <div class="position-relative">
+                        <input class="form-control"
+                               value="@JobOffer.Location"
+                               placeholder="Miasto..."
+                               @oninput="OnOfferLocationInput"
+                               @onfocus="ShowOfferLocationSuggestions"
+                               @onblur="HideOfferLocationSuggestionsDelayed" />
 
-        @if (!string.IsNullOrEmpty(serverErrorMessage))
-        {
-            <div class="alert alert-danger mt-3">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i> <strong>Błąd zapisu:</strong> @serverErrorMessage
+                        @if (showOfferLocationSuggestions && offerLocationSuggestions.Any())
+                        {
+                            <ul class="suggestions-list">
+                                @foreach (var suggestion in offerLocationSuggestions)
+                                {
+                                    <li @onmousedown="@(() => SelectOfferLocationSuggestion(suggestion))">@suggestion</li>
+                                }
+                            </ul>
+                        }
+                        @if (!string.IsNullOrEmpty(locationValidationMessage))
+                        {
+                            <div class="text-danger small">@locationValidationMessage</div>
+                        }
+                    </div>
+                    <ValidationMessage For="() => JobOffer.Location" class="text-danger small" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Email kontaktowy</label>
+                    <InputText @bind-Value="JobOffer.ContactInfo" class="form-control" placeholder="rekrutacja@firma.pl" />
+                    <ValidationMessage For="() => JobOffer.ContactInfo" class="text-danger small" />
+                </div>
             </div>
-        }
 
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-5">
-            <a href="/my-offers" class="btn btn-outline-secondary me-md-2">Anuluj</a>
-            <button type="submit" class="btn btn-primary btn-lg px-5" disabled="@(!isNipVerified)">
-                <i class="bi bi-send-check"></i> Wyślij do weryfikacji
-            </button>
-        </div>
-    </EditForm>
+            <div class="row g-4 mt-2">
+                <div class="col-md-6">
+                    <label class="form-label">Opis Stanowiska</label>
+                    <InputTextArea @bind-Value="JobOffer.Description" class="form-control" rows="6" placeholder="Opis roli..." />
+                    <ValidationMessage For="() => JobOffer.Description" class="text-danger small" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Wymagania Szczegółowe</label>
+                    <InputTextArea @bind-Value="JobOffer.Requirements" class="form-control" rows="6" placeholder="- C#&#10;- SQL..." />
+                    <ValidationMessage For="() => JobOffer.Requirements" class="text-danger small" />
+                </div>
+            </div>
+
+            <div class="section-label">3. Warunki Zatrudnienia</div>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <label class="form-label">Wymiar</label>
+                    <InputSelect @bind-Value="JobOffer.EmplType" class="form-control">
+                        @foreach (var type in Enum.GetValues(typeof(EmploymentType)).Cast<EmploymentType>())
+                        {
+                            <option value="@type">@type</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => JobOffer.EmplType" class="text-danger small" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Tryb</label>
+                    <InputSelect @bind-Value="JobOffer.JobType" class="form-control">
+                        @foreach (var type in Enum.GetValues(typeof(JobType)).Cast<JobType>())
+                        {
+                            <option value="@type">@type</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => JobOffer.JobType" class="text-danger small" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Płaca (Min)</label>
+                    <div class="input-group">
+                        <InputNumber @bind-Value="JobOffer.SalaryMin" class="form-control" placeholder="0" />
+                        <span class="input-group-text">PLN</span>
+                    </div>
+                    <ValidationMessage For="() => JobOffer.SalaryMin" class="text-danger small" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Płaca (Max)</label>
+                    <div class="input-group">
+                        <InputNumber @bind-Value="JobOffer.SalaryMax" class="form-control" placeholder="0" />
+                        <span class="input-group-text">PLN</span>
+                    </div>
+                    <ValidationMessage For="() => JobOffer.SalaryMax" class="text-danger small" />
+                </div>
+            </div>
+
+            <div class="section-label">4. Benefity i Opcje</div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-8">
+                    <label class="form-label">Benefity (opcjonalnie)</label>
+                    <InputText @bind-Value="JobOffer.Benefits" class="form-control" placeholder="np. Multisport, Owocowe czwartki" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Ważna do</label>
+                    <InputDate @bind-Value="JobOffer.ApplicationDeadline" class="form-control" min="@today" />
+                    <ValidationMessage For="() => JobOffer.ApplicationDeadline" class="text-danger small" />
+                </div>
+            </div>
+
+            <label class="form-label fw-bold mb-3 d-block text-center">Dodatkowe Opcje (Tagi):</label>
+
+            <div class="options-container mb-5">
+                <label class="custom-check @(JobOffer.RequiresExperience ? "active" : "")">
+                    <InputCheckbox @bind-Value="JobOffer.RequiresExperience" /> Doświadczenie
+                </label>
+                <label class="custom-check @(JobOffer.IsOnlineRecruitment ? "active" : "")">
+                    <InputCheckbox @bind-Value="JobOffer.IsOnlineRecruitment" /> Rekrutacja Online
+                </label>
+                <label class="custom-check @(JobOffer.RequiresSanitaryBook ? "active" : "")">
+                    <InputCheckbox @bind-Value="JobOffer.RequiresSanitaryBook" /> Sanepid
+                </label>
+                <label class="custom-check @(JobOffer.RequiresStudentStatus ? "active" : "")">
+                    <InputCheckbox @bind-Value="JobOffer.RequiresStudentStatus" /> Student
+                </label>
+                <label class="custom-check @(JobOffer.RequiresDisabilityCertificate ? "active" : "")">
+                    <InputCheckbox @bind-Value="JobOffer.RequiresDisabilityCertificate" /> Orzeczenie
+                </label>
+            </div>
+
+            @if (!string.IsNullOrEmpty(serverErrorMessage))
+            {
+                <div class="alert alert-danger mt-4 shadow-sm">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> <strong>Błąd zapisu:</strong> @serverErrorMessage
+                </div>
+            }
+
+            <div class="d-flex justify-content-end align-items-center gap-3 pt-3 border-top border-light">
+                <a href="/my-offers" class="btn-cancel text-decoration-none">Anuluj</a>
+                <button type="submit" class="btn-submit" disabled="@(!isNipVerified)">
+                    Opublikuj Ofertę
+                </button>
+            </div>
+        </EditForm>
+    </div>
 </div>
 
 @code {
@@ -234,13 +209,10 @@
     private JobOffer JobOffer { get; set; } = new();
 
     private string today = DateTime.Now.ToString("yyyy-MM-dd");
-
     private bool isNipValidating = false;
     private bool isNipVerified = false;
     private string? nipValidationMessage;
     private string? locationValidationMessage;
-
-    // Zmienna na błąd serwera (Trigger)
     private string? serverErrorMessage;
 
     private List<string> offerLocationSuggestions = new();
@@ -248,15 +220,13 @@
 
     protected override void OnInitialized()
     {
-        // Domyślne ustawienia
     }
 
-    // --- WALIDACJA NIP ---
     private async Task HandleNipValidation()
     {
         isNipValidating = true;
         nipValidationMessage = null;
-        serverErrorMessage = null; // Czyścimy błędy przy nowej próbie
+        serverErrorMessage = null;
         StateHasChanged();
 
         try
@@ -267,24 +237,23 @@
             {
                 isNipVerified = true;
                 JobOffer.CompanyName = result.CompanyName;
-                nipValidationMessage = $"Zwerfikowano: {result.CompanyName}";
+                nipValidationMessage = "NIP zweryfikowany poprawnie.";
             }
             else
             {
                 isNipVerified = false;
-                nipValidationMessage = result.ErrorMessage ?? "Wystąpił nieznany błąd walidacji NIP.";
+                nipValidationMessage = result.ErrorMessage ?? "Błąd weryfikacji.";
             }
         }
         catch (Exception ex)
         {
-            nipValidationMessage = $"Błąd połączenia z API: {ex.Message}";
+            nipValidationMessage = $"Błąd API: {ex.Message}";
         }
 
         isNipValidating = false;
         StateHasChanged();
     }
 
-    // --- AUTOCOMPLETE ---
     private async Task OnOfferLocationInput(ChangeEventArgs e)
     {
         var text = e.Value?.ToString() ?? string.Empty;
@@ -320,10 +289,9 @@
         locationValidationMessage = null;
     }
 
-    // --- ZAPIS Z OBSŁUGĄ BŁĘDÓW (TRIGGER) ---
     private async Task AddJobOffer()
     {
-        serverErrorMessage = null; // Reset błędów
+        serverErrorMessage = null;
 
         if (!isNipVerified)
         {
@@ -342,23 +310,19 @@
 
         if (!isValidLocation)
         {
-            locationValidationMessage = "Wybierz poprawną miejscowość z listy podpowiedzi.";
+            locationValidationMessage = "Wybierz poprawną miejscowość z listy.";
             return;
         }
 
         try
         {
-            // Próba zapisu - tutaj może "wyskoczyć" błąd z Triggera SQL
             await JobOfferService.CreateAsync(JobOffer);
             NavigationManager.NavigateTo("/my-offers");
         }
         catch (Exception ex)
         {
-            // Łapiemy błąd i wyświetlamy go w zmiennej serverErrorMessage
             serverErrorMessage = ex.InnerException?.Message ?? ex.Message;
-
-            // Opcjonalnie: logowanie do konsoli
-            Console.WriteLine($"Błąd podczas tworzenia oferty: {ex}");
+            Console.WriteLine($"Błąd zapisu: {ex}");
         }
     }
 

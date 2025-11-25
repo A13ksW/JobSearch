@@ -10,22 +10,22 @@
 
 <div class="home-container">
     <div class="container">
-
+        
         <div class="hero-wrapper animate-fade-up">
             <h1 class="display-3 hero-title mb-3">Twoja kariera zaczyna się <span style="color: #ffcf40;">tutaj</span></h1>
-            <p class="hero-subtitle mb-5">Najlepsze oferty. Sprawdzone firmy. Błyskawiczna rekrutacja.</p>
+            <p class="hero-subtitle mb-5">Najlepsze oferty, sprawdzone firmy, błyskawiczna rekrutacja.</p>
 
             <div class="hero-search-container">
                 <div class="search-glass">
-                    <input type="text"
-                           class="form-control search-input"
-                           placeholder="Wpisz miasto (np. Kraków)..."
+                    <input type="text" 
+                           class="form-control search-input" 
+                           placeholder="Wpisz miasto (np. Kraków)..." 
                            value="@searchLocation"
                            @oninput="OnLocationInput"
                            @onfocus="ShowLocationSuggestions"
                            @onblur="HideLocationSuggestionsDelayed"
                            @onkeyup="HandleEnter" />
-
+                    
                     <button class="btn search-btn" @onclick="Search">
                         SZUKAJ
                     </button>
@@ -134,7 +134,7 @@
     private int offersCount = 0;
     private int companiesCount = 0;
     private List<JobOffer> latestOffers = new();
-
+    
     private string searchLocation = "";
     private List<string> locationSuggestions = new();
     private bool showLocationSuggestions = false;
@@ -142,10 +142,10 @@
     protected override async Task OnInitializedAsync()
     {
         var allOffers = await JobOfferService.GetJobOffersAsync(
-            null, null, "date_desc", null, null, null,
+            null, null, "date_desc", null, null, null, 
             false, false, false, false, false
         );
-
+        
         var published = allOffers.Where(o => o.Status == OfferStatus.Opublikowana).ToList();
         offersCount = published.Count;
         companiesCount = published.Select(o => o.CompanyName).Distinct().Count();

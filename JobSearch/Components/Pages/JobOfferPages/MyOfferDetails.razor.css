@@ -1,0 +1,400 @@
+﻿/* === 1. KONTENER GŁÓWNY === */
+.page-container {
+    padding-top: 2rem;
+    padding-bottom: 6rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    color: #fff;
+}
+
+.animate-fade-up {
+    animation: fadeUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes fadeUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* === 2. GÓRNY PASEK === */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.btn-back-glass {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(5px);
+    border-radius: 50px;
+    color: white !important;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+    .btn-back-glass:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateX(-5px);
+    }
+
+/* === 3. KARTA OFERTY (PODSUMOWANIE) === */
+.offer-summary-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 2.5rem; /* Większy padding */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    color: #0f172a !important;
+    margin-bottom: 3rem;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    position: relative;
+    overflow: hidden;
+}
+
+    .offer-summary-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 6px;
+        background: #2563eb;
+    }
+
+.offer-title {
+    font-weight: 800;
+    font-size: 2rem; /* Większy tytuł */
+    color: #1e293b !important;
+    margin-bottom: 0.3rem;
+}
+
+.offer-company {
+    color: #64748b !important;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* === STATYSTYKI W KARCIE OFERTY (POPRAWIONE) === */
+.offer-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #f1f5f9;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #94a3b8 !important; /* Szary (nie czarny!) */
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+}
+
+.stat-value {
+    font-size: 1.25rem; /* Większa czcionka wartości */
+    font-weight: 700;
+    color: #1e293b !important; /* Ciemny granat */
+}
+
+.text-success {
+    color: #059669 !important;
+}
+
+.text-primary {
+    color: #2563eb !important;
+}
+
+/* Badge Statusu */
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.status-Opublikowana {
+    background: #ecfdf5;
+    color: #047857 !important;
+}
+
+.status-Weryfikacja {
+    background: #fffbeb;
+    color: #b45309 !important;
+}
+
+.status-Odrzucona {
+    background: #fef2f2;
+    color: #b91c1c !important;
+}
+
+.status-Wygasła {
+    background: #f1f5f9;
+    color: #475569 !important;
+}
+
+
+/* === 4. LISTA KANDYDATÓW === */
+.section-header {
+    margin-bottom: 1.5rem;
+    color: white;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* Karta Kandydata */
+.applicant-card {
+    background: #ffffff;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: 1px solid rgba(255,255,255,0.8);
+    transition: box-shadow 0.2s;
+}
+
+    .applicant-card:hover {
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+.applicant-header {
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    background: #fff;
+    color: #0f172a;
+}
+
+    .applicant-header:hover {
+        background-color: #f8fafc;
+    }
+
+.applicant-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.avatar-circle {
+    width: 45px;
+    height: 45px;
+    background: #eff6ff;
+    color: #2563eb !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: 1px solid #dbeafe;
+}
+
+.applicant-name {
+    font-weight: 700;
+    color: #1e293b !important;
+    font-size: 1.05rem;
+}
+
+.applicant-meta {
+    font-size: 0.85rem;
+    color: #64748b !important;
+}
+
+.app-status {
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.app-status-Aplikowano {
+    background: #f1f5f9;
+    color: #64748b !important;
+}
+
+.app-status-Zaproszony {
+    background: #dcfce7;
+    color: #166534 !important;
+}
+
+.app-status-Odrzucony {
+    background: #fee2e2;
+    color: #991b1b !important;
+}
+
+.btn-toggle {
+    width: 34px;
+    height: 34px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    color: #64748b !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+    .btn-toggle.active {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        color: white !important;
+        transform: rotate(180deg);
+    }
+
+/* === 5. SZCZEGÓŁY CV === */
+.applicant-details {
+    background-color: #f8fafc;
+    border-top: 1px solid #f1f5f9;
+    padding: 2rem;
+    color: #334155 !important;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Grid CV */
+.cv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+/* Kafelek (Box) */
+.cv-box-container {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    text-align: left; /* Wyrównanie do lewej */
+}
+
+.cv-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #94a3b8 !important;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.cv-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0f172a !important;
+    line-height: 1.4;
+}
+
+/* Tagi */
+.tags-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.cv-tag {
+    display: inline-block;
+    padding: 5px 12px;
+    background-color: #eff6ff;
+    color: #2563eb !important;
+    border: 1px solid #dbeafe;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Akcje */
+.actions-panel {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+.btn-action {
+    padding: 0.7rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-invite {
+    background: #10b981;
+    color: white !important;
+}
+
+.btn-reject {
+    background: white;
+    color: #ef4444 !important;
+    border: 1px solid #fecaca;
+}
+
+.btn-outline-cancel {
+    background: transparent;
+    border: 1px solid #cbd5e1;
+    color: #64748b !important;
+    margin-left: 10px;
+}
+
+.action-form {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #cbd5e1;
+}
+
+.input-phone {
+    border: 1px solid #cbd5e1;
+    padding: 0.6rem;
+    border-radius: 8px;
+    color: #0f172a !important;
+}
+
+.empty-state {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(5px);
+    border: 2px dashed rgba(255,255,255,0.3);
+    border-radius: 24px;
+    padding: 4rem;
+    text-align: center;
+    color: white;
+}

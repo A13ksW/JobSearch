@@ -1,0 +1,237 @@
+﻿/* Główny kontener */
+.offer-page-wrapper {
+    padding-top: 2rem;
+    padding-bottom: 5rem;
+    color: #fff;
+}
+
+/* Przycisk Powrotu */
+.btn-back-glass {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(5px);
+    border-radius: 50px;
+    color: white !important;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+    .btn-back-glass:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateX(-5px);
+    }
+
+/* Białe Karty */
+.white-card {
+    background-color: #ffffff;
+    border-radius: 24px;
+    padding: 3rem; /* Większy padding */
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    color: #1e293b;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Nagłówek Oferty */
+.offer-header-title {
+    font-weight: 800;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: #0f172a;
+    text-align: center; /* Wyśrodkowanie tytułu */
+    word-wrap: break-word;
+}
+
+.offer-header-company {
+    font-size: 1.2rem;
+    color: #64748b;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Wyśrodkowanie nazwy firmy */
+    gap: 10px;
+}
+
+/* === SEKCJE (Nowy Wygląd) === */
+.section-label {
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 800;
+    color: #2563eb; /* Niebieski akcent */
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+    /* Wyśrodkowanie Flexbox */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    position: relative;
+}
+
+    /* Ozdobna linia pod nagłówkiem */
+    .section-label::after {
+        content: '';
+        display: block;
+        width: 50px;
+        height: 3px;
+        background: #e2e8f0;
+        position: absolute;
+        bottom: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 10px;
+    }
+
+.section-text {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: #334155;
+    /* Atrakcyjne tło dla tekstu */
+    background-color: #f8fafc;
+    border: 1px solid #f1f5f9;
+    border-radius: 16px;
+    padding: 2rem;
+    /* Justowanie tekstu */
+    text-align: justify;
+    /* Zabezpieczenia */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+}
+
+/* Kontener na tagi (Wyśrodkowany) */
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 2rem;
+}
+
+/* Tagi wymagań */
+.tag-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    background: #ffffff;
+    color: #475569;
+    border-radius: 50px;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+}
+
+    .tag-badge:hover {
+        transform: translateY(-2px);
+        border-color: #2563eb;
+        color: #2563eb;
+    }
+
+    .tag-badge i {
+        color: #2563eb;
+        margin-right: 8px;
+    }
+
+/* Sidebar (Prawa kolumna) */
+.sidebar-sticky {
+    position: sticky;
+    top: 6rem;
+}
+
+.salary-box {
+    background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+    padding: 2rem;
+    border-radius: 20px;
+    text-align: center;
+    border: 1px solid #dbeafe;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1);
+}
+
+.salary-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #059669;
+    display: block;
+    margin-top: 0.5rem;
+}
+
+/* Lista info */
+.info-row {
+    display: flex;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.95rem;
+    color: #475569;
+}
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-row i {
+        width: 30px;
+        color: #2563eb;
+        font-size: 1.3rem;
+        text-align: center;
+    }
+
+/* Przycisk Aplikuj */
+.btn-apply-now {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+    .btn-apply-now:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(37, 99, 235, 0.4);
+        color: white;
+    }
+
+    .btn-apply-now.disabled {
+        background: #10b981;
+        cursor: default;
+        box-shadow: none;
+        transform: none;
+    }
+
+/* Animacja wejścia */
+.fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.delay-1 {
+    animation-delay: 0.1s;
+}
+
+.delay-2 {
+    animation-delay: 0.2s;
+}

@@ -6,11 +6,19 @@ namespace JobSearch.Services
 {
     public enum EmploymentType
     {
-        FullTime, PartTime, Contract, Internship, Temporary, Freelance
+        [Display(Name = "Pełny etat")] FullTime,
+        [Display(Name = "Część etatu")] PartTime,
+        [Display(Name = "Kontrakt B2B")] Contract,
+        [Display(Name = "Staż / Praktyka")] Internship,
+        [Display(Name = "Praca tymczasowa")] Temporary,
+        [Display(Name = "Freelance")] Freelance
     }
+
     public enum JobType
     {
-        Remote, OnSite, Hybrid
+        [Display(Name = "Zdalna")] Remote,
+        [Display(Name = "Stacjonarna")] OnSite,
+        [Display(Name = "Hybrydowa")] Hybrid
     }
 
     public enum OfferStatus
@@ -23,43 +31,25 @@ namespace JobSearch.Services
 
     public enum IndustryCategory
     {
-        None,
-        Sprzedaz,
-        Marketing,
-        Finanse,
-        Bankowosc,
-        ObslugaKlienta,
-        ZdrowieIUroda,
-        Gastronomia,
-        Turystyka,
-        Zarzadzanie,
-        PracaWSklepie,
-        Budownictwo,
-        Produkcja,
-        Nieruchomosci,
-        Edukacja,
-        Logistyka,
-        HR,
-        Design,
-        BIData,
-        PracaBiurowa,
-        Consulting,
-        Media,
-        Prawo,
-        IT
+        None, Sprzedaz, Marketing, Finanse, Bankowosc, ObslugaKlienta, ZdrowieIUroda, Gastronomia,
+        Turystyka, Zarzadzanie, PracaWSklepie, Budownictwo, Produkcja, Nieruchomosci, Edukacja,
+        Logistyka, HR, Design, BIData, PracaBiurowa, Consulting, Media, Prawo, IT
     }
 
     public class JobOffer : IValidatableObject
     {
         public int Id { get; set; }
 
-        [Required, StringLength(80, ErrorMessage = "Tytuł nie może przekraczać 80 znaków.")]
+        [Required(ErrorMessage = "Tytuł stanowiska jest wymagany.")]
+        [StringLength(80, ErrorMessage = "Tytuł nie może przekraczać 80 znaków.")]
         public string Title { get; set; } = string.Empty;
 
-        [Required, StringLength(500, ErrorMessage = "Opis nie może przekraczać 500 znaków.")]
+        [Required(ErrorMessage = "Opis stanowiska jest wymagany.")]
+        [StringLength(500, ErrorMessage = "Opis nie może przekraczać 500 znaków.")]
         public string Description { get; set; } = string.Empty;
 
-        [Required, StringLength(500, ErrorMessage = "Nazwa firmy nie może przekraczać 500 znaków.")]
+        [Required(ErrorMessage = "Nazwa firmy jest wymagana.")]
+        [StringLength(500, ErrorMessage = "Nazwa firmy nie może przekraczać 500 znaków.")]
         public string CompanyName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Numer NIP jest wymagany.")]
@@ -67,28 +57,28 @@ namespace JobSearch.Services
         [RegularExpression("^[0-9]{10}$", ErrorMessage = "NIP musi składać się wyłącznie z 10 cyfr.")]
         public string Nip { get; set; } = string.Empty;
 
-        // --- POPRAWKA: Dodano '?' aby pole było nullowalne (obsługiwało .HasValue) ---
+        [Required(ErrorMessage = "Musisz wybrać branżę.")]
         public IndustryCategory? IndustryCategory { get; set; }
 
-        [Required, StringLength(100)]
+        [Required(ErrorMessage = "Lokalizacja jest wymagana.")]
+        [StringLength(100, ErrorMessage = "Lokalizacja nie może przekraczać 100 znaków.")]
         public string Location { get; set; } = string.Empty;
 
-        [Required, StringLength(250)]
-        [EmailAddress(ErrorMessage = "Podaj poprawny adres e-mail.")]
+        [Required(ErrorMessage = "Email kontaktowy jest wymagany.")]
+        [StringLength(250, ErrorMessage = "Email jest za długi.")]
+        [EmailAddress(ErrorMessage = "Podaj poprawny format adresu e-mail.")]
         public string ContactInfo { get; set; } = string.Empty;
 
         [Column(TypeName = "datetime2")]
-        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = false)]
         public DateTime DatePosted { get; set; }
 
-        // ZMIANA: Dodano atrybut Required
         [Required(ErrorMessage = "Data ważności ogłoszenia jest wymagana.")]
         public DateTime? ApplicationDeadline { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Wybierz rodzaj zatrudnienia.")]
         public EmploymentType EmplType { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Wybierz tryb pracy.")]
         public JobType JobType { get; set; }
 
         public bool RequiresExperience { get; set; }
@@ -108,7 +98,7 @@ namespace JobSearch.Services
                     return $"{SalaryMin.Value:0.##} - ?";
                 if (SalaryMax.HasValue)
                     return $"? - {SalaryMax.Value:0.##}";
-                return string.Empty;
+                return "Do negocjacji";
             }
         }
 
@@ -118,7 +108,8 @@ namespace JobSearch.Services
         [Column(TypeName = "decimal(10,2)")]
         public decimal? SalaryMax { get; set; }
 
-        [Required, StringLength(500, ErrorMessage = "Wymagania nie mogą przekraczać 500 znaków.")]
+        [Required(ErrorMessage = "Wymagania są obowiązkowe.")]
+        [StringLength(500, ErrorMessage = "Wymagania nie mogą przekraczać 500 znaków.")]
         public string Requirements { get; set; } = string.Empty;
 
         [StringLength(200, ErrorMessage = "Benefity nie mogą przekraczać 200 znaków.")]

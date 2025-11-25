@@ -1,0 +1,231 @@
+﻿/* === 1. KONTENER I ANIMACJE === */
+.page-container {
+    padding-top: 2rem;
+    padding-bottom: 5rem;
+    color: #fff;
+}
+
+.animate-fade-up {
+    animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes fadeUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* === 2. SEKCJA FILTRÓW (Glassmorphism) === */
+.filters-glass {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    margin-bottom: 3rem;
+}
+
+.filter-title {
+    color: #0f172a; /* Ciemny granat */
+    font-weight: 800;
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 0.5rem;
+}
+
+/* Stylowanie inputów wewnątrz filtrów */
+.filter-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.filters-glass .form-control,
+.filters-glass .form-select {
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    color: #1e293b !important;
+    padding: 0.6rem 1rem;
+    transition: all 0.2s;
+}
+
+    .filters-glass .form-control:focus,
+    .filters-glass .form-select:focus {
+        background-color: #fff !important;
+        border-color: #2563eb !important;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+    }
+
+/* Przyciski filtrów */
+.btn-filter {
+    border-radius: 12px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-filter-primary {
+    background: #2563eb !important;
+    color: white !important;
+    border: none !important;
+}
+
+    .btn-filter-primary:hover {
+        background: #1d4ed8 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+.btn-filter-secondary {
+    background: white !important;
+    color: #64748b !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+    .btn-filter-secondary:hover {
+        background: #f1f5f9 !important;
+        color: #0f172a !important;
+    }
+
+/* === 3. KARTY OFERT (Premium) === */
+.offer-card {
+    display: block;
+    text-decoration: none;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 1.5rem;
+    height: 100%;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+    .offer-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Pasek akcentowy z lewej strony przy hoverze */
+    .offer-card::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        background: #2563eb;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .offer-card:hover::before {
+        opacity: 1;
+    }
+
+/* Typografia w karcie */
+.offer-title {
+    color: #0f172a;
+    font-weight: 800;
+    font-size: 1.15rem;
+    margin-bottom: 0.25rem;
+    line-height: 1.4;
+}
+
+.offer-company {
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.offer-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: auto; /* Wypycha detale na dół karty */
+}
+
+.detail-tag {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tag-location {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.tag-salary {
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid #d1fae5;
+}
+
+.tag-type {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.offer-footer {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.btn-view {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #2563eb;
+    text-decoration: none;
+}
+
+/* Stan pusty */
+.empty-state {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(5px);
+    border: 2px dashed rgba(255,255,255,0.3);
+    border-radius: 24px;
+    padding: 4rem;
+    text-align: center;
+    color: white;
+}
+
+/* Nagłówek strony */
+.page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.page-title {
+    font-weight: 800;
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.page-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}

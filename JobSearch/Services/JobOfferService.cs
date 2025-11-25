@@ -45,38 +45,74 @@ public class JobOfferService : IJobOfferService
         context.AuditLogs.Add(log);
     }
 
-    public async Task<List<JobOffer>> GetJobOffersAsync(string? location, decimal? minSalary, string? sortBy, EmploymentType? employmentType, JobType? jobType, IndustryCategory? industryCategory, bool onlyWithExperience, bool onlyOnlineRecruitment, bool onlyWithSanitaryBook, bool onlyWithStudentStatus, bool onlyWithDisabilityCertificate)
+    // ... (Metody GetJobOffersAsync, GetByIdAsync, CreateAsync, UpdateAsync, DeleteAsync, GetMyOffersAsync, ApplyForOfferAsync pozostają bez zmian - możesz je zostawić tak jak masz) ...
+
+    // ============================================================
+    // TĄ METODĘ PODMIEŃ NA PONIŻSZĄ WERSJĘ (EXPLICIT LOADING)
+    // ============================================================
+    public async Task<List<JobApplication>> GetApplicationsForOfferAsync(int offerId)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync();
+
+        // 1. Pobierz listę aplikacji i użytkowników (bez CV na razie)
+        var applications = await context.JobApplications
+            .Where(a => a.JobOfferId == offerId)
+            .Include(a => a.Applicant) // Pobieramy użytkownika
+            .OrderByDescending(a => a.ApplicationDate)
+            .ToListAsync();
+
+        // 2. Dociągnij dane CV "ręcznie" dla każdego kandydata
+        foreach (var app in applications)
+        {
+            if (app.Applicant != null)
+            {
+                // Załaduj obiekt UserProfileCV dla tego użytkownika
+                await context.Entry(app.Applicant)
+                    .Reference(u => u.UserProfileCV)
+                    .LoadAsync();
+
+                // Jeśli CV istnieje, załaduj jego kolekcje (Umiejętności, Języki)
+                if (app.Applicant.UserProfileCV != null)
+                {
+                    await context.Entry(app.Applicant.UserProfileCV)
+                        .Collection(cv => cv.Skills)
+                        .LoadAsync();
+
+                    await context.Entry(app.Applicant.UserProfileCV)
+                        .Collection(cv => cv.Languages)
+                        .LoadAsync();
+
+                    // Wymuś odświeżenie danych prostych (w tym Preferencji) z bazy
+                    await context.Entry(app.Applicant.UserProfileCV).ReloadAsync();
+                }
+            }
+        }
+
+        return applications;
+    }
+    // ============================================================
+
+    // ... (Reszta metod: HasUserAppliedAsync, ApproveOfferAsync, RejectOfferAsync, GetMyApplicationsAsync, UpdateApplicationStatusAsync, ExtendOfferAsync - bez zmian) ...
+
+    // Poniżej wklejam kompletny kod dla pewności, jeśli wolisz podmienić całość:
+
+    public async Task<List<JobOffer>> GetJobOffersAsync(string? location, decimal? minSalary, string? sortBy, EmploymentType? employmentType, JobType? jobType, IndustryCategory? industryCategory, bool onlyWithExperience, bool onlyOnlineRecruitment, bool onlyWithSanitaryBook, bool onlyWithStudentStatus, bool onlyWithDisabilityCertificate, bool isModeration = false)
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
         var query = context.JobOffer.AsQueryable();
         var httpContext = _httpContextAccessor.HttpContext;
+        bool hasAccess = httpContext != null && (httpContext.User.IsInRole("Admin") || httpContext.User.IsInRole("Moderator"));
 
-        // Tutaj kolejność && jest wyższa niż ||, więc to działa poprawnie (Gość LUB (nie-Admin I nie-Moderator))
-        if (httpContext == null || (!httpContext.User.IsInRole("Admin") && !httpContext.User.IsInRole("Moderator")))
+        if (!isModeration || !hasAccess)
         {
             query = query.Where(o => o.Status == OfferStatus.Opublikowana);
         }
 
-        if (!string.IsNullOrEmpty(location))
-        {
-            query = query.Where(o => o.Location.ToLower().Contains(location.ToLower()));
-        }
-        if (minSalary.HasValue && minSalary.Value > 0)
-        {
-            query = query.Where(o => o.SalaryMin >= minSalary.Value);
-        }
-        if (employmentType.HasValue)
-        {
-            query = query.Where(o => o.EmplType == employmentType.Value);
-        }
-        if (industryCategory.HasValue)
-        {
-            query = query.Where(o => o.IndustryCategory == industryCategory.Value);
-        }
-        if (jobType.HasValue)
-        {
-            query = query.Where(o => o.JobType == jobType.Value);
-        }
+        if (!string.IsNullOrEmpty(location)) query = query.Where(o => o.Location.ToLower().Contains(location.ToLower()));
+        if (minSalary.HasValue && minSalary.Value > 0) query = query.Where(o => o.SalaryMin >= minSalary.Value);
+        if (employmentType.HasValue) query = query.Where(o => o.EmplType == employmentType.Value);
+        if (industryCategory.HasValue) query = query.Where(o => o.IndustryCategory == industryCategory.Value);
+        if (jobType.HasValue) query = query.Where(o => o.JobType == jobType.Value);
 
         if (onlyWithExperience) query = query.Where(o => o.RequiresExperience);
         if (onlyOnlineRecruitment) query = query.Where(o => o.IsOnlineRecruitment);
@@ -86,15 +122,9 @@ public class JobOfferService : IJobOfferService
 
         switch (sortBy)
         {
-            case "salary_desc":
-                query = query.OrderByDescending(o => o.SalaryMin);
-                break;
-            case "salary_asc":
-                query = query.OrderBy(o => o.SalaryMin);
-                break;
-            default:
-                query = query.OrderByDescending(o => o.DatePosted);
-                break;
+            case "salary_desc": query = query.OrderByDescending(o => o.SalaryMin); break;
+            case "salary_asc": query = query.OrderBy(o => o.SalaryMin); break;
+            default: query = query.OrderByDescending(o => o.DatePosted); break;
         }
         return await query.ToListAsync();
     }
@@ -109,10 +139,8 @@ public class JobOfferService : IJobOfferService
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
         var currentUserId = GetCurrentUserId();
-        if (string.IsNullOrEmpty(currentUserId))
-        {
-            throw new InvalidOperationException("Nie można utworzyć oferty bez zalogowanego użytkownika.");
-        }
+        if (string.IsNullOrEmpty(currentUserId)) throw new InvalidOperationException("Nie można utworzyć oferty bez zalogowanego użytkownika.");
+
         jobOffer.DatePosted = DateTime.Now;
         jobOffer.Status = OfferStatus.Weryfikacja;
         jobOffer.CreatedByUserId = currentUserId;
@@ -126,33 +154,21 @@ public class JobOfferService : IJobOfferService
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
         var originalOffer = await context.JobOffer.AsNoTracking().FirstOrDefaultAsync(o => o.Id == jobOffer.Id);
-
         var currentUserId = GetCurrentUserId();
         var isOwner = originalOffer?.CreatedByUserId == currentUserId;
-
         var httpContext = _httpContextAccessor.HttpContext;
-        // POPRAWKA: Dodano nawiasy, aby naprawić błąd CS0019
         bool isModerator = (httpContext?.User.IsInRole("Admin") ?? false) || (httpContext?.User.IsInRole("Moderator") ?? false);
 
-        if (!isOwner && !isModerator)
-        {
-            throw new InvalidOperationException("Nie masz uprawnień do edycji tej oferty.");
-        }
+        if (!isOwner && !isModerator) throw new InvalidOperationException("Nie masz uprawnień do edycji tej oferty.");
 
         string changes = "Oferta została zedytowana.";
         if (originalOffer != null && originalOffer.Status != jobOffer.Status)
         {
-            if (!isModerator)
-            {
-                jobOffer.Status = originalOffer.Status;
-            }
+            if (!isModerator) jobOffer.Status = originalOffer.Status;
             else
             {
                 changes = $"Zmieniono status z '{originalOffer.Status}' na '{jobOffer.Status}'.";
-                if (!string.IsNullOrEmpty(jobOffer.ModerationComment))
-                {
-                    changes += $" Komentarz: {jobOffer.ModerationComment}";
-                }
+                if (!string.IsNullOrEmpty(jobOffer.ModerationComment)) changes += $" Komentarz: {jobOffer.ModerationComment}";
             }
         }
         else if (isOwner && !isModerator && originalOffer?.Status != OfferStatus.Weryfikacja)
@@ -174,15 +190,10 @@ public class JobOfferService : IJobOfferService
         {
             var currentUserId = GetCurrentUserId();
             var isOwner = jobOffer.CreatedByUserId == currentUserId;
-
             var httpContext = _httpContextAccessor.HttpContext;
-            // POPRAWKA: Dodano nawiasy
             bool isModerator = (httpContext?.User.IsInRole("Admin") ?? false) || (httpContext?.User.IsInRole("Moderator") ?? false);
 
-            if (!isOwner && !isModerator)
-            {
-                throw new InvalidOperationException("Nie masz uprawnień do usunięcia tej oferty.");
-            }
+            if (!isOwner && !isModerator) throw new InvalidOperationException("Nie masz uprawnień do usunięcia tej oferty.");
 
             LogAudit(context, "OfferDelete", jobOffer.Id, $"Oferta '{jobOffer.Title}' została usunięta.");
             context.JobOffer.Remove(jobOffer);
@@ -202,10 +213,7 @@ public class JobOfferService : IJobOfferService
     public async Task<bool> ApplyForOfferAsync(int offerId, string applicantId)
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
-
-        var existingApplication = await context.JobApplications
-            .AnyAsync(a => a.JobOfferId == offerId && a.ApplicantId == applicantId);
-
+        var existingApplication = await context.JobApplications.AnyAsync(a => a.JobOfferId == offerId && a.ApplicantId == applicantId);
         if (existingApplication) return false;
 
         var offer = await context.JobOffer.FindAsync(offerId);
@@ -234,34 +242,15 @@ public class JobOfferService : IJobOfferService
         return true;
     }
 
-    public async Task<List<JobApplication>> GetApplicationsForOfferAsync(int offerId)
-    {
-        await using var context = await _contextFactory.CreateDbContextAsync();
-
-        return await context.JobApplications
-            .Where(a => a.JobOfferId == offerId)
-            .Include(a => a.Applicant)
-                .ThenInclude(u => u.UserProfileCV)
-                    .ThenInclude(cv => cv.Skills)
-            .Include(a => a.Applicant)
-                .ThenInclude(u => u.UserProfileCV)
-                    .ThenInclude(cv => cv.Languages)
-            .OrderByDescending(a => a.ApplicationDate)
-            .ToListAsync();
-    }
-
     public async Task<bool> HasUserAppliedAsync(int offerId, string applicantId)
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
-
-        return await context.JobApplications
-            .AnyAsync(a => a.JobOfferId == offerId && a.ApplicantId == applicantId);
+        return await context.JobApplications.AnyAsync(a => a.JobOfferId == offerId && a.ApplicantId == applicantId);
     }
 
     public async Task ApproveOfferAsync(int offerId)
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
-
         var offer = await context.JobOffer.FindAsync(offerId);
         if (offer == null || offer.Status != OfferStatus.Weryfikacja) return;
 
@@ -283,7 +272,6 @@ public class JobOfferService : IJobOfferService
     public async Task RejectOfferAsync(int offerId)
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
-
         var offer = await context.JobOffer.FindAsync(offerId);
         if (offer == null || offer.Status != OfferStatus.Weryfikacja) return;
 
@@ -304,7 +292,6 @@ public class JobOfferService : IJobOfferService
     public async Task<List<JobApplication>> GetMyApplicationsAsync(string applicantId)
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
-
         return await context.JobApplications
             .Where(a => a.ApplicantId == applicantId)
             .Include(a => a.JobOffer)
@@ -315,7 +302,6 @@ public class JobOfferService : IJobOfferService
     public async Task UpdateApplicationStatusAsync(int applicationId, ApplicationStatus newStatus, string ownerUserId, string? employerPhone = null, string? rejectionReason = null)
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
-
         var application = await context.JobApplications
             .Include(a => a.JobOffer)
             .Include(a => a.Applicant)
@@ -324,7 +310,6 @@ public class JobOfferService : IJobOfferService
         if (application == null) throw new InvalidOperationException("Nie znaleziono aplikacji.");
         if (application.JobOffer?.CreatedByUserId != ownerUserId) throw new InvalidOperationException("Brak uprawnień.");
 
-        // Blokada 30 minut
         if (application.Status != ApplicationStatus.Aplikowano && application.StatusLastUpdated.HasValue)
         {
             var timeSinceUpdate = DateTime.UtcNow - application.StatusLastUpdated.Value;
@@ -349,12 +334,8 @@ public class JobOfferService : IJobOfferService
         {
             application.EmployerContactPhone = null;
             application.RejectionReason = rejectionReason;
-
             message = $"Niestety, Twoja aplikacja na stanowisko: {application.JobOffer.Title} została odrzucona.";
-            if (!string.IsNullOrEmpty(rejectionReason))
-            {
-                message += $" Powód: {rejectionReason}";
-            }
+            if (!string.IsNullOrEmpty(rejectionReason)) message += $" Powód: {rejectionReason}";
         }
 
         await context.SaveChangesAsync();
@@ -373,22 +354,13 @@ public class JobOfferService : IJobOfferService
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
         var offer = await context.JobOffer.FindAsync(offerId);
-
         if (offer == null) throw new InvalidOperationException("Oferta nie istnieje.");
 
         var httpContext = _httpContextAccessor.HttpContext;
-        // POPRAWKA: Dodano nawiasy
         bool isModerator = (httpContext?.User.IsInRole("Admin") ?? false) || (httpContext?.User.IsInRole("Moderator") ?? false);
 
-        if (offer.CreatedByUserId != userId && !isModerator)
-        {
-            throw new InvalidOperationException("Brak uprawnień do przedłużenia oferty.");
-        }
-
-        if (offer.Status != OfferStatus.Wygasła)
-        {
-            throw new InvalidOperationException("Można przedłużyć tylko wygasłe oferty.");
-        }
+        if (offer.CreatedByUserId != userId && !isModerator) throw new InvalidOperationException("Brak uprawnień do przedłużenia oferty.");
+        if (offer.Status != OfferStatus.Wygasła) throw new InvalidOperationException("Można przedłużyć tylko wygasłe oferty.");
 
         offer.Status = OfferStatus.Opublikowana;
         offer.DatePosted = DateTime.Now;
@@ -397,12 +369,12 @@ public class JobOfferService : IJobOfferService
         LogAudit(context, "OfferExtended", offer.Id, $"Oferta przedłużona o {daysToAdd} dni.");
         await context.SaveChangesAsync();
     }
+
     public async Task<JobApplication?> GetApplicationByIdAsync(int applicationId)
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
-
         return await context.JobApplications
-            .Include(a => a.JobOffer) // Dołączamy ofertę, żeby wyświetlić jej tytuł
+            .Include(a => a.JobOffer)
             .FirstOrDefaultAsync(a => a.Id == applicationId);
     }
 }

@@ -10,179 +10,144 @@
 
 <PageTitle>Moje Oferty Pracy</PageTitle>
 
-<h1>Moje Oferty Pracy</h1>
+<div class="page-container">
+    <div class="container">
 
-<p>
-    <a href="/joboffers/create" class="btn btn-primary">Dodaj nową ofertę</a>
-</p>
+        <div class="header-section animate-fade-up">
+            <h1 class="page-title">Moje Oferty</h1>
+            <a href="/joboffers/create" class="btn-add-new">
+                <i class="bi bi-plus-lg"></i> Dodaj Nową Ofertę
+            </a>
+        </div>
 
-@if (jobOffers == null)
-
-{
-    <p><em>Ładowanie...</em></p>
-}
-
-else if (!jobOffers.Any())
-
-{
-    <div class="alert alert-info">Nie dodałeś jeszcze żadnych ofert pracy.</div>
-}
-
-else
-
-{
-    <div class="row row-cols-1 row-cols-md-2 g-4">
-        @foreach (var offer in jobOffers)
-
+        @if (jobOffers == null)
         {
-            <div class="col">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">@offer.Title</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">@offer.CompanyName</h6>
-                        <p class="card-text">
-                            @if (offer.IndustryCategory.HasValue)
+            <div class="text-center py-5">
+                <div class="spinner-border text-light" role="status"></div>
+            </div>
+        }
+        else if (!jobOffers.Any())
+        {
+            <div class="empty-state animate-fade-up delay-1">
+                <i class="bi bi-folder2-open display-1 mb-3 d-block opacity-50"></i>
+                <h3>Nie masz jeszcze żadnych ofert</h3>
+                <p class="mb-4">Dodaj swoje pierwsze ogłoszenie i zacznij rekrutację.</p>
+                <a href="/joboffers/create" class="btn-add-new">Dodaj pierwszą ofertę</a>
+            </div>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 animate-fade-up delay-1">
+                @foreach (var offer in jobOffers)
+                {
+                    <div class="col">
+                        <div class="my-offer-card">
+
+                            <div class="card-top">
+                                <div>
+                                    <h5 class="offer-title">@offer.Title</h5>
+                                    <div class="offer-company">@offer.CompanyName</div>
+                                </div>
+                                <span class="status-badge status-@offer.Status">
+                                    @offer.Status.ToString()
+                                </span>
+                            </div>
+
+                            <div class="tags-container">
+                                <span class="detail-tag tag-location">
+                                    <i class="bi bi-geo-alt-fill"></i> @offer.Location
+                                </span>
+
+                                @if (offer.IndustryCategory.HasValue)
+                                {
+                                    <span class="detail-tag tag-industry">
+                                        <i class="bi bi-briefcase-fill"></i> @offer.IndustryCategory
+                                    </span>
+                                }
+
+                                <span class="detail-tag tag-salary">
+                                    <i class="bi bi-cash-stack"></i> @offer.SalaryRange
+                                </span>
+                            </div>
+
+                            @if (offer.Status == OfferStatus.Odrzucona && !string.IsNullOrEmpty(offer.ModerationComment))
                             {
-                                <strong>Branża:</strong> @offer.IndustryCategory
-
-                                <br />
+                                <div class="moderation-alert">
+                                    <strong><i class="bi bi-exclamation-triangle-fill"></i> Powód odrzucenia:</strong><br />
+                                    @offer.ModerationComment
+                                </div>
                             }
-                            <strong>Lokalizacja:</strong> @offer.Location<br />
-                            <strong>Wynagrodzenie:</strong> @offer.SalaryRange
-                        </p>
 
-                        <span class="badge @GetStatusBadgeClass(offer.Status)">@offer.Status.ToString()</span>
+                            <div class="card-actions">
 
-                        @if (offer.Status == OfferStatus.Wygasła)
+                                @if (offer.Status == OfferStatus.Wygasła)
+                                {
+                                    <button class="btn-action btn-extend" @onclick="() => ExtendOffer(offer)">
+                                        <i class="bi bi-arrow-clockwise me-2"></i> Przedłuż o 3 dni
+                                    </button>
+                                }
 
-                        {
-                            <div class="mt-2">
-                                <button class="btn btn-warning btn-sm" @onclick="() => ExtendOffer(offer)">
-                                    <span class="bi bi-arrow-clockwise"></span> Przedłuż o 3 dni
-                                </button>
+                                <a href="@($"/my-offers/details/{offer.Id}")" class="btn-action btn-manage">
+                                    <i class="bi bi-people-fill me-2"></i> Zarządzaj / Aplikacje
+                                </a>
+
+                                <div class="d-flex gap-2">
+                                    <a href="@($"/my-offers/edit/{offer.Id}")" class="btn-action btn-edit flex-grow-1">
+                                        <i class="bi bi-pencil me-2"></i> Edytuj
+                                    </a>
+                                    <a href="@($"/my-offers/delete/{offer.Id}")" class="btn-action btn-delete flex-grow-1">
+                                        <i class="bi bi-trash me-2"></i> Usuń
+                                    </a>
+                                </div>
                             </div>
-                        }
-                        @if (offer.Status == OfferStatus.Odrzucona && !string.IsNullOrEmpty(offer.ModerationComment))
 
-                        {
-                            <div class="alert alert-danger mt-2">
-                                <strong>Powód odrzucenia:</strong> @offer.ModerationComment
+                            <div class="date-info">
+                                Dodano: @offer.DatePosted.ToShortDateString()
                             </div>
-                        }
 
-                        <div class="mt-3">
-                            <a href="@($"/my-offers/details/{offer.Id}")" class="btn btn-secondary btn-sm">Zarządzaj / Zobacz aplikacje</a>
-                            <a href="@($"/my-offers/edit/{offer.Id}")" class="btn btn-primary btn-sm">Edytuj</a>
-                            <a href="@($"/my-offers/delete/{offer.Id}")" class="btn btn-danger btn-sm">Usuń</a>
                         </div>
                     </div>
-                    <div class="card-footer text-muted">
-                        Dodano: @offer.DatePosted.ToShortDateString()
-                    </div>
-                </div>
+                }
             </div>
         }
     </div>
-}
+</div>
 
 @code {
     private List<JobOffer>? jobOffers;
-
     private string? currentUserId;
 
-
-
     protected override async Task OnInitializedAsync()
-
     {
-
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-
         var user = authState.User;
-
         currentUserId = user.FindFirstValue(ClaimTypes.NameIdentifier);
 
-
-
         if (!string.IsNullOrEmpty(currentUserId))
-
         {
-
             await LoadOffers();
-
         }
-
     }
-
-
 
     private async Task LoadOffers()
-
     {
-
         if (string.IsNullOrEmpty(currentUserId)) return;
-
         jobOffers = await JobOfferService.GetMyOffersAsync(currentUserId);
-
         StateHasChanged();
-
     }
-
-
 
     private async Task ExtendOffer(JobOffer offer)
-
     {
-
         if (string.IsNullOrEmpty(currentUserId)) return;
 
-
-
         try
-
         {
-
-            // ### ZMIANA TUTAJ: Przekazujemy '3' zamiast '30' ###
-
             await JobOfferService.ExtendOfferAsync(offer.Id, 3, currentUserId);
-
-
-
             await LoadOffers();
-
         }
-
         catch (Exception ex)
-
         {
-
-            Console.WriteLine($"Błąd podczas przedłużania: {ex.Message}");
-
+            Console.WriteLine($"Błąd: {ex.Message}");
         }
-
-    }
-
-
-
-    private string GetStatusBadgeClass(OfferStatus status)
-
-    {
-
-        return status switch
-
-        {
-
-            OfferStatus.Opublikowana => "bg-success",
-
-            OfferStatus.Weryfikacja => "bg-warning text-dark",
-
-            OfferStatus.Odrzucona => "bg-danger",
-
-            OfferStatus.Wygasła => "bg-secondary",
-
-            _ => "bg-secondary"
-
-        };
-
     }
 }

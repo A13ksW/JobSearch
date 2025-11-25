@@ -4,7 +4,21 @@ using JobSearch.Services;
 public interface IJobOfferService
 {
     // --- Istniejące metody (z Twoimi rozszerzonymi filtrami) ---
-    Task<List<JobOffer>> GetJobOffersAsync(string? location, decimal? minSalary, string? sortBy, EmploymentType? employmentType, JobType? jobType, IndustryCategory? industryCategory, bool onlyWithExperience, bool onlyOnlineRecruitment, bool onlyWithSanitaryBook, bool onlyWithStudentStatus, bool onlyWithDisabilityCertificate);
+    Task<List<JobOffer>> GetJobOffersAsync(
+            string? location,
+            decimal? minSalary,
+            string? sortBy,
+            EmploymentType? employmentType,
+            JobType? jobType,
+            IndustryCategory? industryCategory,
+            bool onlyWithExperience,
+            bool onlyOnlineRecruitment,
+            bool onlyWithSanitaryBook,
+            bool onlyWithStudentStatus,
+            bool onlyWithDisabilityCertificate,
+            // NOWY PARAMETR: Domyślnie false (tryb zwykłego użytkownika)
+            bool isModeration = false
+        );
 
     Task<JobOffer?> GetByIdAsync(int id);
     Task CreateAsync(JobOffer jobOffer);

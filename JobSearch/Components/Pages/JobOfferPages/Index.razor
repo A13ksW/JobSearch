@@ -441,11 +441,18 @@ else
     {
 
         var allOffers = await JobOfferService.GetJobOffersAsync(
-
-            locationFilter, minSalaryFilter, sortBy, employmentTypeFilter, jobTypeFilter, selectedIndustryCategory,
-
-            onlyWithExperience, onlyOnlineRecruitment, onlyWithSanitaryBook, onlyWithStudentStatus, onlyWithDisabilityCertificate
-
+            locationFilter,
+            minSalaryFilter,
+            sortBy,
+            employmentTypeFilter,
+            jobTypeFilter,
+            selectedIndustryCategory,
+            onlyWithExperience,
+            onlyOnlineRecruitment,
+            onlyWithSanitaryBook,
+            onlyWithStudentStatus,
+            onlyWithDisabilityCertificate,
+            true // <--- isModeration = TRUE (Pokaż wszystko)
         );
 
 
