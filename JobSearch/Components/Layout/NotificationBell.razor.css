@@ -1,62 +1,125 @@
-﻿.bi-bell-fill {
-    display: inline-block;
+﻿/* Kontener */
+.notification-wrapper {
     position: relative;
-    width: 1.25rem;
-    height: 1.25rem;
-    margin-right: 0.75rem;
-    top: -1px;
-    background-size: cover;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' class='bi bi-bell-fill' viewBox='0 0 16 16'%3E%3Cpath d='M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2m.995-14.901a1 1 0 1 0-1.99 0A5 5 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901'/%3E%3C/svg%3E");
+    display: inline-block;
 }
 
-.top-row-bell {
-    color: #ffffff;
-    text-decoration: none;
-    padding-top: 0.25rem;
-    transition: color 0.2s;
+/* IKONA DZWONKA - POPRAWIONA */
+.bi-bell-fill {
+    display: inline-block;
+    width: 1.5rem;
+    height: 1.5rem;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    /* ZMIANA: Użyto kodu %23ffffff (biały) zamiast nazwy 'white' dla pewności */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23ffffff' class='bi bi-bell-fill' viewBox='0 0 16 16'%3E%3Cpath d='M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2m.995-14.901a1 1 0 1 0-1.99 0A5 5 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901'/%3E%3C/svg%3E");
 }
 
-    .top-row-bell:hover {
-        text-decoration: none;
-        color: #e0e0e0;
+/* Przycisk */
+.bell-btn {
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    border: none;
+    background: transparent;
+}
+
+    .bell-btn:focus {
+        box-shadow: none;
     }
 
-/* --- Styl dla menu powiadomień --- */
-.dropdown-menu-right {
-    right: 0;
-    left: auto;
-    border-radius: 0.25rem;
-    /* POPRAWKA: Wymuszenie ciemnego tekstu w menu */
-    color: #212529 !important;
+    /* Plakietka z liczbą */
+    .bell-btn .badge {
+        font-size: 0.65rem;
+        padding: 0.35em 0.5em;
+        top: 2px !important;
+        right: 0px;
+        border: 2px solid #0f172a; /* Obramowanie w kolorze tła nagłówka dla kontrastu */
+    }
+
+/* --- OKNO POWIADOMIEŃ --- */
+.notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: -10px; /* Lekkie przesunięcie, żeby nie wychodziło za ekran */
+    width: 360px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    z-index: 2000;
+    margin-top: 15px;
+    overflow: hidden;
+    color: #333333;
+    text-align: left;
+    /* Dodajemy trójkątny "dziubek" wskazujący na dzwonek */
+    clip-path: padding-box;
 }
 
-.dropdown-item-notification {
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid #e9ecef;
+/* Nagłówek */
+.notification-header {
+    padding: 12px 16px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* Przycisk "Oznacz wszystkie" */
+.mark-read-btn {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #2563eb !important;
     cursor: pointer;
-    white-space: normal;
-    color: #212529; /* Ciemny tekst */
 }
 
-    .dropdown-item-notification:hover {
-        background-color: #f8f9fa;
+    .mark-read-btn:hover {
+        text-decoration: underline !important;
+        color: #1d4ed8 !important;
     }
 
-/* Link "Oznacz wszystkie jako przeczytane" */
-.dropdown-menu-right a {
-    color: #0d6efd !important; /* Niebieski link */
-    text-decoration: none;
+/* Lista */
+.notification-list {
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #fff;
 }
 
-    .dropdown-menu-right a:hover {
-        text-decoration: underline;
+/* Element listy */
+.notification-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f5f5f5;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    position: relative;
+}
+
+    .notification-item:hover {
+        background-color: #f8fafc;
     }
 
-/* Podświetlenie nieprzeczytanych */
-.dropdown-item-notification.unread {
-    background-color: #f0f8ff;
+    .notification-item.unread {
+        background-color: #eff6ff; /* Jasny niebieski */
+    }
+
+.notification-text {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: #334155;
+    margin-bottom: 4px;
+    word-wrap: break-word;
 }
 
-.dropdown-item-notification:last-child {
-    border-bottom: 0;
+.notification-time {
+    font-size: 0.75rem;
+    color: #94a3b8 !important;
+}
+
+.unread-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #2563eb;
+    border-radius: 50%;
+    margin-left: 10px;
+    margin-top: 6px;
+    flex-shrink: 0;
 }

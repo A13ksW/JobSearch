@@ -27,6 +27,11 @@ namespace JobSearch.Data
         {
             base.OnModelCreating(builder);
 
+            // === WAŻNE: KONFIGURACJA DLA TRIGGERA (Aby nie blokował EF Core) ===
+            builder.Entity<JobOffer>()
+                .ToTable(tb => tb.HasTrigger("TRG_JobOffer_SalaryCheck"));
+            // ==================================================================
+
             // === KONFIGURACJA RELACJI UŻYTKOWNIKA ===
 
             // 1. Użytkownik -> Stworzone Oferty
@@ -82,7 +87,6 @@ namespace JobSearch.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
             // === RELACJE CZATU ===
-            // Używamy Restrict dla nadawcy, aby uniknąć pętli usuwania (multiple cascade paths)
             builder.Entity<ChatMessage>()
                 .HasOne(m => m.Sender)
                 .WithMany()
