@@ -1,0 +1,179 @@
+﻿/* === 1. KONTENER I ANIMACJE === */
+.page-container {
+    padding-top: 3rem;
+    padding-bottom: 6rem;
+    max-width: 700px;
+    margin: 0 auto;
+    color: #fff;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.animate-fade-up {
+    animation: fadeUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes fadeUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* === 2. KARTA USUWANIA === */
+.delete-card {
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 3rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    color: #0f172a;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    width: 100%;
+}
+
+    .delete-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 8px;
+        background: linear-gradient(90deg, #ef4444, #b91c1c);
+    }
+
+.warning-icon {
+    font-size: 4rem;
+    color: #ef4444;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.card-title {
+    font-weight: 800;
+    font-size: 2rem;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.card-subtitle {
+    color: #64748b;
+    font-size: 1.1rem;
+    margin-bottom: 2.5rem;
+}
+
+/* === 3. PODSUMOWANIE OFERTY (POPRAWIONE) === */
+.offer-summary-box {
+    background-color: #fef2f2;
+    border: 1px solid #fee2e2;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+    text-align: left;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    /* ZMIANA: flex-start zamiast center, żeby długi tekst nie psuł układu */
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid #fecaca;
+    /* ZMIANA: Odstęp między etykietą a wartością */
+    gap: 20px;
+}
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+.info-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #991b1b;
+    letter-spacing: 0.5px;
+    /* Zabezpieczenie, żeby etykieta się nie zwijała */
+    flex-shrink: 0;
+    margin-top: 2px; /* Wyrównanie optyczne do tekstu */
+}
+
+.info-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+    /* ZMIANA: Tekst do prawej, zawijanie długich słów */
+    text-align: right;
+    word-break: break-word;
+}
+
+/* === 4. PRZYCISKI === */
+.actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.btn-delete {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    padding: 1rem 2.5rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: none;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    transition: transform 0.2s;
+    flex: 1;
+    cursor: pointer;
+}
+
+    .btn-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5);
+    }
+
+.btn-cancel {
+    background: white;
+    color: #64748b;
+    padding: 1rem 2.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-decoration: none;
+    border: 2px solid #e2e8f0;
+    transition: all 0.2s;
+    flex: 1;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+    .btn-cancel:hover {
+        background: #f1f5f9;
+        color: #0f172a;
+        border-color: #cbd5e1;
+    }

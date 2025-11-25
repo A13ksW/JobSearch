@@ -11,41 +11,56 @@
 
 <PageTitle>Usuń Ofertę</PageTitle>
 
-<h1>Usuń Ofertę</h1>
+<div class="page-container">
+    <div class="delete-card animate-fade-up">
 
-<h3>Czy na pewno chcesz usunąć tę ofertę?</h3>
-<hr />
-
-@if (jobOffer == null)
-{
-    <p><em>Ładowanie...</em></p>
-}
-else
-{
-    <div class="card">
-        <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-3">Tytuł</dt>
-                <dd class="col-sm-9">@jobOffer.Title</dd>
-
-                <dt class="col-sm-3">Firma</dt>
-                <dd class="col-sm-9">@jobOffer.CompanyName</dd>
-
-                <dt class="col-sm-3">Lokalizacja</dt>
-                <dd class="col-sm-9">@jobOffer.Location</dd>
-
-                <dt class="col-sm-3">Data dodania</dt>
-                <dd class="col-sm-9">@jobOffer.DatePosted.ToShortDateString()</dd>
-
-                <dt class="col-sm-3">Status</dt>
-                <dd class="col-sm-9">@jobOffer.Status</dd>
-            </dl> <div class="mt-3">
-                <button type="button" class="btn btn-danger" @onclick="DeleteOffer">Potwierdź usunięcie</button>
-                <a href="/my-offers" class="btn btn-secondary">Anuluj</a>
-            </div>
+        <div class="warning-icon">
+            <i class="bi bi-exclamation-triangle-fill"></i>
         </div>
+
+        <h1 class="card-title">Usuwanie Oferty</h1>
+        <p class="card-subtitle">Tej operacji nie można cofnąć. Czy na pewno chcesz usunąć tę ofertę?</p>
+
+        @if (jobOffer == null)
+        {
+            <div class="py-4">
+                <div class="spinner-border text-danger" role="status"></div>
+            </div>
+        }
+        else
+        {
+            <div class="offer-summary-box">
+                <div class="info-row">
+                    <span class="info-label">Tytuł</span>
+                    <span class="info-value">@jobOffer.Title</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Firma</span>
+                    <span class="info-value">@jobOffer.CompanyName</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Lokalizacja</span>
+                    <span class="info-value">@jobOffer.Location</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Data dodania</span>
+                    <span class="info-value">@jobOffer.DatePosted.ToShortDateString()</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Status</span>
+                    <span class="info-value text-uppercase fw-bold">@jobOffer.Status</span>
+                </div>
+            </div>
+
+            <div class="actions">
+                <a href="/my-offers" class="btn-cancel">Anuluj</a>
+                <button type="button" class="btn-delete" @onclick="DeleteOffer">
+                    <i class="bi bi-trash3-fill me-2"></i> Usuń Ofertę
+                </button>
+            </div>
+        }
     </div>
-}
+</div>
 
 @code {
     [Parameter]

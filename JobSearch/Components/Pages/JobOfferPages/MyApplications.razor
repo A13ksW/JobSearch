@@ -11,127 +11,101 @@
 
 <PageTitle>Moje Aplikacje</PageTitle>
 
-<h1>Moje Aplikacje</h1>
-<p>Lista ofert pracy, na które aplikowałeś.</p>
+<div class="page-container">
+    <div class="container">
 
-@if (myApplications == null)
+        <div class="header-section animate-fade-up">
+            <h1 class="page-title">Moje Aplikacje</h1>
+            <p class="page-subtitle">Śledź status swoich zgłoszeń i historię rekrutacji.</p>
+        </div>
 
-{
-    <p><em>Ładowanie...</em></p>
-}
+        @if (myApplications == null)
+        {
+            <div class="text-center py-5">
+                <div class="spinner-border text-light" role="status"></div>
+            </div>
+        }
+        else if (!myApplications.Any())
+        {
+            <div class="empty-state animate-fade-up delay-1">
+                <i class="bi bi-send display-1 mb-3 d-block opacity-50"></i>
+                <h3>Nie wysłałeś jeszcze żadnych aplikacji</h3>
+                <p>Przeglądaj oferty i aplikuj na wymarzone stanowiska.</p>
+                <a href="/offers" class="btn-empty-cta">Przeglądaj Oferty</a>
+            </div>
+        }
+        else
+        {
+            <div class="applications-grid animate-fade-up delay-1">
+                @foreach (var app in myApplications)
+                {
+                    <div class="app-card card-status-@app.Status">
 
-else if (!myApplications.Any())
+                        <div class="card-header-flex">
+                            <div>
+                                <div class="job-title">@app.JobOffer?.Title</div>
+                                <div class="job-company">
+                                    <i class="bi bi-building"></i> @app.JobOffer?.CompanyName
+                                </div>
+                            </div>
+                            <div class="app-date">
+                                @app.ApplicationDate.ToLocalTime().ToString("dd MMM yyyy")
+                            </div>
+                        </div>
 
-{
-    <div class="alert alert-info">Nie aplikowałeś jeszcze na żadną ofertę.</div>
-    <a href="/offers" class="btn btn-primary">Przeglądaj oferty</a>
-}
-
-else
-
-{
-    <table class="table table-striped align-middle">
-        <thead>
-            <tr>
-                <th style="width: 25%">Stanowisko</th>
-                <th style="width: 20%">Firma</th>
-                <th style="width: 15%">Data Aplikacji</th>
-                <th style="width: 30%">Status</th>
-                <th style="width: 10%"></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var app in myApplications)
-
-            {
-                <tr>
-                    <td>@app.JobOffer?.Title</td>
-                    <td>@app.JobOffer?.CompanyName</td>
-                    <td>@app.ApplicationDate.ToLocalTime().ToString("g")</td>
-                    <td>
-                        <span class="badge @GetApplicationStatusBadge(app.Status)">@app.Status.ToString()</span>
+                        <div class="mb-3">
+                            <span class="status-badge status-@app.Status">
+                                @app.Status.ToString()
+                            </span>
+                        </div>
 
                         @if (app.Status == ApplicationStatus.Zaproszony && !string.IsNullOrEmpty(app.EmployerContactPhone))
-
                         {
-                            <div class="text-success small fw-bold mt-1">
-                                <span class="bi bi-telephone-fill"></span> +48 @app.EmployerContactPhone
+                            <div class="info-box info-box-success">
+                                <i class="bi bi-telephone-fill info-box-icon"></i>
+                                <div>
+                                    <small class="d-block text-uppercase fw-bold" style="font-size: 0.7rem; opacity: 0.8;">Kontakt</small>
+                                    <strong>@app.EmployerContactPhone</strong>
+                                </div>
                             </div>
                         }
 
-                        @if (app.Status == ApplicationStatus.Odrzucony && !string.IsNullOrEmpty(app.RejectionReason))
+                        <div class="card-footer-actions">
+                            <a href="@($"/offer/{app.JobOfferId}")" class="btn-action btn-view">
+                                Zobacz Ofertę
+                            </a>
 
-                        {
-                            <div class="mt-2">
-                                <a href="@($"/my-applications/feedback/{app.Id}")" class="btn btn-outline-danger btn-sm">
-                                    Powód odrzucenia
+                            @if (app.Status == ApplicationStatus.Odrzucony && !string.IsNullOrEmpty(app.RejectionReason))
+                            {
+                                <a href="@($"/my-applications/feedback/{app.Id}")" class="btn-action btn-feedback">
+                                    <i class="bi bi-chat-left-text-fill"></i> Powód
                                 </a>
-                            </div>
-                        }
-                    </td>
-                    <td>
-                        <a href="@($"/offer/{app.JobOfferId}")" class="btn btn-secondary btn-sm">Zobacz ofertę</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+                            }
+                        </div>
+
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
 
 @code {
     private List<JobApplication>? myApplications;
-
     private string? currentUserId;
 
-
-
     protected override async Task OnInitializedAsync()
-
     {
-
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-
         var user = authState.User;
-
         currentUserId = user.FindFirstValue(ClaimTypes.NameIdentifier);
 
-
-
         if (string.IsNullOrEmpty(currentUserId))
-
         {
-
             NavigationManager.NavigateTo("Account/Login");
-
             return;
-
         }
 
-
-
         myApplications = await JobOfferService.GetMyApplicationsAsync(currentUserId);
-
-    }
-
-
-
-    private string GetApplicationStatusBadge(ApplicationStatus status)
-
-    {
-
-        return status switch
-
-        {
-
-            ApplicationStatus.Aplikowano => "bg-secondary",
-
-            ApplicationStatus.Zaproszony => "bg-success",
-
-            ApplicationStatus.Odrzucony => "bg-danger",
-
-            _ => "bg-light text-dark"
-
-        };
-
     }
 }
