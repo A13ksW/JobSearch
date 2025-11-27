@@ -1,17 +1,47 @@
 ﻿@inherits LayoutComponentBase
 @layout AccountLayout
 
-<h1>Manage your account</h1>
+<!-- Główny wrapper dashboardu -->
+<div class="dashboard-wrapper animate-fade-in">
 
-<div>
-    <h2>Change your account settings</h2>
-    <hr />
-    <div class="row">
-        <div class="col-md-3">
-            <ManageNavMenu />
-        </div>
-        <div class="col-md-9">
-            @Body
-        </div>
+    <!-- Karta Settings Card - to ona ma białe tło i zaokrąglenia -->
+    <div class="settings-card">
+
+        <!-- LEWY PANEL (SIDEBAR) -->
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-header">
+                <!-- Ikona w nagłówku -->
+                <div class="brand-box">
+                    <i class="bi bi-person-gear"></i>
+                </div>
+                <!-- Tekst nagłówka -->
+                <div class="header-text">
+                    <h3>MOJE KONTO</h3>
+                    <small>Panel użytkownika</small>
+                </div>
+            </div>
+
+            <!-- Menu nawigacyjne -->
+            <div class="sidebar-content">
+                <ManageNavMenu />
+            </div>
+
+            <!-- Stopka sidebara -->
+            <div class="sidebar-footer">
+                <div class="info-badge">
+                    <i class="bi bi-shield-check"></i>
+                    <span>Połączenie szyfrowane</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- PRAWY PANEL (TREŚĆ WŁAŚCIWA) -->
+        <main class="dashboard-content">
+            <div class="content-container">
+                <!-- Tutaj renderowane są podstrony: Index, Email, ChangePassword, MyCV -->
+                @Body
+            </div>
+        </main>
+
     </div>
 </div>

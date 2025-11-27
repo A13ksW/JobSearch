@@ -7,96 +7,147 @@
 @inject ChatService ChatService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavManager
+@inject IJSRuntime JSRuntime
 @implements IDisposable
 @attribute [Authorize]
 
 <PageTitle>Wiadomości</PageTitle>
 
-<div class="container mt-3">
-    <div class="row chat-layout g-0">
+<div class="page-container">
+    <div class="chat-layout-wrapper animate-fade-up">
 
-        <div class="col-md-4 chat-sidebar">
-            <div class="p-3 border-bottom bg-white sticky-top">
-                <h5 class="m-0 fw-bold text-primary">Wiadomości</h5>
+        <div class="chat-sidebar">
+            <div class="sidebar-header">
+                <h5 class="m-0 fw-bold text-light">Wiadomości</h5>
             </div>
 
-            <div class="list-group list-group-flush">
+            <div class="conversations-list">
                 @if (!chatPartners.Any())
                 {
-                    <div class="p-4 text-center text-muted">
-                        <i class="bi bi-chat-square-dots fs-1 mb-2"></i>
-                        <p>Brak rozmów. Aplikuj na oferty, aby nawiązać kontakt.</p>
+                    <div class="empty-sidebar">
+                        <i class="bi bi-chat-square-dots"></i>
+                        <p>Brak rozpoczętych rozmów.</p>
                     </div>
                 }
 
                 @foreach (var user in chatPartners)
                 {
-                    <div class="contact-item @(selectedUserId == user.Id ? "active" : "")"
+                    <div class="conversation-item @(selectedUserId == user.Id ? "active" : "")"
                          @onclick="() => SelectUser(user)">
-                        <div class="d-flex align-items-center">
-                            <div class="contact-avatar">
-                                @GetInitials(user.DisplayName ?? user.Email)
-                            </div>
-                            <div class="flex-grow-1 overflow-hidden">
-                                <div class="fw-bold text-truncate">@(user.DisplayName ?? user.Email)</div>
-                                <small class="text-muted text-truncate d-block">@user.Email</small>
-                            </div>
+
+                        <div class="avatar-circle">
+                            @GetInitials(GetDisplayName(user))
                         </div>
+
+                        <div class="conversation-info">
+                            <div class="user-name">@GetDisplayName(user)</div>
+                            <div class="user-status text-truncate">@user.Email</div>
+                        </div>
+
+                        @if (selectedUserId == user.Id)
+                        {
+                            <div class="active-indicator"></div>
+                        }
                     </div>
                 }
             </div>
         </div>
 
-        <div class="col-md-8 chat-area">
+        <div class="chat-main">
             @if (selectedUser != null)
             {
                 <div class="chat-header">
-                    <div class="contact-avatar me-2" style="background-color: var(--primary);">
-                        @GetInitials(selectedUser.DisplayName ?? selectedUser.Email)
-                    </div>
-                    <div>
-                        <div class="fw-bold">@(selectedUser.DisplayName ?? selectedUser.Email)</div>
-                        <div class="small text-success"><i class="bi bi-circle-fill" style="font-size: 8px;"></i> Dostępny</div>
+                    <div class="d-flex align-items-center">
+                        <div class="avatar-circle small me-3">
+                            @GetInitials(GetDisplayName(selectedUser))
+                        </div>
+                        <div>
+                            <div class="chat-user-name">@GetDisplayName(selectedUser)</div>
+
+                            <div class="chat-user-status">
+                                @if (IsUserOnline(selectedUser.Id))
+                                {
+                                    <div class="status-dot online"></div>
+                                    <span class="text-success fw-bold" style="font-size: 0.8rem;">Dostępny</span>
+                                }
+                                else
+                                {
+                                    <div class="status-dot offline"></div>
+                                    <span class="text-danger fw-bold" style="font-size: 0.8rem;">Niedostępny</span>
+                                }
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="messages-container" id="messagesBox">
+                <div class="messages-area" id="messagesBox">
+                    @if (!messages.Any())
+                    {
+                        <div class="empty-chat-placeholder">
+                            <i class="bi bi-chat-heart"></i>
+                            <p>To początek Waszej rozmowy.</p>
+                        </div>
+                    }
+
                     @foreach (var msg in messages)
                     {
                         var isMe = msg.SenderId == currentUserId;
 
-                        <div class="message-wrapper @(isMe ? "me" : "other")">
-                            <div class="message-bubble">
-                                <div>@msg.Message</div>
-                                <span class="message-time">@msg.Timestamp.ToLocalTime().ToString("HH:mm")</span>
+                        <div class="message-row @(isMe ? "message-out" : "message-in")">
+                            @if (!isMe)
+                            {
+                                <div class="message-avatar-spacer">
+                                    @GetInitials(GetDisplayName(selectedUser))
+                                </div>
+                            }
+
+                            <div class="message-bubble animate-pop">
+                                <div class="message-text">@msg.Message</div>
+                                <div class="message-time">@msg.Timestamp.ToLocalTime().ToString("HH:mm")</div>
                             </div>
                         </div>
                     }
                 </div>
 
-                <div class="input-area">
-                    <div class="input-group">
+                <div class="chat-input-area">
+                    <div class="input-wrapper">
                         <input @bind="newMessageInput"
                                @bind:event="oninput"
                                @onkeyup="HandleEnter"
-                               class="form-control chat-input"
+                               class="chat-input-field"
                                placeholder="Napisz wiadomość..." />
-                        <button class="btn btn-primary ms-2 rounded-circle" style="width: 45px; height: 45px;" @onclick="SendMessage">
-                            <i class="bi bi-send-fill"></i>
+
+                        <button class="btn-send @(!string.IsNullOrWhiteSpace(newMessageInput) ? "ready" : "")"
+                                @onclick="SendMessage">
+                            WYŚLIJ
                         </button>
                     </div>
                 </div>
             }
             else
             {
-                <div class="d-flex flex-column align-items-center justify-content-center h-100 text-muted bg-light">
-                    <i class="bi bi-chat-left-text fs-1 mb-3 text-secondary"></i>
-                    <h5>Wybierz osobę, aby rozpocząć czat</h5>
+                <div class="no-chat-selected">
+                    <div class="no-chat-content animate-fade-up">
+                        <div class="icon-circle">
+                            <i class="bi bi-chat-dots-fill"></i>
+                        </div>
+                        <h3>Witaj w komunikatorze</h3>
+                        <p>Wybierz osobę z listy po lewej stronie, aby rozpocząć rozmowę.</p>
+                    </div>
                 </div>
             }
         </div>
     </div>
 </div>
+
+<script>
+    window.scrollToBottom = (id) => {
+        var element = document.getElementById(id);
+        if (element) {
+            element.scrollTop = element.scrollHeight;
+        }
+    }
+</script>
 
 @code {
     private string? currentUserId;
@@ -108,43 +159,74 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        currentUserId = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (!string.IsNullOrEmpty(currentUserId))
+        try
         {
-            chatPartners = await ChatService.GetChatPartnersAsync(currentUserId);
-            ChatService.OnMessageSent += HandleNewMessage;
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            currentUserId = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!string.IsNullOrEmpty(currentUserId))
+            {
+                chatPartners = await ChatService.GetChatPartnersAsync(currentUserId);
+                ChatService.OnMessageSent += HandleNewMessage;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Błąd inicjalizacji czatu: {ex.Message}");
         }
     }
 
     private async void HandleNewMessage(string senderId, string receiverId)
     {
-        if (selectedUser != null &&
-            ((senderId == selectedUser.Id && receiverId == currentUserId) ||
-             (senderId == currentUserId && receiverId == selectedUser.Id)))
+        try
         {
-            await InvokeAsync(async () =>
+            if (selectedUser != null &&
+                ((senderId == selectedUser.Id && receiverId == currentUserId) ||
+                 (senderId == currentUserId && receiverId == selectedUser.Id)))
             {
-                await LoadMessages();
-                StateHasChanged();
-                // Opcjonalnie: Tutaj można by dodać auto-scroll do dołu
-            });
+                await InvokeAsync(async () =>
+                {
+                    await LoadMessages();
+                    StateHasChanged();
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Błąd w HandleNewMessage: {ex.Message}");
         }
     }
 
     private async Task SelectUser(ApplicationUser user)
     {
-        selectedUser = user;
-        selectedUserId = user.Id;
-        await LoadMessages();
+        try
+        {
+            selectedUser = user;
+            selectedUserId = user.Id;
+            messages = new List<ChatMessage>();
+            await LoadMessages();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Błąd podczas wybierania użytkownika: {ex.Message}");
+        }
     }
 
     private async Task LoadMessages()
     {
         if (currentUserId != null && selectedUserId != null)
         {
-            messages = await ChatService.GetConversationAsync(currentUserId, selectedUserId);
+            try
+            {
+                messages = await ChatService.GetConversationAsync(currentUserId, selectedUserId);
+                StateHasChanged();
+                await Task.Delay(50);
+                await JSRuntime.InvokeVoidAsync("scrollToBottom", "messagesBox");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Błąd ładowania wiadomości: {ex.Message}");
+            }
         }
     }
 
@@ -152,8 +234,18 @@
     {
         if (!string.IsNullOrWhiteSpace(newMessageInput) && currentUserId != null && selectedUserId != null)
         {
-            await ChatService.SendMessageAsync(currentUserId, selectedUserId, newMessageInput);
-            newMessageInput = "";
+            try
+            {
+                await ChatService.SendMessageAsync(currentUserId, selectedUserId, newMessageInput);
+                newMessageInput = "";
+                StateHasChanged();
+                await Task.Delay(50);
+                await JSRuntime.InvokeVoidAsync("scrollToBottom", "messagesBox");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Błąd wysyłania: {ex.Message}");
+            }
         }
     }
 
@@ -162,16 +254,37 @@
         if (e.Key == "Enter") await SendMessage();
     }
 
-    // Helper do inicjałów
+    private string GetDisplayName(ApplicationUser? user)
+    {
+        if (user == null) return "Nieznany";
+        if (!string.IsNullOrWhiteSpace(user.DisplayName)) return user.DisplayName;
+        return user.Email ?? "Brak danych";
+    }
+
     private string GetInitials(string? name)
     {
-        if (string.IsNullOrEmpty(name)) return "?";
-        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length >= 2)
+        if (string.IsNullOrWhiteSpace(name)) return "?";
+        if (name.Contains("@"))
         {
-            return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+            var localPart = name.Split('@')[0];
+            var parts = localPart.Split(new[] { '.', '_', '-' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length >= 2)
+                return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+            return localPart.Substring(0, Math.Min(2, localPart.Length)).ToUpper();
         }
+        var nameParts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (nameParts.Length >= 2)
+            return $"{nameParts[0][0]}{nameParts[1][0]}".ToUpper();
         return name.Substring(0, Math.Min(2, name.Length)).ToUpper();
+    }
+
+    private bool IsUserOnline(string userId)
+    {
+        // ZMIANA: Symulacja losowości opartej na ID użytkownika.
+        // Jeśli HashCode jest parzysty -> Online, nieparzysty -> Offline.
+        // Dzięki temu status jest stały dla danej osoby, ale różny między osobami.
+        if (string.IsNullOrEmpty(userId)) return false;
+        return Math.Abs(userId.GetHashCode()) % 2 == 0;
     }
 
     public void Dispose()

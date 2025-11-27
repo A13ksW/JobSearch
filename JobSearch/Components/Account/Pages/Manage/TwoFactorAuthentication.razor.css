@@ -1,0 +1,257 @@
+﻿/* === OGÓLNA STRUKTURA I ANIMACJE === */
+.security-container {
+    padding: 30px 20px;
+    max-width: 900px;
+    margin: 0 auto;
+    animation: fadeIn 0.5s ease-out forwards;
+    /* CENTROWANIE TYTUŁÓW I PODTYTUŁÓW */
+    text-align: center;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.page-title {
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 0.2rem;
+    font-size: 2rem;
+}
+
+.page-subtitle {
+    color: #64748b;
+    margin-bottom: 2.5rem;
+    font-size: 1.05rem;
+}
+
+/* === KARTA BEZPIECZEŃSTWA (DYNAMICZNY EFEKT) === */
+.security-card {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 15px 45px -15px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    border: 1px solid #f1f5f9;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    /* Utrzymujemy centrowanie bloków, które nie są Flex */
+    text-align: center;
+}
+
+    .security-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 55px -15px rgba(0, 0, 0, 0.12);
+    }
+
+/* === NAGŁÓWKI STATUSU (WYŚRODKOWANE) === */
+.card-header-status {
+    font-size: 1.5rem;
+    font-weight: 700;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+    border-bottom: 2px solid;
+    display: flex;
+    align-items: center;
+    /* WYŚRODKOWANIE CAŁEGO BLOKU NAGŁÓWKA */
+    justify-content: center;
+}
+
+    .card-header-status i {
+        font-size: 1.8rem;
+    }
+
+    /* Kolorystyka Statusu (Zielony/Czerwony) */
+    .card-header-status.enabled {
+        color: #10b981;
+        border-bottom-color: #d1fae5;
+    }
+
+    .card-header-status.disabled {
+        color: #ef4444;
+        border-bottom-color: #fee2e2;
+    }
+
+/* === STYLIZACJA ALARMÓW (WYŚRODKOWANE) === */
+.custom-alert {
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+    transition: all 0.3s ease;
+    /* WYŚRODKOWANIE TEKSTU W ALERCIE */
+    text-align: center;
+}
+
+    .custom-alert strong {
+        font-weight: 800;
+        display: block;
+    }
+
+    .custom-alert a {
+        font-weight: 700;
+        text-decoration: underline;
+        text-decoration-color: rgba(255, 255, 255, 0);
+        transition: text-decoration-color 0.3s;
+    }
+
+        .custom-alert a:hover {
+            text-decoration-color: currentColor;
+        }
+
+.alert-danger.custom-alert {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    border-left: 6px solid #ef4444;
+}
+
+.alert-warning.custom-alert {
+    background-color: #fffbeb;
+    color: #92400e;
+    border: 1px solid #fde68a;
+    border-left: 6px solid #f59e0b;
+}
+
+
+/* === PRZYCISKI AKCJI (GŁÓWNY: NIEBIESKI, WYŚRODKOWANY) === */
+.btn-security-action {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    /* KOLORYSTYKA */
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+}
+
+    .btn-security-action:hover {
+        background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(37, 99, 235, 0.35);
+    }
+
+/* AKCJA ZAGROŻENIA (CZERWONY) */
+.btn-security-danger {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
+}
+
+    .btn-security-danger:hover {
+        background-color: #dc2626;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(239, 68, 68, 0.35);
+    }
+
+/* AKCJA POBOCZNA (SZARY, WYŚRODKOWANY) */
+.btn-security-secondary {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    /* KOLORYSTYKA */
+    background-color: #f9fafb;
+    color: #4b5563;
+    border: 1px solid #d1d5db;
+}
+
+    .btn-security-secondary:hover {
+        background-color: #e5e7eb;
+        color: #1f2937;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+/* === UKŁAD I ELEMENTY INFORMACYJNE === */
+
+/* Tytuł sekcji (Wyśrodkowany) */
+.section-title {
+    font-weight: 700;
+    color: #4b5563;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #e5e7eb;
+    letter-spacing: 0.5px;
+    text-align: center;
+}
+
+/* Grupa Przycisków (Wyśrodkowana) */
+.action-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 15px;
+    justify-content: center;
+}
+
+/* Wiersz Akcji (Zapomnij przeglądarkę) - Wyśrodkowany w kolumnie na małych ekranach */
+.action-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px dashed #e5e7eb;
+    margin-bottom: 15px;
+    /* Domyślny układ, który zostanie zmieniony przez media query */
+    flex-direction: column;
+}
+
+    .action-row:last-of-type {
+        border-bottom: none;
+    }
+
+.action-info {
+    color: #4b5563;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    /* Zapewniamy centrowanie tekstu info, gdy jest w trybie column */
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* Ikonki w przyciskach */
+.btn-security-action i,
+.btn-security-danger i,
+.btn-security-secondary i {
+    margin-right: 8px;
+}
+
+/* Responsywność dla małych ekranów */
+@media (max-width: 768px) {
+    /* Upewnienie się, że wszystkie przyciski są full width na telefonach */
+    .action-row button,
+    .action-group a,
+    .action-group button {
+        width: 100%;
+        margin-left: 0 !important;
+    }
+}

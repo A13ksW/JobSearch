@@ -10,55 +10,58 @@
 @inject UserManager<ApplicationUser> UserManager
 @inject NavigationManager Nav
 
-<h1>Nowy użytkownik</h1>
+<div class="text-center">
+    <h1>Nowy użytkownik</h1>
+</div>
 
 @if (!string.IsNullOrWhiteSpace(Message))
 {
     <div class="alert alert-danger">@Message</div>
 }
 
-<div class="row">
-    <div class="col-md-4">
-        <EditForm Model="@model" OnValidSubmit="Save" class="mb-3">
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <EditForm Model="@model" OnValidSubmit="Save" class="mb-3" novalidate>
             <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" />
+            @* USUNIĘTE: ValidationSummary, żeby nie dublować błędów *@
+            @* <ValidationSummary class="text-danger" /> *@
 
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="model.Email" class="form-control" placeholder="name@example.com" />
-                <label>Email</label>
+            <div class="mb-3">
+                <label class="form-label" for="emailInput">Email</label>
+                <input id="emailInput" @bind="model.Email" class="form-control" placeholder="name@example.com" />
                 <ValidationMessage For="() => model.Email" class="text-danger" />
             </div>
 
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="model.DisplayName" class="form-control" placeholder="Nazwa" />
-                <label>Nazwa</label>
+            <div class="mb-3">
+                <label class="form-label" for="displayNameInput">Nazwa</label>
+                <input id="displayNameInput" @bind="model.DisplayName" class="form-control" placeholder="Nazwa" />
                 <ValidationMessage For="() => model.DisplayName" class="text-danger" />
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Typ konta:</label>
-                <InputSelect @bind-Value="model.AccountType" class="form-select">
+                <select @bind="model.AccountType" class="form-select">
                     <option value="">Wybierz typ konta</option>
                     <option value="Individual">Osoba prywatna</option>
                     <option value="Company">Firma</option>
-                </InputSelect>
+                </select>
                 <ValidationMessage For="() => model.AccountType" class="text-danger" />
             </div>
 
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="model.Password" type="password" class="form-control" placeholder="Hasło" />
-                <label>Hasło</label>
+            <div class="mb-3">
+                <label class="form-label" for="passwordInput">Hasło</label>
+                <input id="passwordInput" @bind="model.Password" type="password" class="form-control" placeholder="Hasło" />
                 <ValidationMessage For="() => model.Password" class="text-danger" />
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Rola:</label>
-                <InputSelect @bind-Value="model.Role" class="form-select">
+                <select @bind="model.Role" class="form-select">
                     <option value="">Wybierz rolę</option>
                     <option value="User">User</option>
                     <option value="Moderator">Moderator</option>
                     <option value="Admin">Admin</option>
-                </InputSelect>
+                </select>
                 <ValidationMessage For="() => model.Role" class="text-danger" />
             </div>
 
@@ -74,26 +77,37 @@
     private IEnumerable<IdentityError>? identityErrors;
 
     private CreateUserDto model = new();
-    //private string roleInput = "";
-    private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
+    private string? Message => identityErrors is null ? null : $"Błąd tworzenia użytkownika: {string.Join(", ", identityErrors.Select(error => error.Description))}";
 
     private async Task Save()
     {
-        var user = new ApplicationUser { UserName = model.Email, Email = model.Email, DisplayName = model.DisplayName, EmailConfirmed = true };
+        var user = new ApplicationUser
+        {
+            UserName = model.Email,
+            Email = model.Email,
+            DisplayName = model.DisplayName,
+            AccountType = model.AccountType,
+            EmailConfirmed = true
+        };
+
         var res = await UserManager.CreateAsync(user, model.Password);
+
         if (!string.IsNullOrWhiteSpace(model.AccountType))
         {
             user.AccountType = model.AccountType;
         }
+
         if (!res.Succeeded)
         {
             identityErrors = res.Errors;
             return;
         }
+
         if (!string.IsNullOrWhiteSpace(model.Role))
         {
             await UserManager.AddToRoleAsync(user, model.Role);
         }
+
         Back();
     }
 
@@ -101,8 +115,14 @@
 
     private sealed class CreateUserDto
     {
-        [Required, EmailAddress] public string Email { get; set; } = "";
-        [Required, MinLength(8)] public string Password { get; set; } = "";
+        [Required(ErrorMessage = "Adres email jest wymagany.")]
+        [EmailAddress(ErrorMessage = "Nieprawidłowy format adresu email.")]
+        public string Email { get; set; } = "";
+
+        [Required(ErrorMessage = "Hasło jest wymagane.")]
+        [MinLength(8, ErrorMessage = "Hasło musi mieć co najmniej 8 znaków.")]
+        public string Password { get; set; } = "";
+
         public string? DisplayName { get; set; }
         public string? AccountType { get; set; }
         public string? Role { get; set; }

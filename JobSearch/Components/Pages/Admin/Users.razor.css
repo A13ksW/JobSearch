@@ -1,0 +1,149 @@
+﻿/* === 1. KONTENER GŁÓWNY I NAGŁÓWKI === */
+:host {
+    display: block;
+    color: #ffffff; /* Domyślny kolor tekstu na stronie */
+}
+
+h1 {
+    font-weight: 800;
+    font-size: 2.5rem;
+    color: #ffffff; /* Nagłówek na biało */
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+    margin: 0;
+    width: 100%; /* Umożliwia centrowanie */
+    text-align: center; /* Wyśrodkowanie tekstu */
+}
+
+/* Sekcja kontrolowana przez Flexbox, aby wyśrodkować blok wyszukiwania */
+.search-control-wrapper {
+    display: flex;
+    justify-content: center; /* Wyśrodkowanie horyzontalne */
+    width: 100%;
+}
+
+/* Przyciski w filtrach */
+.btn-control-action {
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.2s;
+    color: white !important;
+    padding: 0.5rem 1rem;
+}
+
+.btn-success {
+    background-color: #10b981;
+    border-color: #10b981;
+}
+
+.btn-primary {
+    background-color: #2563eb;
+    border-color: #2563eb;
+}
+
+/* === 2. SEKCJA FILTROWANIA/WYSZUKIWANIA === */
+.input-group input {
+    /* Tło pola szukania */
+    background-color: rgba(30, 41, 59, 0.95);
+    border: 1px solid #475569;
+    color: #ffffff;
+}
+
+    .input-group input::placeholder {
+        color: #94a3b8;
+    }
+
+    .input-group input:focus {
+        background-color: rgba(30, 41, 59, 1);
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35);
+    }
+
+
+/* === 3. TABELA UŻYTKOWNIKÓW === */
+.table {
+    /* Tło całej tabeli */
+    background-color: rgba(15, 23, 42, 0.9);
+    border-radius: 12px;
+    overflow: hidden;
+    color: #ffffff; /* Domyślny kolor tekstu dla tabeli (powinno się dziedziczyć) */
+    --bs-table-bg: #1e293b; /* Tło bazowe dla Bootstrapa */
+    --bs-table-striped-bg: #111827; /* Tło dla nieparzystych wierszy */
+    --bs-table-hover-bg: #334155; /* Tło dla wierszy na hover */
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+    /* Wymuszamy biały kolor tekstu w nagłówkach i komórkach */
+    .table th, .table td {
+        border-color: #475569; /* Ciemne obramowania komórek */
+        vertical-align: middle;
+        color: #ffffff; /* KLUCZOWA POPRAWKA: Wymuszamy biały kolor w komórkach */
+    }
+
+    .table thead {
+        /* Nagłówek tabeli */
+        --bs-table-bg: #0f172a;
+        border-bottom: 2px solid #475569;
+        color: #cbd5e1; /* Kolor nagłówków kolumn */
+    }
+
+/* Wiersz tabeli */
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: var(--bs-table-striped-bg);
+}
+
+.table-hover > tbody > tr:hover > * {
+    background-color: var(--bs-table-hover-bg) !important;
+}
+
+/* === 4. BADGE STATUSU I RÓL === */
+.badge {
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+    /* Aktywny */
+    .badge.bg-success {
+        background-color: #10b981 !important;
+        color: white !important;
+    }
+
+    /* Zablokowany */
+    .badge.bg-danger {
+        background-color: #ef4444 !important;
+        color: white !important;
+    }
+
+/* === 5. PRZYCISKI AKCJI W TABELI === */
+.btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.15s;
+}
+
+/* Edytuj */
+.btn-secondary {
+    background-color: #475569 !important;
+    border-color: #475569 !important;
+    color: #ffffff !important;
+}
+
+    .btn-secondary:hover {
+        background-color: #64748b !important;
+        border-color: #64748b !important;
+    }
+
+/* Usuń */
+.btn-danger {
+    background-color: #ef4444;
+    border-color: #ef4444;
+}
+
+    .btn-danger:hover {
+        background-color: #dc2626;
+        border-color: #dc2626;
+    }

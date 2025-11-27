@@ -1,8 +1,11 @@
-﻿/* Główny kontener */
+﻿/* === 1. KONTENER I ANIMACJE === */
 .offer-page-wrapper {
     padding-top: 2rem;
     padding-bottom: 5rem;
     color: #fff;
+    /* DODANIE SUBTELNEGO TŁA Z GRADIENTAMI */
+    background: radial-gradient(circle at 10% 90%, rgba(37, 99, 235, 0.08) 0%, transparent 20%), radial-gradient(circle at 90% 10%, rgba(16, 185, 129, 0.08) 0%, transparent 20%);
+    min-height: 100vh;
 }
 
 /* Przycisk Powrotu */
@@ -10,8 +13,9 @@
     display: inline-flex;
     align-items: center;
     padding: 10px 20px;
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    /* Ciemne szkło */
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.4);
     backdrop-filter: blur(5px);
     border-radius: 50px;
     color: white !important;
@@ -21,38 +25,63 @@
 }
 
     .btn-back-glass:hover {
-        background: rgba(255, 255, 255, 0.3);
+        background: rgba(30, 41, 59, 1);
         transform: translateX(-5px);
     }
 
-/* Białe Karty */
+/* Białe Karty - ZMIANA NA CIEMNE */
 .white-card {
-    background-color: #ffffff;
+    /* Używamy ciemnego, szklistego tła */
+    background-color: rgba(15, 23, 42, 0.9) !important;
     border-radius: 24px;
-    padding: 3rem; /* Większy padding */
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-    color: #1e293b;
+    padding: 3rem;
+    /* Ciemny cień */
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    /* Biały tekst */
+    color: #ffffff;
     height: 100%;
+    /* KLUCZOWE DLA PASKÓW: Ustawienie pozycji i obcinanie */
     overflow: hidden;
+    position: relative;
+    /* Ciemne obramowanie */
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    /* Dodajemy padding na górze, by pasek ::before się zmieścił */
+    padding-top: 3rem;
 }
+
+    /* Pasek gradientowy na górze GŁÓWNEJ KARTY */
+    .white-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        /* Gradient niebiesko-fioletowo-zielony (jak w home) */
+        background: linear-gradient(90deg, #2563eb 0%, #a78bfa 50%, #10b981 100%);
+        z-index: 3;
+        border-top-left-radius: 24px;
+        border-top-right-radius: 24px;
+        box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
+    }
 
 /* Nagłówek Oferty */
 .offer-header-title {
     font-weight: 800;
     font-size: 2.5rem;
     margin-bottom: 0.5rem;
-    color: #0f172a;
-    text-align: center; /* Wyśrodkowanie tytułu */
+    color: #ffffff; /* Biały tytuł */
+    text-align: center;
     word-wrap: break-word;
 }
 
 .offer-header-company {
     font-size: 1.2rem;
-    color: #64748b;
+    color: #cbd5e1; /* Jasny szary tekst firmy */
     font-weight: 500;
     display: flex;
     align-items: center;
-    justify-content: center; /* Wyśrodkowanie nazwy firmy */
+    justify-content: center;
     gap: 10px;
 }
 
@@ -62,10 +91,9 @@
     text-transform: uppercase;
     letter-spacing: 2px;
     font-weight: 800;
-    color: #2563eb; /* Niebieski akcent */
+    color: #60a5fa; /* Jasny niebieski akcent */
     margin-top: 3rem;
     margin-bottom: 1.5rem;
-    /* Wyśrodkowanie Flexbox */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -79,7 +107,8 @@
         display: block;
         width: 50px;
         height: 3px;
-        background: #e2e8f0;
+        /* Ciemna linia */
+        background: #475569;
         position: absolute;
         bottom: -12px;
         left: 50%;
@@ -90,15 +119,13 @@
 .section-text {
     font-size: 1.05rem;
     line-height: 1.8;
-    color: #334155;
-    /* Atrakcyjne tło dla tekstu */
-    background-color: #f8fafc;
-    border: 1px solid #f1f5f9;
+    color: #e2e8f0; /* Jasny tekst w sekcji */
+    /* Ciemne tło dla tekstu */
+    background-color: #1e293b;
+    border: 1px solid #475569;
     border-radius: 16px;
     padding: 2rem;
-    /* Justowanie tekstu */
     text-align: justify;
-    /* Zabezpieczenia */
     overflow-wrap: break-word;
     word-wrap: break-word;
     word-break: break-word;
@@ -114,28 +141,29 @@
     margin-bottom: 2rem;
 }
 
-/* Tagi wymagań */
+/* Tagi wymagań - ZMIANA NA CIEMNE */
 .tag-badge {
     display: inline-flex;
     align-items: center;
     padding: 10px 20px;
-    background: #ffffff;
-    color: #475569;
+    /* Ciemne tło tagu */
+    background: #1e293b;
+    color: #e2e8f0;
     border-radius: 50px;
     font-weight: 600;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border: 1px solid #475569;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     transition: transform 0.2s;
 }
 
     .tag-badge:hover {
         transform: translateY(-2px);
         border-color: #2563eb;
-        color: #2563eb;
+        color: #60a5fa; /* Jasny niebieski na hover */
     }
 
     .tag-badge i {
-        color: #2563eb;
+        color: #60a5fa; /* Jasny niebieski */
         margin-right: 8px;
     }
 
@@ -145,32 +173,36 @@
     top: 6rem;
 }
 
+/* Salary Box - ZMIANA NA CIEMNY AKCENT */
 .salary-box {
-    background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+    /* Tło pozostaje ciemne */
+    background-color: rgba(15, 23, 42, 0.9) !important;
     padding: 2rem;
     border-radius: 20px;
     text-align: center;
-    border: 1px solid #dbeafe;
+    /* Obramowanie akcentowe */
+    border: 1px solid rgba(37, 99, 235, 0.4);
     margin-bottom: 1.5rem;
-    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
 }
 
 .salary-value {
     font-size: 2rem;
     font-weight: 800;
-    color: #059669;
+    color: #34d399; /* Jasna zieleń dla wartości */
     display: block;
     margin-top: 0.5rem;
 }
 
-/* Lista info */
+/* Lista info - ZMIANA NA CIEMNE */
 .info-row {
     display: flex;
     align-items: center;
     padding: 14px 0;
-    border-bottom: 1px solid #f1f5f9;
+    /* Ciemny separator */
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
     font-size: 0.95rem;
-    color: #475569;
+    color: #e2e8f0; /* Jasny tekst */
 }
 
     .info-row:last-child {
@@ -179,12 +211,12 @@
 
     .info-row i {
         width: 30px;
-        color: #2563eb;
+        color: #60a5fa; /* Jasny niebieski dla ikon */
         font-size: 1.3rem;
         text-align: center;
     }
 
-/* Przycisk Aplikuj */
+/* Przycisk Aplikuj - Bez zmian, bo jest akcentowy */
 .btn-apply-now {
     display: block;
     width: 100%;
@@ -214,7 +246,7 @@
         transform: none;
     }
 
-/* Animacja wejścia */
+/* Animacja wejścia (bez zmian) */
 .fade-in {
     animation: fadeIn 0.6s ease-out forwards;
     opacity: 0;

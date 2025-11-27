@@ -1,82 +1,445 @@
+/* --- RESET + PODSTAWOWA TYPOGRAFIA --- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     height: 100%;
     margin: 0;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
 }
 
-/* === G£ÓWNE T£O APLIKACJI === */
+/* === G£ÓWNE T£O APLIKACJI (ANIMOWANY GRADIENT) === */
 body {
-    /* Twój niebieski gradient */
-    background: linear-gradient(-45deg, #1e3c72, #2a5298, #2563eb, #6d28d9);
+    background: linear-gradient(-45deg, #4c1d95, #7e22ce, #3b82f6, #06b6d4);
     background-size: 400% 400%;
     background-attachment: fixed;
-    color: white; /* Domyœlny tekst na bia³o */
+    color: #f9fafb;
+    animation: gradientShift 30s ease infinite;
+    position: relative;
+    overflow-x: hidden;
 }
 
-/* === NAPRAWA KART I KONTENERÓW === */
-/* Wszystkie karty i menu maj¹ mieæ bia³e t³o i ciemny tekst */
-.card, .modal-content, .dropdown-menu {
-    background-color: #ffffff;
-    color: #212529; /* Ciemny tekst */
-    border: none;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+/* Animacja zmiany gradientu */
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
-/* Linki globalne (np. w menu) */
+/* === DU¯E ROZMYTE BLOBY W TLE === */
+body::before {
+    content: '';
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(200px);
+    opacity: 0.5;
+    z-index: -3;
+    top: -250px;
+    left: -250px;
+    width: 800px;
+    height: 800px;
+    background: #c084fc;
+    animation: blobMove1 22s infinite alternate;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(150px);
+    opacity: 0.4;
+    z-index: -3;
+    bottom: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: #14b8a6;
+    animation: blobMove2 18s infinite alternate;
+}
+
+@keyframes blobMove1 {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate(100px, 70px) scale(1.05);
+    }
+
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+}
+
+@keyframes blobMove2 {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    50% {
+        transform: translate(-80px, 80px) rotate(180deg);
+    }
+
+    100% {
+        transform: translate(0, 0) rotate(360deg);
+    }
+}
+
+/* === P£YWAJ¥CE KULKI W TLE (ORBITUJ¥CE OBIEKTY) === */
+/* W HTML dodaj <div class="background-balls"> z kilkoma .ball w œrodku */
+.background-balls {
+    position: fixed;
+    inset: -120px;
+    pointer-events: none;
+    z-index: -2;
+    overflow: hidden;
+    opacity: 0.45;
+}
+
+    .background-balls .ball {
+        position: absolute;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(59,130,246,0.1));
+        backdrop-filter: blur(6px);
+        box-shadow: 0 15px 40px rgba(15, 23, 42, 0.4);
+        animation: floatY 18s ease-in-out infinite alternate, floatX 26s linear infinite alternate, ballPulse 6s ease-in-out infinite;
+    }
+
+        /* Konkretny rozk³ad i opóŸnienia – wiêcej kulek = ¿ywsze t³o */
+        .background-balls .ball:nth-child(1) {
+            width: 120px;
+            height: 120px;
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s, 0s, 1s;
+        }
+
+        .background-balls .ball:nth-child(2) {
+            width: 180px;
+            height: 180px;
+            top: 60%;
+            left: 15%;
+            animation-delay: 2s, -4s, 0s;
+        }
+
+        .background-balls .ball:nth-child(3) {
+            width: 140px;
+            height: 140px;
+            top: 20%;
+            right: 10%;
+            animation-delay: -1s, -6s, 1.5s;
+        }
+
+        .background-balls .ball:nth-child(4) {
+            width: 220px;
+            height: 220px;
+            bottom: 5%;
+            right: 25%;
+            animation-delay: -3s, -10s, 0.5s;
+        }
+
+        .background-balls .ball:nth-child(5) {
+            width: 90px;
+            height: 90px;
+            bottom: 20%;
+            left: 40%;
+            animation-delay: 1s, -2s, 2s;
+        }
+
+@keyframes floatY {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-50px);
+    }
+
+    100% {
+        transform: translateY(30px);
+    }
+}
+
+@keyframes floatX {
+    0% {
+        transform: translateX(0px);
+    }
+
+    50% {
+        transform: translateX(60px);
+    }
+
+    100% {
+        transform: translateX(-40px);
+    }
+}
+
+@keyframes ballPulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.06);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* === DELIKATNE „GWIAZDKI” / ISKRY === */
+.dynamic-star {
+    position: fixed;
+    width: 3px;
+    height: 3px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 0 5px white, 0 0 10px #facc15;
+    animation: twinkle 3s infinite alternate;
+    z-index: -1;
+}
+
+#star-1 {
+    top: 15%;
+    left: 80%;
+    animation-delay: 0.5s;
+}
+
+#star-2 {
+    top: 50%;
+    left: 10%;
+    animation-delay: 1.2s;
+}
+
+#star-3 {
+    top: 75%;
+    left: 45%;
+    animation-delay: 2.1s;
+}
+
+@keyframes twinkle {
+    0% {
+        opacity: 0.3;
+        transform: scale(0.8);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.4);
+    }
+
+    100% {
+        opacity: 0.3;
+        transform: scale(0.9);
+    }
+}
+
+/* === OGÓLNY LAYOUT TREŒCI === */
+.content {
+    padding-top: 1.1rem;
+    padding-bottom: 1.5rem;
+    position: relative;
+    z-index: 10;
+}
+
+/* === KARTY, MODALE, DROPDOWNY – PROFESJONALNY LOOK === */
+.card,
+.modal-content,
+.dropdown-menu,
+.card-glass,
+.auth-card,
+.email-card {
+    background: rgba(255, 255, 255, 0.96);
+    color: #0f172a;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.3), 0 0 0 1px rgba(148, 163, 184, 0.25);
+    border-radius: 16px;
+    position: relative;
+    z-index: 20;
+    padding: 1.25rem;
+    backdrop-filter: blur(10px);
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+}
+
+    /* Subtelny efekt unoszenia przy hoverze */
+    .card:hover,
+    .modal-content:hover,
+    .card-glass:hover,
+    .auth-card:hover,
+    .email-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(96, 165, 250, 0.45);
+        border-color: rgba(59, 130, 246, 0.6);
+    }
+
+    /* Pasek dekoracyjny u góry karty */
+    .card::before,
+    .auth-card::before,
+    .email-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        height: 3px;
+        border-radius: 16px 16px 0 0;
+        background: linear-gradient(90deg, #a855f7, #3b82f6, #22c55e);
+        opacity: 0.8;
+    }
+
+    /* Nag³ówki wewn¹trz kart */
+    .card h1, .card h2, .card h3,
+    .auth-card h1, .auth-card h2, .auth-card h3 {
+        color: #0f172a;
+        margin-top: 0.25rem;
+        margin-bottom: 0.75rem;
+        letter-spacing: 0.01em;
+        font-weight: 600;
+    }
+
+/* --- LINKI --- */
 a {
     color: #e0e0e0;
     text-decoration: none;
+    transition: color 0.18s ease, opacity 0.18s ease;
 }
 
     a:hover {
-        color: white;
-        text-decoration: underline;
+        color: #facc15;
+        text-decoration: none;
+        opacity: 1;
     }
 
-/* Linki wewn¹trz kart (musz¹ byæ ciemne/niebieskie) */
-.card a, .dropdown-menu a, table a {
-    color: #0d6efd;
+.card a,
+.dropdown-menu a,
+table a,
+.btn-link-arrow {
+    color: #2563eb;
+    font-weight: 600;
 }
 
-    .card a:hover, .dropdown-menu a:hover, table a:hover {
-        color: #0a58ca;
+    .card a:hover,
+    .dropdown-menu a:hover,
+    table a:hover,
+    .btn-link-arrow:hover {
+        color: #1d4ed8;
     }
 
-/* Formularze wewn¹trz kart */
-.form-control, .form-select {
-    background-color: #fff;
-    color: #212529;
-    border: 1px solid #ced4da;
+/* --- FORMULARZE --- */
+.form-control,
+.form-select,
+.modern-input {
+    background-color: #f8fafc;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.55rem 0.75rem;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, transform 0.12s ease;
 }
 
-/* Przyciski */
+    .form-control::placeholder,
+    .modern-input::placeholder {
+        color: #9ca3af;
+    }
+
+    .form-control:focus,
+    .form-select:focus,
+    .modern-input:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.45), 0 0 0 6px rgba(37, 99, 235, 0.18);
+        background-color: #ffffff;
+        outline: none;
+        transform: translateY(-1px);
+    }
+
+/* --- PRZYCISKI --- */
 .btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+    color: #ffffff;
+    background: linear-gradient(135deg, #2563eb, #4f46e5);
+    border-color: transparent;
+    border-radius: 999px;
+    padding-inline: 1.3rem;
+    padding-block: 0.55rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    box-shadow: 0 12px 30px rgba(37, 99, 235, 0.5);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
 }
 
-.content {
-    padding-top: 1.1rem;
-}
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #1d4ed8, #4338ca);
+        transform: translateY(-2px) translateZ(0);
+        box-shadow: 0 18px 40px rgba(37, 99, 235, 0.65);
+        filter: brightness(1.02);
+    }
 
-/* Walidacja */
+    .btn-primary:active {
+        transform: translateY(0);
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.45);
+    }
+
+    /* Subtelne ikonki w przyciskach, jeœli s¹ */
+    .btn-primary svg {
+        width: 1rem;
+        height: 1rem;
+    }
+
+/* --- WALIDACJA --- */
 .valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
+    outline: 1px solid #10b981;
 }
 
 .invalid {
-    outline: 1px solid #e50000;
+    outline: 1px solid #ef4444;
 }
 
 .validation-message {
-    color: #ff6b6b;
+    color: #ef4444;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
 }
-/* Jasnoczerwony dla czytelnoœci na ciemnym */
 
-/* B³êdy */
+/* --- B£ÊDY --- */
 .blazor-error-boundary {
-    background: lightyellow;
-    color: black;
+    background: #ffedd5;
+    color: #9a3412;
     padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #fed7aa;
 }
+
+/* --- SCROLLBAR (CHROMIUM/EDGE) --- */
+::-webkit-scrollbar {
+    width: 9px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.35);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #4f46e5, #06b6d4);
+    border-radius: 999px;
+}
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #4338ca, #0ea5e9);
+    }
+

@@ -1,0 +1,243 @@
+﻿/* === OGÓLNA STRUKTURA I CENTROWANIE === */
+.security-container {
+    padding: 30px 20px;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center; /* Centrowanie tytułów */
+}
+
+.page-title {
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 0.2rem;
+    font-size: 2rem;
+}
+
+.page-subtitle {
+    color: #64748b;
+    margin-bottom: 2.5rem;
+}
+
+.setup-card {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 15px 45px -15px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    border: 1px solid #f1f5f9;
+}
+
+.setup-intro {
+    font-size: 1.1rem;
+    color: #334155;
+    margin-bottom: 2rem;
+}
+
+/* === LISTA KROKÓW (STEP LIST) === */
+.step-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left; /* Zmieniamy wyrównanie na lewe wewnątrz listy dla lepszej czytelności tekstu */
+}
+
+.step-item {
+    border-bottom: 1px solid #e2e8f0;
+    padding: 20px 0;
+}
+
+    .step-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+.step-content {
+    position: relative;
+    padding-left: 50px;
+}
+
+.step-number {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    background-color: #2563eb; /* Niebieskie tło numeru */
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+}
+
+.step-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 5px;
+}
+
+.step-text {
+    color: #475569;
+    margin-bottom: 10px;
+}
+
+/* === KROK 1: LINKI DO POBRANIA === */
+.download-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.download-link {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+    .download-link:hover {
+        color: #1d4ed8;
+        text-decoration: underline;
+    }
+
+/* === KROK 2: KOD QR I KLUCZ === */
+.qr-key-area {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 30px;
+    margin-top: 20px;
+    /* CENTROWANIE W BLOKU */
+    justify-content: center;
+}
+
+.qr-code-box {
+    padding: 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: #f8fafc;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.qr-code-image {
+    width: 200px;
+    height: 200px;
+    display: block;
+}
+
+.key-display {
+    max-width: 300px;
+    text-align: center;
+    padding-top: 10px;
+}
+
+.key-label {
+    font-weight: 700;
+    color: #475569;
+    margin-bottom: 5px;
+}
+
+.shared-key-code {
+    display: inline-block;
+    padding: 8px 15px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #ef4444; /* Czerwony kolor dla klucza, by się wyróżniał */
+    background-color: #fee2e2;
+    border-radius: 4px;
+    user-select: all; /* Umożliwia łatwe kopiowanie */
+}
+
+.key-note {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-top: 5px;
+}
+
+/* === KROK 3: FORMULARZ WERYFIKACYJNY === */
+.verification-form-area {
+    max-width: 400px;
+    margin: 20px auto 0; /* Centrowanie formularza */
+}
+
+/* Przycisk Akcji (Niebieski, wyśrodkowany) */
+.btn-security-action {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+}
+
+    .btn-security-action:hover {
+        background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-security-action i {
+        margin-right: 8px;
+    }
+
+/* Style formularza i inputów */
+.form-floating > .form-control {
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    transition: border-color 0.3s;
+}
+
+    .form-floating > .form-control:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+
+.validation-summary {
+    list-style: none;
+    padding: 0;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.validation-message {
+    display: block;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 600px) {
+    .qr-key-area {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .key-display {
+        max-width: 100%;
+    }
+
+    .step-content {
+        padding-left: 0;
+        text-align: center; /* Centrujemy tekst w krokach na telefonie */
+    }
+
+    .step-number {
+        position: static;
+        margin: 0 auto 10px;
+    }
+
+    .step-list {
+        text-align: center;
+    }
+}

@@ -4,6 +4,8 @@
     padding-bottom: 5rem;
     max-width: 1300px;
     margin: 0 auto;
+    /* Ustawienie koloru tekstu na biały dla całej strony, jeśli nie jest w karcie */
+    color: #ffffff;
 }
 
 .animate-fade-up {
@@ -19,19 +21,23 @@
     }
 }
 
-/* === 2. GŁÓWNA KARTA === */
+/* === 2. GŁÓWNA KARTA - ZMIANA NA CIEMNĄ === */
 .edit-card {
-    background: #ffffff;
+    /* Ciemne tło, spójne z filtrami */
+    background: rgba(15, 23, 42, 0.9) !important;
     border-radius: 20px;
     padding: 2.5rem;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-    color: #0f172a;
+    /* Ciemny cień */
+    box-shadow: 0 12px 45px rgba(0, 0, 0, 0.6);
+    /* Kolor tekstu wewnątrz karty */
+    color: #ffffff;
     position: relative;
     overflow: hidden;
-    border: 1px solid rgba(0,0,0,0.05);
+    /* Ciemne obramowanie */
+    border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
-    /* Pasek akcentowy (inny kolor dla edycji - np. pomarańczowy/niebieski) */
+    /* Pasek akcentowy */
     .edit-card::after {
         content: '';
         position: absolute;
@@ -39,6 +45,7 @@
         left: 0;
         bottom: 0;
         width: 6px;
+        /* Kolor gradientu pozostaje bez zmian (niebieski/żółty) */
         background: linear-gradient(180deg, #3b82f6, #f59e0b);
     }
 
@@ -50,24 +57,25 @@
 .card-title {
     font-weight: 800;
     font-size: 2.2rem;
-    color: #1e293b;
+    color: #ffffff; /* Biały tytuł */
     margin-bottom: 0.5rem;
 }
 
 .card-subtitle {
-    color: #64748b;
+    color: #cbd5e1; /* Jasny podtytuł */
     font-size: 1.1rem;
 }
 
-/* === 3. SEKCJE I FORMULARZE === */
+/* === 3. SEKCJE I FORMULARZE - ZMIANA NA CIEMNĄ ESTETYKĘ === */
 .section-label {
     font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 1.5px;
     font-weight: 700;
-    color: #94a3b8;
+    color: #94a3b8; /* Jasny szary kolor labela sekcji */
     margin-bottom: 1rem;
-    border-bottom: 1px solid #f1f5f9;
+    /* Ciemny, subtelny separator */
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
     padding-bottom: 8px;
     margin-top: 2rem;
 }
@@ -75,70 +83,100 @@
 .form-label {
     font-weight: 600;
     font-size: 0.9rem;
-    color: #334155;
+    color: #e5e7eb; /* Biały/jasny kolor etykiety */
     margin-bottom: 0.4rem;
 }
 
 .form-control, .form-select {
-    background-color: #f8fafc;
-    border: 1px solid #e2e8f0;
+    /* KLUCZOWA ZMIANA: CIEMNE TŁO */
+    background-color: rgba(30, 41, 59, 0.9);
+    border: 1px solid #475569;
     border-radius: 10px;
     padding: 0.7rem 0.9rem;
     font-size: 0.95rem;
     transition: all 0.2s;
+    /* KLUCZOWA ZMIANA: BIAŁY TEKST */
+    color: #ffffff;
 }
 
     .form-control:focus, .form-select:focus {
-        background-color: #fff;
+        background-color: rgba(30, 41, 59, 1);
         border-color: #2563eb;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        /* Niebieski cień focus */
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35);
     }
 
     .form-control:disabled, .form-control[readonly] {
-        background-color: #f1f5f9;
-        color: #64748b;
-        opacity: 0.8;
+        /* Lekko jaśniejsze tło dla wyłączonych pól */
+        background-color: rgba(30, 41, 59, 0.5);
+        color: #94a3b8;
+        opacity: 0.9;
         cursor: not-allowed;
     }
 
+/* --- BIAŁA IKONA KALENDARZA DLA INPUT TYPE="DATE" (NAPRAWIONA) --- */
+.edit-card .form-control[type="date"] {
+    /* Ustawiamy białą ikonę SVG */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23FFFFFF' class='bi bi-calendar-date' viewBox='0 0 16 16'%3E%3Cpath d='M6.446 12.604v.038h.635v-.038H6.446zm.937 0v.038h.634v-.038H7.383zm.936 0v.038h.635v-.038H8.319zm.937 0v.038h.634v-.038H9.256z'/%3E%3Cpath d='M6.446 12.604v.038h.635v-.038H6.446zm.937 0v.038h.634v-.038H7.383zm.936 0v.038h.635v-.038H8.319zm.937 0v.038h.634v-.038H9.256z'/%3E%3Cpath fill-rule='evenodd' d='M10.887 0a.5.5 0 0 1 .5.5v1h2a.5.5 0 0 1 .5.5v12a.5.5 0 0 1-.5.5h-12a.5.5 0 0 1-.5-.5v-12a.5.5 0 0 1 .5-.5h2v-1a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v1h2v-1a.5.5 0 0 1 .5-.5zM1.5 3.5v11.75c0 .138.112.25.25.25h11.5a.25.25 0 0 0 .25-.25V3.5h-12zM.75 2.5a.75.75 0 0 1 .75-.75h2a.75.75 0 0 1 .75.75v1a.75.75 0 0 1-.75.75h-2a.75.75 0 0 1-.75-.75v-1zM7 2.5a.75.75 0 0 1 .75-.75h2a.75.75 0 0 1 .75.75v1a.75.75 0 0 1-.75.75h-2a.75.75 0 0 1-.75-.75v-1z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.75rem center !important;
+    background-size: 1rem 1rem !important;
+    color-scheme: dark;
+}
+
+    /* KLUCZOWA POPRAWKA: Usunięcie problematycznego rozciągania */
+    .edit-card .form-control[type="date"]::-webkit-calendar-picker-indicator {
+        opacity: 0 !important;
+        /* RESETOWANIE ROZCIĄGANIA, aby obszar kliknięcia był mały i natywny */
+        width: auto;
+        height: auto;
+        position: static;
+        /* Wymiary/pozycjonowanie są teraz kontrolowane przez przeglądarkę */
+    }
+
 .input-group-text {
-    background-color: #f1f5f9;
-    border: 1px solid #e2e8f0;
-    color: #64748b;
+    /* Ciemne tło dla dodatku do inputa */
+    background-color: #1e293b;
+    border: 1px solid #475569;
+    color: #cbd5e1;
     font-weight: 600;
 }
 
-/* === 4. INTERAKTYWNE TAGI === */
+/* === 4. INTERAKTYWNE TAGI (POZOSTAŁOŚĆ PO KREACJI) === */
 .options-container {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
     justify-content: center;
     padding: 1rem;
-    background-color: #f8fafc;
+    /* Ciemne tło dla kontenera opcji */
+    background-color: rgba(30, 41, 59, 0.5);
     border-radius: 16px;
-    border: 1px dashed #e2e8f0;
+    /* Ciemne przerywane obramowanie */
+    border: 1px dashed rgba(148, 163, 184, 0.4);
 }
 
+/* Wygląd Taga */
 .custom-check {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #ffffff;
+    /* Niezaznaczony tag: ciemne tło (jak button secondary) */
+    background: rgba(30, 41, 59, 0.7) !important;
     padding: 0.6rem 1.2rem;
     border-radius: 50px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid #475569;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     font-weight: 600;
-    color: #64748b;
+    color: #e2e8f0; /* Jasny kolor tekstu */
     user-select: none;
     font-size: 0.9rem;
     position: relative;
 }
 
     /* UKRYWAMY INPUT */
-    .custom-check ::deep input {
+    .custom-check input {
         position: absolute;
         opacity: 0;
         width: 100%;
@@ -146,33 +184,36 @@
         top: 0;
         left: 0;
         margin: 0;
+        padding: 0;
         cursor: pointer;
-        z-index: 5;
     }
 
+    /* Hover */
     .custom-check:hover {
-        border-color: #cbd5e1;
+        border-color: #2563eb;
         transform: translateY(-2px);
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     }
 
-    /* STYL AKTYWNY */
+    /* === STYL AKTYWNY (ZAZNACZONY) === */
     .custom-check.active {
-        background-color: #2563eb;
+        background-color: #2563eb; /* Niebieskie tło */
         border-color: #2563eb;
-        color: #ffffff;
+        color: #ffffff; /* Biały tekst */
         box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         transform: translateY(-1px);
     }
 
+        /* Dodatkowy "ptaszek" przed tekstem */
         .custom-check.active::before {
             content: '✔';
-            margin-right: 6px;
+            margin-right: 8px;
             font-weight: 800;
         }
 
 /* === 5. PRZYCISKI === */
 .btn-submit {
+    /* Przycisk akcentowy - bez zmian */
     background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
     color: white;
     padding: 0.9rem 3rem;
@@ -189,8 +230,16 @@
         box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
     }
 
+    .btn-submit:disabled {
+        background: #475569; /* Ciemniejsza szarość dla disabled */
+        box-shadow: none;
+        cursor: not-allowed;
+        transform: none;
+    }
+
 .btn-cancel {
-    color: #64748b;
+    /* Zmiana na ciemny button secondary */
+    color: #cbd5e1;
     font-weight: 600;
     text-decoration: none;
     padding: 0.8rem 1.5rem;
@@ -199,33 +248,37 @@
 }
 
     .btn-cancel:hover {
-        background: #f1f5f9;
-        color: #0f172a;
+        background: rgba(30, 41, 59, 0.7);
+        color: #ffffff;
     }
 
-/* Autocomplete */
+/* Autocomplete list - ZMIANA NA CIEMNĄ */
 .suggestions-list {
     position: absolute;
     top: 100%;
     left: 0;
     width: 100%;
-    background: white;
-    border: 1px solid #e2e8f0;
+    /* Ciemne tło, jak w PublicOffers */
+    background: rgba(15, 23, 42, 0.98);
+    border: 1px solid #1e293b;
     border-radius: 10px;
     margin-top: 4px;
     z-index: 1000;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     overflow: hidden;
 }
 
     .suggestions-list li {
         padding: 10px 15px;
-        border-bottom: 1px solid #f1f5f9;
+        /* Ciemny separator */
+        border-bottom: 1px solid #1e293b;
         cursor: pointer;
-        color: #334155;
+        /* Jasny tekst */
+        color: #e5e7eb;
     }
 
         .suggestions-list li:hover {
-            background: #f8fafc;
-            color: #2563eb;
+            /* Niebieski hover */
+            background: #1e3a8a;
+            color: #ffffff;
         }

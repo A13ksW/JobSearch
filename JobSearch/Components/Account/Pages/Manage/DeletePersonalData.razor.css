@@ -1,0 +1,150 @@
+﻿/* === OGÓLNA STRUKTURA I CENTROWANIE === */
+.security-container.delete-container {
+    padding: 30px 20px;
+    max-width: 600px; /* Wąska karta dla skupienia uwagi */
+    margin: 0 auto;
+    text-align: center;
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.page-title {
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 0.2rem;
+    font-size: 2rem;
+}
+
+.page-subtitle {
+    color: #64748b;
+    margin-bottom: 2.5rem;
+    font-size: 1.05rem;
+}
+
+/* === KARTA KRYTYCZNA === */
+.security-card.delete-card {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 15px 45px -15px rgba(0, 0, 0, 0.15);
+    padding: 30px;
+    border: 3px solid #ef4444; /* Czerwona ramka alarmowa */
+    text-align: center;
+}
+
+/* === OSTRZEŻENIE IRREWERSYJNE (NAJWAŻNIEJSZE) === */
+.irreversible-warning {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    border-left: 6px solid #ef4444;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+    .irreversible-warning .alert-title {
+        font-weight: 800;
+        font-size: 1.25rem;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center; /* CENTROWANIE IKONY I TYTUŁU */
+        color: #ef4444;
+    }
+
+    .irreversible-warning p {
+        font-size: 1rem;
+        line-height: 1.5;
+        margin-bottom: 8px;
+    }
+
+    .irreversible-warning strong {
+        color: #ef4444;
+        font-weight: 800;
+    }
+
+
+/* === FORMULARZ I PRZYCISK === */
+.delete-form-area {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px dashed #fecaca;
+}
+
+.delete-confirmation-prompt {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #4b5563;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* INPUT HASŁA */
+.custom-floating > .form-control {
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    transition: border-color 0.3s;
+    text-align: center; /* Centrowanie tekstu w polu */
+}
+
+    .custom-floating > .form-control:focus {
+        border-color: #ef4444; /* Czerwony focus dla alarmu */
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+    }
+
+.validation-summary {
+    list-style: none;
+    padding: 0;
+    text-align: center;
+    color: #ef4444;
+    margin-bottom: 15px;
+}
+
+.validation-message {
+    display: block;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/* PRZYCISK FINALNY (MAX. DANGER) */
+.btn-security-danger.delete-final-button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: flex;
+    justify-content: center; /* WYŚRODKOWANIE NAPISU */
+    align-items: center;
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+    transition: all 0.3s ease;
+}
+
+    .btn-security-danger.delete-final-button:hover {
+        background-color: #dc2626;
+        transform: translateY(-2px) scale(1.01);
+        box-shadow: 0 10px 25px rgba(239, 68, 68, 0.6);
+    }
+
+/* Responsywność */
+@media (max-width: 500px) {
+    .security-card.delete-card {
+        padding: 20px;
+    }
+}

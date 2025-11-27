@@ -4,6 +4,8 @@ using JobSearch.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,24 +21,38 @@ builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuth
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddAuthentication(options =>
+// --- AUTHENTICATION + COOKIES + GOOGLE ---
+var authBuilder = builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = IdentityConstants.ApplicationScheme;
     options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-})
-    .AddIdentityCookies();
+});
 
+authBuilder.AddIdentityCookies();
+
+// --- NAPRAWA BŁĘDU: Sprawdzamy, czy klucze istnieją, zanim spróbujemy ich użyć ---
+var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
+var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+
+if (!string.IsNullOrEmpty(googleClientId) && !string.IsNullOrEmpty(googleClientSecret))
+{
+    authBuilder.AddGoogle(options =>
+    {
+        options.ClientId = googleClientId;
+        options.ClientSecret = googleClientSecret;
+        options.CallbackPath = "/signin-google";
+    });
+}
+// --- KONIEC NAPRAWY ---
+
+// --- AUTORYZACJA ---
 builder.Services
     .AddAuthorizationBuilder()
     .AddPolicy("RequireAdmin", policy => policy.RequireRole("Admin"))
-    .AddPolicy("RequireModerator", policy => policy.RequireRole("Moderator"));
+    .AddPolicy("RequireModerator", policy => policy.RequireRole("Moderator"))
+    .AddPolicy("CanSearchJobs", policy => policy.RequireClaim("account_type", "Individual"));
 
 builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationUserClaimsPrincipalFactory>();
-
-builder.Services.AddAuthorizationCore(options =>
-{
-    options.AddPolicy("CanSearchJobs", policy => policy.RequireClaim("account_type", "Individual"));
-});
 
 // --- BAZA DANYCH ---
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
@@ -67,7 +83,7 @@ builder.Services.AddHttpClient<INipValidationService, NipValidationService>(clie
     client.BaseAddress = new Uri("https://wl-api.mf.gov.pl/");
 });
 
-// NOWE: lokalny serwis geolokalizacji z pliku Data/polish-locations.json
+// lokalny serwis geolokalizacji
 builder.Services.AddSingleton<IGeoLocationService, LocalGeoLocationService>();
 
 builder.Services.AddQuickGridEntityFrameworkAdapter();
@@ -80,10 +96,14 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     options.Lockout.MaxFailedAccessAttempts = 5;
     options.Lockout.AllowedForNewUsers = true;
 
+    // --- KONFIGURACJA HASŁA (PROFESJONALNA) ---
     options.Password.RequiredLength = 8;
     options.Password.RequireUppercase = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireDigit = true;
+
+    // Wyłączamy wymóg znaku specjalnego, aby pasowało do Twoich oczekiwań
+    options.Password.RequireNonAlphanumeric = false;
 
     options.SignIn.RequireConfirmedAccount = false; // demo
 })
@@ -92,6 +112,8 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
 .AddSignInManager()
 .AddDefaultTokenProviders();
 
+
+builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationUserClaimsPrincipalFactory>();
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 var app = builder.Build();
@@ -137,6 +159,11 @@ else
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+
+// WAŻNE DLA COOKIE + GOOGLE:
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()

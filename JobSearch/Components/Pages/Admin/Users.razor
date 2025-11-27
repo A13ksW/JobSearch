@@ -9,14 +9,17 @@
 @inject UserManager<ApplicationUser> UserManager
 @inject NavigationManager Nav
 
-<h1>Użytkownicy</h1>
+<div class="d-flex justify-content-center mb-4">
+    <h1>Użytkownicy</h1>
+</div>
 
-<div class="row mb-3">
-    <div class="col-md-6">
+<div class="search-control-wrapper mb-4">
+    <div class="col-md-8 col-lg-6">
         <div class="input-group">
             <input @bind="search" class="form-control" placeholder="Szukaj email/nazwa" aria-label="Szukaj email lub nazwa" />
-            <button class="btn btn-success" @onclick="Load" type="button">Szukaj</button>
-            <button class="btn btn-primary" @onclick="Create" type="button">Dodaj</button>
+
+            <button class="btn btn-control-action btn-success" @onclick="Load" type="button">Szukaj</button>
+            <button class="btn btn-control-action btn-primary" @onclick="Create" type="button">Dodaj</button>
         </div>
     </div>
 </div>

@@ -6,10 +6,10 @@ namespace JobSearch.Data
 {
     public enum ExperienceYearsRange
     {
-        Zero,           // 0 lat
-        LessThanOne,    // <1 rok
-        OneToThree,     // 1-3 lata
-        ThreePlus       // 3+ lat
+        Zero,           
+        LessThanOne,    
+        OneToThree,     
+        ThreePlus       
     }
 
     public enum EducationStatus
@@ -37,7 +37,6 @@ namespace JobSearch.Data
         [ForeignKey("UserId")]
         public virtual ApplicationUser? User { get; set; }
 
-        // Pola z zakładki "Dane do e-CV" (image_fdfee0.png)
         public ExperienceYearsRange ExperienceYears { get; set; }
         public EducationStatus EducationStatus { get; set; }
 
@@ -47,7 +46,6 @@ namespace JobSearch.Data
         [StringLength(200)]
         public string? University { get; set; }
 
-        // Pola z zakładki "Preferencje" (image_fdfefe.png)
         [Column(TypeName = "nvarchar(max)")]
         public string? PreferredCategories { get; set; }
 

@@ -3,24 +3,43 @@
 
 @inject IdentityUserAccessor UserAccessor
 
-<PageTitle>Personal Data</PageTitle>
+<PageTitle>Dane Osobowe</PageTitle>
 
-<StatusMessage />
-<h3>Personal Data</h3>
+<div class="security-container">
+    <h2 class="page-title">Dane Osobowe</h2>
+    <p class="page-subtitle">Zarządzanie Twoimi danymi (GDPR).</p>
 
-<div class="row">
-    <div class="col-md-6">
-        <p>Your account contains personal data that you have given us. This page allows you to download or delete that data.</p>
-        <p>
-            <strong>Deleting this data will permanently remove your account, and this cannot be recovered.</strong>
-        </p>
-        <form action="Account/Manage/DownloadPersonalData" method="post">
-            <AntiforgeryToken />
-            <button class="btn btn-primary" type="submit">Download</button>
-        </form>
-        <p>
-            <a href="Account/Manage/DeletePersonalData" class="btn btn-danger">Delete</a>
-        </p>
+    <StatusMessage />
+
+    <div class="security-card data-card">
+
+        <div class="data-intro-section">
+            <p class="intro-text">Twoje konto zawiera dane osobowe, które nam przekazałeś. Ta strona umożliwia ich pobranie lub trwałe usunięcie.</p>
+        </div>
+
+        <div class="delete-warning-box">
+            <p>
+                <i class="bi bi-shield-lock-fill me-2"></i>
+                <strong>Usunięcie tych danych spowoduje trwałe usunięcie Twojego konta. Tego procesu nie można cofnąć!</strong>
+            </p>
+        </div>
+
+        <div class="data-actions-group">
+
+            <form action="Account/Manage/DownloadPersonalData" method="post">
+                <AntiforgeryToken />
+                <button class="btn-security-action wide-button" type="submit">
+                    <i class="bi bi-download me-2"></i> Pobierz dane
+                </button>
+            </form>
+
+            <p class="or-separator">lub</p>
+
+            <a href="Account/Manage/DeletePersonalData" class="btn-security-danger wide-button">
+                <i class="bi bi-trash-fill me-2"></i> Usuń konto i dane
+            </a>
+
+        </div>
     </div>
 </div>
 

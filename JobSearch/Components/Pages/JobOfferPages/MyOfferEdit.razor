@@ -40,22 +40,22 @@
                 <div class="row g-4">
                     <div class="col-md-4">
                         <label class="form-label">NIP (Nieedytowalny)</label>
-                        <InputText id="nip" @bind-Value="JobOffer.Nip" class="form-control" ReadOnly="true" />
+                        <input id="nip" @bind="JobOffer.Nip" class="form-control" readonly="true" />
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Nazwa Firmy</label>
-                        <InputText id="companyname" @bind-Value="JobOffer.CompanyName" class="form-control" ReadOnly="true" />
+                        <input id="companyname" @bind="JobOffer.CompanyName" class="form-control" readonly="true" />
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Branża</label>
-                        <InputSelect class="form-select" @bind-Value="JobOffer.IndustryCategory">
+                        <select class="form-select" @bind="JobOffer.IndustryCategory">
                             <option value="">-- Wybierz --</option>
                             @foreach (IndustryCategory category in Enum.GetValues(typeof(IndustryCategory)))
                             {
                                 if (category == IndustryCategory.None) continue;
                                 <option value="@category">@GetIndustryLabel(category)</option>
                             }
-                        </InputSelect>
+                        </select>
                         <ValidationMessage For="() => JobOffer.IndustryCategory" class="text-danger small" />
                     </div>
                 </div>
@@ -64,7 +64,7 @@
                 <div class="row g-4">
                     <div class="col-md-4">
                         <label class="form-label">Tytuł Stanowiska</label>
-                        <InputText id="title" @bind-Value="JobOffer.Title" class="form-control fw-bold" aria-required="true" maxlength="80" />
+                        <input id="title" @bind="JobOffer.Title" class="form-control fw-bold" aria-required="true" maxlength="80" />
                         <ValidationMessage For="() => JobOffer.Title" class="text-danger small" />
                     </div>
                     <div class="col-md-4">
@@ -72,8 +72,8 @@
                         <div class="position-relative">
                             <input class="form-control @(!string.IsNullOrEmpty(locationValidationMessage) ? "is-invalid" : "")"
                                    value="@JobOffer.Location"
-                                   placeholder="Miasto..."
                                    @oninput="OnOfferLocationInput"
+                                   placeholder="Miasto..."
                                    @onfocus="ShowOfferLocationSuggestions"
                                    @onblur="HideOfferLocationSuggestionsDelayed" />
 
@@ -95,7 +95,7 @@
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Email kontaktowy</label>
-                        <InputText id="contactinfo" @bind-Value="JobOffer.ContactInfo" class="form-control" aria-required="true" maxlength="250" />
+                        <input id="contactinfo" @bind="JobOffer.ContactInfo" class="form-control" aria-required="true" maxlength="250" />
                         <ValidationMessage For="() => JobOffer.ContactInfo" class="text-danger small" />
                     </div>
                 </div>
@@ -103,12 +103,12 @@
                 <div class="row g-4 mt-2">
                     <div class="col-md-6">
                         <label class="form-label">Opis Stanowiska</label>
-                        <InputTextArea id="description" @bind-Value="JobOffer.Description" class="form-control" rows="6" aria-required="true" maxlength="500" />
+                        <textarea id="description" @bind="JobOffer.Description" class="form-control" rows="6" aria-required="true" maxlength="500"></textarea>
                         <ValidationMessage For="() => JobOffer.Description" class="text-danger small" />
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Wymagania Szczegółowe</label>
-                        <InputTextArea id="requirements" @bind-Value="JobOffer.Requirements" class="form-control" rows="6" aria-required="true" maxlength="500" />
+                        <textarea id="requirements" @bind="JobOffer.Requirements" class="form-control" rows="6" aria-required="true" maxlength="500"></textarea>
                         <ValidationMessage For="() => JobOffer.Requirements" class="text-danger small" />
                     </div>
                 </div>
@@ -117,28 +117,28 @@
                 <div class="row g-4">
                     <div class="col-md-3">
                         <label class="form-label">Wymiar</label>
-                        <InputSelect id="empltype" @bind-Value="JobOffer.EmplType" class="form-control" aria-required="true">
+                        <select id="empltype" @bind="JobOffer.EmplType" class="form-control" aria-required="true">
                             @foreach (var type in Enum.GetValues(typeof(EmploymentType)).Cast<EmploymentType>())
                             {
                                 <option value="@type">@type</option>
                             }
-                        </InputSelect>
+                        </select>
                         <ValidationMessage For="() => JobOffer.EmplType" class="text-danger small" />
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">Tryb</label>
-                        <InputSelect id="jobtype" @bind-Value="JobOffer.JobType" class="form-control" aria-required="true">
+                        <select id="jobtype" @bind="JobOffer.JobType" class="form-control" aria-required="true">
                             @foreach (var type in Enum.GetValues(typeof(JobType)).Cast<JobType>())
                             {
                                 <option value="@type">@type</option>
                             }
-                        </InputSelect>
+                        </select>
                         <ValidationMessage For="() => JobOffer.JobType" class="text-danger small" />
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">Płaca (Min)</label>
                         <div class="input-group">
-                            <InputNumber id="salarymin" @bind-Value="JobOffer.SalaryMin" class="form-control" />
+                            <input id="salarymin" @bind="JobOffer.SalaryMin" class="form-control" type="number" />
                             <span class="input-group-text">PLN</span>
                         </div>
                         <ValidationMessage For="() => JobOffer.SalaryMin" class="text-danger small" />
@@ -146,7 +146,7 @@
                     <div class="col-md-3">
                         <label class="form-label">Płaca (Max)</label>
                         <div class="input-group">
-                            <InputNumber id="salarymax" @bind-Value="JobOffer.SalaryMax" class="form-control" />
+                            <input id="salarymax" @bind="JobOffer.SalaryMax" class="form-control" type="number" />
                             <span class="input-group-text">PLN</span>
                         </div>
                         <ValidationMessage For="() => JobOffer.SalaryMax" class="text-danger small" />
@@ -158,32 +158,33 @@
                 <div class="row g-4 mb-4">
                     <div class="col-md-8">
                         <label class="form-label">Benefity</label>
-                        <InputText id="benefits" @bind-Value="JobOffer.Benefits" class="form-control" maxlength="200" />
+                        <input id="benefits" @bind="JobOffer.Benefits" class="form-control" maxlength="200" />
                         <ValidationMessage For="() => JobOffer.Benefits" class="text-danger small" />
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Ważna do</label>
-                        <InputDate id="applicationdeadline" @bind-Value="JobOffer.ApplicationDeadline" class="form-control" min="@today" />
+                        <input id="applicationdeadline" @bind="JobOffer.ApplicationDeadline" class="form-control" type="date" min="@today" />
                         <ValidationMessage For="() => JobOffer.ApplicationDeadline" class="text-danger small" />
                     </div>
                 </div>
 
                 <label class="form-label fw-bold mb-3 d-block text-center">Dodatkowe Opcje:</label>
                 <div class="options-container mb-5">
+
                     <label class="custom-check @(JobOffer.RequiresExperience ? "active" : "")">
-                        <InputCheckbox @bind-Value="JobOffer.RequiresExperience" /> Doświadczenie
+                        <input type="checkbox" @bind="JobOffer.RequiresExperience" /> Doświadczenie
                     </label>
                     <label class="custom-check @(JobOffer.IsOnlineRecruitment ? "active" : "")">
-                        <InputCheckbox @bind-Value="JobOffer.IsOnlineRecruitment" /> Rekrutacja Online
+                        <input type="checkbox" @bind="JobOffer.IsOnlineRecruitment" /> Rekrutacja Online
                     </label>
                     <label class="custom-check @(JobOffer.RequiresSanitaryBook ? "active" : "")">
-                        <InputCheckbox @bind-Value="JobOffer.RequiresSanitaryBook" /> Sanepid
+                        <input type="checkbox" @bind="JobOffer.RequiresSanitaryBook" /> Sanepid
                     </label>
                     <label class="custom-check @(JobOffer.RequiresStudentStatus ? "active" : "")">
-                        <InputCheckbox @bind-Value="JobOffer.RequiresStudentStatus" /> Student
+                        <input type="checkbox" @bind="JobOffer.RequiresStudentStatus" /> Student
                     </label>
                     <label class="custom-check @(JobOffer.RequiresDisabilityCertificate ? "active" : "")">
-                        <InputCheckbox @bind-Value="JobOffer.RequiresDisabilityCertificate" /> Orzeczenie
+                        <input type="checkbox" @bind="JobOffer.RequiresDisabilityCertificate" /> Orzeczenie
                     </label>
                 </div>
 
@@ -272,6 +273,7 @@
         catch (Exception ex)
         {
             serverErrorMessage = ex.InnerException?.Message ?? ex.Message;
+            Console.WriteLine($"Błąd zapisu: {ex}");
         }
     }
 

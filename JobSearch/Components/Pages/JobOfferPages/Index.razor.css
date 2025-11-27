@@ -1,0 +1,303 @@
+﻿/* === 1. KONTEKST KOMPONENTU (CIEMNY PANEL) === */
+:host {
+    display: block;
+    color: #ffffff;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+    /* odstęp od góry i dołu – jak na innych podstronach */
+    :host > div.container,
+    :host > .container {
+        padding-top: 2rem;
+        padding-bottom: 4rem;
+    }
+
+/* === 2. NAGŁÓWEK STRONY === */
+h1 {
+    font-weight: 800;
+    font-size: 2.2rem;
+    color: #ffffff;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+    margin-bottom: 0;
+}
+
+.d-flex.mb-4 a.btn.btn-primary {
+    border-radius: 999px;
+    font-weight: 600;
+    padding-inline: 1.4rem;
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+}
+
+/* === 3. KARTA FILTRÓW – „SZKLANY” CIEMNY PANEL === */
+.card.mb-4 {
+    background: rgba(15, 23, 42, 0.9) !important;
+    border-radius: 24px;
+    border: 1px solid rgba(148, 163, 184, 0.35) !important;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.8);
+    overflow: hidden;
+}
+
+    /* nagłówek karty */
+    .card.mb-4 .card-header {
+        background: transparent !important;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.35) !important;
+        padding: 1rem 1.5rem;
+    }
+
+        .card.mb-4 .card-header h5 {
+            margin: 0;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+    /* ciało karty */
+    .card.mb-4 .card-body {
+        padding: 1.5rem;
+    }
+
+    /* etykiety pól */
+    .card.mb-4 .form-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #e5e7eb;
+        margin-bottom: 0.4rem;
+    }
+
+    /* === 4. INPUTY / SELECTY W KARCIE FILTRÓW === */
+    .card.mb-4 .form-control,
+    .card.mb-4 .form-select {
+        background-color: rgba(30, 41, 59, 0.95) !important; /* CIEMNE TŁO */
+        border: 1px solid #475569 !important;
+        border-radius: 12px !important;
+        color: #ffffff !important;
+        padding: 0.55rem 0.95rem;
+        font-size: 0.95rem;
+        transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+        /* placeholder np. 5000 / np. Warszawa */
+        .card.mb-4 .form-control::placeholder {
+            color: rgba(148, 163, 184, 0.9);
+        }
+
+        /* fokus */
+        .card.mb-4 .form-control:focus,
+        .card.mb-4 .form-select:focus {
+            background-color: rgba(30, 41, 59, 1) !important;
+            border-color: #2563eb !important;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35);
+        }
+
+    /* opcje dropdown – ciemne */
+    .card.mb-4 select.form-select option {
+        background-color: #020617;
+        color: #e5e7eb;
+    }
+
+    /* === AUTOCOMPLETE LOKALIZACJI === */
+    .card.mb-4 .list-group-item {
+        background-color: rgba(15, 23, 42, 0.98);
+        color: #e5e7eb;
+        border-color: #1f2937;
+        font-size: 0.9rem;
+    }
+
+        .card.mb-4 .list-group-item:hover {
+            background-color: rgba(30, 64, 175, 0.85);
+            color: #ffffff;
+        }
+
+    /* === TAGI W DODATKOWYCH FILTRACH === */
+
+    /* kontener na wszystkie tagi – JEDEN rząd (z możliwością zawijania na mniejszych ekranach) */
+    .card.mb-4 .advanced-tags-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    /* ukrycie natywnego checkboxa */
+    .card.mb-4 .custom-check-modern input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        margin: 0;
+        padding: 0;
+        pointer-events: none;
+    }
+
+    /* sam "tag" */
+    .card.mb-4 .custom-check-modern {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.55rem 1.1rem;
+        min-height: 40px;
+        background: rgba(30, 41, 59, 0.7) !important;
+        color: #e2e8f0;
+        border: 1px solid #475569;
+        border-radius: 999px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        margin: 0;
+        white-space: nowrap; /* trzyma w jednej linii */
+    }
+
+        /* aktywny tag */
+        .card.mb-4 .custom-check-modern.active {
+            background-color: #2563eb !important;
+            border-color: #2563eb !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+        }
+
+            .card.mb-4 .custom-check-modern.active::before {
+                content: '✔';
+                margin-right: 8px;
+                font-weight: 800;
+            }
+
+    /* === PRZYCISKI FILTRÓW === */
+    .card.mb-4 .btn-success,
+    .card.mb-4 .btn-secondary {
+        border-radius: 999px;
+        font-weight: 600;
+        border-width: 0;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+    }
+
+    .card.mb-4 .btn-success {
+        background-color: #22c55e;
+        box-shadow: 0 10px 25px rgba(34, 197, 94, 0.35);
+    }
+
+        .card.mb-4 .btn-success:hover {
+            background-color: #16a34a;
+            transform: translateY(-1px);
+        }
+
+    .card.mb-4 .btn-secondary {
+        background-color: rgba(30, 41, 59, 0.9);
+        color: #e5e7eb;
+        border: 1px solid #475569;
+    }
+
+        .card.mb-4 .btn-secondary:hover {
+            background-color: rgba(51, 65, 85, 1);
+        }
+
+    /* link „Pokaż / Ukryj dodatkowe filtry” */
+    .card.mb-4 .btn.btn-link {
+        color: #93c5fd;
+        font-weight: 600;
+    }
+
+        .card.mb-4 .btn.btn-link:hover {
+            color: #bfdbfe;
+        }
+
+/* === 5. KARTY OFERT W PANELU (LISTA) === */
+.card.h-100 {
+    background: rgba(15, 23, 42, 0.96);
+    border-radius: 20px;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.7);
+    overflow: hidden;
+    transition: all 0.25s ease;
+}
+
+    .card.h-100:hover {
+        transform: translateY(-6px);
+        border-color: #2563eb;
+        background: rgba(15, 23, 42, 1) !important;
+    }
+
+    .card.h-100 .card-body {
+        padding: 1.4rem 1.4rem 1.2rem;
+    }
+
+    .card.h-100 .card-title {
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 1.15rem;
+    }
+
+    .card.h-100 .card-subtitle {
+        color: #9ca3af !important;
+    }
+
+    /* lista szczegółów (lokalizacja / płaca / branża) */
+    .card.h-100 ul.small li {
+        color: #e5e7eb;
+    }
+
+    .card.h-100 ul.small strong {
+        color: #cbd5e1;
+    }
+
+    /* badge statusu */
+    .card.h-100 .badge {
+        border-radius: 999px;
+        padding-inline: 0.8rem;
+        font-weight: 600;
+    }
+
+    /* przycisk „Szczegóły / Edytuj” */
+    .card.h-100 .btn-outline-primary {
+        color: #60a5fa;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    /* stopka kart – przyciski Zatwierdź / Odrzuć */
+    .card.h-100 .card-footer {
+        background: transparent !important; /* usuwa białe tło Bootstrapa */
+        border-top: 1px solid rgba(148, 163, 184, 0.25) !important;
+    }
+
+.card-footer .btn-success,
+.card-footer .btn-danger {
+    border-radius: 12px;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+    .card-footer .btn-success:hover,
+    .card-footer .btn-danger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    }
+
+.card-footer .btn-success {
+    background-color: #10b981;
+    border-color: #10b981;
+}
+
+.card-footer .btn-danger {
+    background-color: #ef4444;
+    border-color: #ef4444;
+}
+
+/* stopka tekstowa (Dodano: data) */
+.card-footer.text-muted {
+    background: transparent !important;
+    color: #9ca3af !important;
+}
+
+/* === 6. RESPONSYWNOŚĆ === */
+@media (max-width: 767.98px) {
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    .card.mb-4 .card-body {
+        padding: 1.25rem;
+    }
+}

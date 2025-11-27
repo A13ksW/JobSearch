@@ -1,0 +1,136 @@
+﻿/* === KONTENER I ANIMACJE === */
+/* Skopiuj zawartość z Components/Account/Pages/ConfirmEmail.razor.css - style są identyczne */
+/* === KONTENER I ANIMACJE === */
+.email-container {
+    padding: 2rem 0;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    min-height: 80vh;
+    display
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* === KARTA GLASS === */
+.email-card, .auth-card { /* Dodano auth-card */
+    background: #ffffff;
+    border-radius: 30px;
+    padding: 3rem;
+    box-shadow: 0 15px 40px -10px rgba(0,0,0,0.15);
+    border: 1px solid #f1f5f9;
+    transition: transform 0.3s ease;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+
+    .email-card:hover, .auth-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 50px -10px rgba(0,0,0,0.2);
+    }
+
+    /* Ozdobny pasek na górze */
+    .email-card::before, .auth-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, #2563eb, #60a5fa);
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
+        z-index: 2;
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+    }
+
+/* === ICONS & HEADERS === */
+.email-header {
+    margin-bottom: 2rem;
+}
+
+.header-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+}
+
+.email-icon-circle {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    color: #2563eb;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.15);
+    margin: 0 auto 1rem;
+}
+
+/* === BUTTONS === */
+::deep .btn-save-pro.large {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 16px 60px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 280px;
+    cursor: pointer;
+    text-decoration: none; /* Dla linków <a> */
+}
+
+    ::deep .btn-save-pro.large:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 15px 40px rgba(37, 99, 235, 0.5);
+        background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+        color: white;
+    }
+
+/* === ALERTS === */
+::deep .alert {
+    border-radius: 16px;
+    border: none;
+    padding: 1.2rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+::deep .alert-success {
+    background-color: #f0fdf4;
+    color: #166534;
+    border: 1px solid #dcfce7;
+}
+
+::deep .alert-danger {
+    background-color: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}

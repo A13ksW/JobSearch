@@ -1,0 +1,145 @@
+﻿/* === OGÓLNA STRUKTURA I CENTROWANIE === */
+.security-container {
+    padding: 30px 20px;
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: center; /* Centrowanie wszystkich tytułów i podtytułów */
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.page-title {
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 0.2rem;
+    font-size: 2rem;
+}
+
+.page-subtitle {
+    color: #64748b;
+    margin-bottom: 2.5rem;
+    font-size: 1.05rem;
+}
+
+/* === KARTA DANYCH === */
+.security-card.data-card {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 15px 45px -15px rgba(0, 0, 0, 0.08);
+    padding: 40px;
+    border: 1px solid #f1f5f9;
+    text-align: center;
+}
+
+.intro-text {
+    font-size: 1.1rem;
+    color: #475569;
+    margin-bottom: 30px;
+}
+
+/* === OSTRZEŻENIE O USUWANIU KONTA (KRYTYCZNE) === */
+.delete-warning-box {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    border-left: 6px solid #ef4444;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 30px auto;
+    /* Tekst wewnątrz zostawiamy na środku */
+    text-align: center;
+}
+
+    .delete-warning-box p {
+        font-size: 1.1rem;
+        font-weight: 600;
+        line-height: 1.5;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .delete-warning-box i {
+        color: #ef4444;
+        font-size: 1.5rem;
+    }
+
+/* === AKCJE (BUTTON GROUP) === */
+.data-actions-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.or-separator {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+/* Uniwersalny styl dla przycisków na tej stronie */
+.wide-button {
+    width: 100%;
+    max-width: 300px; /* Ograniczenie szerokości dla estetyki */
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+/* 1. PRZYCISK GŁÓWNY (NIEBIESKI - POBIERZ) */
+.btn-security-action.wide-button {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+}
+
+    .btn-security-action.wide-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(37, 99, 235, 0.35);
+    }
+
+/* 2. PRZYCISK DANGER (CZERWONY - USUŃ) */
+.btn-security-danger.wide-button {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
+}
+
+    .btn-security-danger.wide-button:hover {
+        background-color: #dc2626;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(239, 68, 68, 0.35);
+    }
+
+/* Responsywność */
+@media (max-width: 500px) {
+    .security-card.data-card {
+        padding: 20px;
+    }
+
+    .wide-button {
+        max-width: 100%;
+    }
+}

@@ -1,0 +1,118 @@
+﻿/* === OGÓLNA STRUKTURA I CENTROWANIE === */
+.security-container {
+    padding: 30px 20px;
+    max-width: 700px; /* Mniejsza szerokość, by uwaga była bardziej skupiona */
+    margin: 0 auto;
+    text-align: center;
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.page-title {
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 0.2rem;
+    font-size: 2rem;
+}
+
+.page-subtitle {
+    color: #64748b;
+    margin-bottom: 2.5rem;
+    font-size: 1.05rem;
+}
+
+/* === KARTA BEZPIECZEŃSTWA === */
+.security-card {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 15px 45px -15px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    border: 1px solid #f1f5f9;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+}
+
+/* === OSTRZEŻENIE O KASOWANIU (WYRAŹNY BLOK DANGER) === */
+.danger-warning {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    border-left: 6px solid #ef4444;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    text-align: left; /* Tekst wewnątrz ostrzeżenia zostawiamy wyrównany do lewej dla czytelności */
+}
+
+.alert-title {
+    font-weight: 800;
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    color: #ef4444;
+}
+
+    .alert-title i {
+        font-size: 1.5rem;
+    }
+
+.danger-warning p {
+    margin-bottom: 8px;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* === PRZYCISK RESETU (DYNAMICZNY DANGER) === */
+.reset-action-area {
+    margin-top: 30px;
+}
+
+.reset-prompt {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.btn-security-danger.large-button {
+    /* Używamy czerwonego koloru z poprzedniego schematu */
+    display: flex;
+    justify-content: center; /* WYŚRODKOWANIE NAPISU */
+    align-items: center;
+    width: 100%;
+    max-width: 350px; /* Ograniczenie szerokości przycisku */
+    margin: 0 auto;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    box-shadow: 0 6px 15px rgba(239, 68, 68, 0.3);
+    transition: all 0.3s ease;
+}
+
+    .btn-security-danger.large-button:hover {
+        background-color: #dc2626;
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 20px rgba(239, 68, 68, 0.45);
+    }
+
+    .btn-security-danger.large-button i {
+        margin-right: 10px;
+        font-size: 1.25rem;
+    }

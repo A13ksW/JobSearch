@@ -15,9 +15,13 @@
 
         <div class="header-section animate-fade-up">
             <h1 class="page-title">Moje Oferty</h1>
-            <a href="/joboffers/create" class="btn-add-new">
-                <i class="bi bi-plus-lg"></i> Dodaj Nową Ofertę
-            </a>
+            @* ZMIANA: Przycisk w nagłówku wyświetla się tylko, gdy są oferty. Jeśli nie ma - wyświetla się ten duży poniżej *@
+            @if (jobOffers != null && jobOffers.Any())
+            {
+                <a href="/joboffers/create" class="btn-add-new">
+                    <i class="bi bi-plus-lg"></i> Dodaj Nową Ofertę
+                </a>
+            }
         </div>
 
         @if (jobOffers == null)
@@ -70,13 +74,16 @@
                                 </span>
                             </div>
 
-                            @if (offer.Status == OfferStatus.Odrzucona && !string.IsNullOrEmpty(offer.ModerationComment))
+                            @if (offer.Status == OfferStatus.Odrzucona)
                             {
-                                <div class="moderation-alert">
-                                    <strong><i class="bi bi-exclamation-triangle-fill"></i> Powód odrzucenia:</strong><br />
-                                    @offer.ModerationComment
+                                <div class="moderation-alert mb-2">
+                                    <strong><i class="bi bi-exclamation-triangle-fill"></i> Odrzucono:</strong>
+                                    <a href="@($"/my-offers/rejected/{offer.Id}")" class="text-danger ms-2 fw-bold text-decoration-underline">
+                                        Zobacz powód
+                                    </a>
                                 </div>
                             }
+
 
                             <div class="card-actions">
 
@@ -143,6 +150,7 @@
         try
         {
             await JobOfferService.ExtendOfferAsync(offer.Id, 3, currentUserId);
+
             await LoadOffers();
         }
         catch (Exception ex)

@@ -10,22 +10,26 @@
 
 <div class="home-container">
     <div class="container">
-        
+
         <div class="hero-wrapper animate-fade-up">
-            <h1 class="display-3 hero-title mb-3">Twoja kariera zaczyna się <span style="color: #ffcf40;">tutaj</span></h1>
-            <p class="hero-subtitle mb-5">Najlepsze oferty, sprawdzone firmy, błyskawiczna rekrutacja.</p>
+            <h1 class="display-3 hero-title mb-3">
+                Twoja kariera zaczyna się <span style="color: #ffcf40;">TUTAJ</span>
+            </h1>
+            <p class="hero-subtitle mb-5">
+                Najlepsze oferty, sprawdzone firmy, błyskawiczna rekrutacja.
+            </p>
 
             <div class="hero-search-container">
                 <div class="search-glass">
-                    <input type="text" 
-                           class="form-control search-input" 
-                           placeholder="Wpisz miasto (np. Kraków)..." 
+                    <input type="text"
+                           class="form-control search-input"
+                           placeholder="Wpisz miasto (np. Kraków)..."
                            value="@searchLocation"
                            @oninput="OnLocationInput"
                            @onfocus="ShowLocationSuggestions"
                            @onblur="HideLocationSuggestionsDelayed"
                            @onkeyup="HandleEnter" />
-                    
+
                     <button class="btn search-btn" @onclick="Search">
                         SZUKAJ
                     </button>
@@ -47,86 +51,140 @@
             </div>
         </div>
 
-        <div class="stats-wrapper row g-4 mb-5 justify-content-center animate-fade-up delay-1">
-            <div class="col-md-4 col-lg-3">
-                <div class="stat-card">
-                    <div class="stat-value">@offersCount</div>
-                    <div class="stat-label"><i class="bi bi-briefcase me-2"></i>Dostępnych Ofert</div>
-                </div>
-            </div>
-            <div class="col-md-4 col-lg-3">
-                <div class="stat-card">
-                    <div class="stat-value">@companiesCount</div>
-                    <div class="stat-label"><i class="bi bi-building me-2"></i>Zaufanych Firm</div>
-                </div>
-            </div>
-            <div class="col-md-4 col-lg-3">
-                <div class="stat-card">
-                    <div class="stat-value">@latestOffers.Count</div>
-                    <div class="stat-label"><i class="bi bi-fire me-2"></i>Dodano Dzisiaj</div>
-                </div>
-            </div>
-        </div>
+        <!-- Wrapper z gradientami za kartami -->
+        <div class="home-main">
 
-        <div class="row g-4 animate-fade-up delay-2">
-            <div class="col-lg-7">
-                <div class="content-card">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h4 class="fw-bold m-0 text-dark">Najnowsze Oferty</h4>
-                        <a href="offers" class="btn btn-link text-decoration-none fw-bold">Wszystkie &rarr;</a>
+            <div class="stats-wrapper row g-4 mb-5 justify-content-center animate-fade-up delay-1">
+                <div class="col-md-4 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-value">@offersCount</div>
+                        <div class="stat-label"><i class="bi bi-briefcase me-2"></i>Dostępnych Ofert</div>
                     </div>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-value">@companiesCount</div>
+                        <div class="stat-label"><i class="bi bi-building me-2"></i>Zaufanych Firm</div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-value">@latestOffers.Count</div>
+                        <div class="stat-label"><i class="bi bi-fire me-2"></i>Dodano Dzisiaj</div>
+                    </div>
+                </div>
+            </div>
 
-                    @if (latestOffers.Any())
-                    {
-                        <div class="d-flex flex-column gap-2">
-                            @foreach (var offer in latestOffers)
-                            {
-                                <a href="/offer/@offer.Id" class="offer-item">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h6 class="fw-bold mb-1 text-dark">@offer.Title</h6>
-                                            <div class="text-muted small">@offer.CompanyName</div>
+            <div class="row g-4 animate-fade-up delay-2">
+                <div class="col-lg-7">
+                    <div class="content-card">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="fw-bold m-0 text-dark">Najnowsze Oferty</h4>
+                            <a href="offers" class="btn btn-link text-decoration-none fw-bold">
+                                Wszystkie &rarr;
+                            </a>
+                        </div>
+
+                        @if (latestOffers.Any())
+                        {
+                            <div class="d-flex flex-column gap-2">
+                                @foreach (var offer in latestOffers)
+                                {
+                                    <a href="/offer/@offer.Id" class="offer-item">
+                                        <div class="offer-header d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="fw-bold mb-1 text-dark">@offer.Title</h6>
+                                                <div class="text-muted small">@offer.CompanyName</div>
+                                            </div>
                                         </div>
-                                        <span class="badge bg-primary rounded-pill">@offer.JobType</span>
-                                    </div>
-                                    <div class="mt-2 d-flex gap-3 text-secondary small">
-                                        <span><i class="bi bi-geo-alt-fill"></i> @offer.Location</span>
-                                        <span class="text-success fw-bold"><i class="bi bi-cash"></i> @offer.SalaryRange</span>
-                                    </div>
-                                </a>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="text-center py-5 text-muted">
-                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                            Brak nowych ofert w tej chwili.
-                        </div>
-                    }
-                </div>
-            </div>
 
-            <div class="col-lg-5">
-                <div class="content-card">
-                    <h4 class="fw-bold mb-4 text-dark">Co chcesz zrobić?</h4>
-                    <div class="vstack gap-3">
-                        <div class="role-card">
-                            <div class="role-icon"><i class="bi bi-person-bounding-box"></i></div>
-                            <h5 class="fw-bold">Jestem Kandydatem</h5>
-                            <p class="text-muted small">Stwórz profil, dodaj CV i aplikuj jednym kliknięciem.</p>
-                            <a href="Account/Manage/MyCV" class="btn btn-primary w-100 rounded-pill">Uzupełnij Profil</a>
-                        </div>
-                        <div class="role-card">
-                            <div class="role-icon text-success"><i class="bi bi-briefcase-fill"></i></div>
-                            <h5 class="fw-bold">Jestem Pracodawcą</h5>
-                            <p class="text-muted small">Dodaj ogłoszenie i znajdź najlepszych specjalistów.</p>
-                            <a href="joboffers/create" class="btn btn-success w-100 rounded-pill">Dodaj Ofertę</a>
+                                        <div class="offer-meta mt-2">
+                                            <div class="offer-meta-left">
+                                                <span class="offer-location fw-bold">
+                                                    <i class="bi bi-geo-alt-fill me-1"></i>@offer.Location
+                                                </span>
+                                                <span class="offer-salary fw-bold">
+                                                    <i class="bi bi-cash me-1"></i>@offer.SalaryRange
+                                                    <span class="offer-salary-currency">PLN</span>
+                                                </span>
+                                            </div>
+                                            <span class="badge bg-primary rounded-pill offer-jobtype">
+                                                @offer.JobType
+                                            </span>
+                                        </div>
+                                    </a>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                Brak nowych ofert w tej chwili.
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="col-lg-5">
+                    <div class="content-card">
+                        <h4 class="fw-bold mb-4 text-dark">Co chcesz zrobić?</h4>
+                        <div class="vstack gap-3">
+                            <AuthorizeView>
+                                <NotAuthorized>
+                                    <div class="role-card">
+                                        <div class="role-icon text-success">
+                                            <i class="bi bi-briefcase-fill"></i>
+                                        </div>
+                                        <h5 class="fw-bold">Jestem Kandydatem</h5>
+                                        <p class="text-muted small">
+                                            Stwórz profil, dodaj CV i aplikuj jednym kliknięciem.
+                                        </p>
+                                        <a href="joboffers/create"
+                                           class="btn btn-success w-100 rounded-pill">
+                                            Szukaj Ofert
+                                        </a>
+                                    </div>
+                                </NotAuthorized>
+                            </AuthorizeView>
+
+                            <AuthorizeView Policy="CanSearchJobs">
+                                <Authorized>
+                                    <div class="role-card">
+                                        <div class="role-icon">
+                                            <i class="bi bi-person-bounding-box"></i>
+                                        </div>
+                                        <h5 class="fw-bold">Jestem Kandydatem</h5>
+                                        <p class="text-muted small">
+                                            Stwórz profil, dodaj CV i aplikuj jednym kliknięciem.
+                                        </p>
+                                        <a href="Account/Manage/MyCV"
+                                           class="btn btn-primary w-100 rounded-pill">
+                                            Uzupełnij Profil
+                                        </a>
+                                    </div>
+                                </Authorized>
+                            </AuthorizeView>
+
+                            <div class="role-card">
+                                <div class="role-icon text-success">
+                                    <i class="bi bi-briefcase-fill"></i>
+                                </div>
+                                <h5 class="fw-bold">Jestem Pracodawcą</h5>
+                                <p class="text-muted small">
+                                    Dodaj ogłoszenie i znajdź najlepszych specjalistów.
+                                </p>
+                                <a href="joboffers/create"
+                                   class="btn btn-success w-100 rounded-pill">
+                                    Dodaj Ofertę
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+        </div> <!-- /home-main -->
     </div>
 </div>
 
@@ -134,7 +192,7 @@
     private int offersCount = 0;
     private int companiesCount = 0;
     private List<JobOffer> latestOffers = new();
-    
+
     private string searchLocation = "";
     private List<string> locationSuggestions = new();
     private bool showLocationSuggestions = false;
@@ -142,10 +200,10 @@
     protected override async Task OnInitializedAsync()
     {
         var allOffers = await JobOfferService.GetJobOffersAsync(
-            null, null, "date_desc", null, null, null, 
+            null, null, "date_desc", null, null, null,
             false, false, false, false, false
         );
-        
+
         var published = allOffers.Where(o => o.Status == OfferStatus.Opublikowana).ToList();
         offersCount = published.Count;
         companiesCount = published.Select(o => o.CompanyName).Distinct().Count();
@@ -170,7 +228,11 @@
         }
     }
 
-    private void ShowLocationSuggestions() { if (locationSuggestions.Any()) showLocationSuggestions = true; }
+    private void ShowLocationSuggestions()
+    {
+        if (locationSuggestions.Any())
+            showLocationSuggestions = true;
+    }
 
     private async Task HideLocationSuggestionsDelayed()
     {

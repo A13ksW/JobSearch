@@ -16,45 +16,62 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Register</PageTitle>
+<PageTitle>Rejestracja</PageTitle>
 
-<h1>Register</h1>
+<div class="row justify-content-center pt-5">
+    <div class="col-12 text-center">
+        <h1>Rejestracja</h1>
+    </div>
+</div>
 
-<div class="row">
-    <div class="col-md-4">
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4 login-card-section">
         <StatusMessage Message="@Message" />
         <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
             <DataAnnotationsValidator />
-            <h2>Create a new account.</h2>
+            <h2 class="text-center">Utwórz nowe konto.</h2>
             <hr />
             <ValidationSummary class="text-danger" role="alert" />
+
             <div class="mb-3">
-                <InputSelect @bind-Value="Input.AccountType" class="form-control" placeholder="Individual">
+                <label for="account-type" class="form-label">Typ konta:</label>
+                <InputSelect id="account-type" @bind-Value="Input.AccountType" class="form-select">
                     <option value="Individual">Osoba prywatna</option>
                     <option value="Company">Firma</option>
                 </InputSelect>
             </div>
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label for="email">Email</label>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Adres e-mail</label>
+                <InputText id="email" @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="adres@przyklad.pl" />
                 <ValidationMessage For="() => Input.Email" class="text-danger" />
             </div>
-            <div class="form-floating mb-3">
-                <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label for="password">Password</label>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Hasło</label>
+                <InputText id="password" type="password" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Wprowadź hasło" />
                 <ValidationMessage For="() => Input.Password" class="text-danger" />
             </div>
-            <div class="form-floating mb-3">
-                <InputText type="password" @bind-Value="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label for="confirm-password">Confirm Password</label>
+
+            <div class="mb-3">
+                <label for="confirm-password" class="form-label">Potwierdź hasło</label>
+                <InputText id="confirm-password" type="password" @bind-Value="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Powtórz hasło" />
                 <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
             </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Zarejestruj</button>
+
+            <div class="text-center mt-3">
+                <p>
+                    <a href="/Account/Login">Masz już konto? Zaloguj się</a>
+                </p>
+            </div>
         </EditForm>
     </div>
-    <div class="col-md-6 col-md-offset-2">
+
+    <div class="col-md-6 col-lg-4 external-login-col">
         <section>
-            <h3>Use another service to register.</h3>
+            <h3>Użyj innej usługi, aby się zarejestrować.</h3>
             <hr />
             <ExternalLoginPicker />
         </section>
@@ -70,7 +87,8 @@
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
 
-    private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
+    // Zmieniono komunikat błędu na polski
+    private string? Message => identityErrors is null ? null : $"Błąd rejestracji: {string.Join(", ", identityErrors.Select(error => error.Description))}";
 
     public async Task RegisterUser(EditContext editContext)
     {
@@ -134,22 +152,24 @@
 
     private sealed class InputModel
     {
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "Pole Email jest wymagane.")]
+        [EmailAddress(ErrorMessage = "Nieprawidłowy format Email.")]
+        [RegularExpression(@"(?i)^[^@\s]+@[^@\s]+\.(pl|com)$", ErrorMessage = "Adres e‑mail musi zawierać '@' i kończyć się na .pl lub .com.")]
         [Display(Name = "Email")]
         public string Email { get; set; } = "";
 
-        [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [Required(ErrorMessage = "Pole Hasło jest wymagane.")]
+        [StringLength(100, ErrorMessage = "Hasło musi mieć co najmniej {2} i maksymalnie {1} znaków.", MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
+        [Display(Name = "Hasło")]
         public string Password { get; set; } = "";
 
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        [Display(Name = "Potwierdź hasło")]
+        [Compare("Password", ErrorMessage = "Hasło i potwierdzenie hasła są różne.")]
         public string ConfirmPassword { get; set; } = "";
 
+        [Required(ErrorMessage = "Wybór typu konta jest wymagany.")]
         public string AccountType { get; set; } = "";
     }
 }

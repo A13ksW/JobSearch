@@ -391,7 +391,7 @@ namespace JobSearch.Migrations
                     b.Property<int>("EmplType")
                         .HasColumnType("int");
 
-                    b.Property<int?>("IndustryCategory")
+                    b.Property<int>("IndustryCategory")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsOnlineRecruitment")
@@ -448,7 +448,12 @@ namespace JobSearch.Migrations
 
                     b.HasIndex("CreatedByUserId");
 
-                    b.ToTable("JobOffer");
+                    b.ToTable("JobOffer", t =>
+                        {
+                            t.HasTrigger("TRG_JobOffer_SalaryCheck");
+                        });
+
+                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

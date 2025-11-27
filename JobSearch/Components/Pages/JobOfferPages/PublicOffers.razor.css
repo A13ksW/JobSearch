@@ -3,6 +3,8 @@
     padding-top: 2rem;
     padding-bottom: 5rem;
     color: #fff;
+    /* DODANIE SUBTELNEGO TŁA Z GRADIENTAMI */
+    background: radial-gradient(circle at 10% 90%, rgba(37, 99, 235, 0.05) 0%, transparent 20%), radial-gradient(circle at 90% 10%, rgba(16, 185, 129, 0.05) 0%, transparent 20%);
 }
 
 .animate-fade-up {
@@ -18,55 +20,151 @@
     }
 }
 
-/* === 2. SEKCJA FILTRÓW (Glassmorphism) === */
+/* === 2. SEKCJA FILTRÓW – CIEMNA WERSJA (SZKŁO Z PASKIEM GRADIENTU) === */
 .filters-glass {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(15, 23, 42, 0.9);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
     border-radius: 24px;
     padding: 2rem;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(148, 163, 184, 0.25);
     margin-bottom: 3rem;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
+    position: relative; /* Kluczowe dla ::before */
+    overflow: hidden; /* Kluczowe: Obcina gradient na zaokrągleniach */
+    padding-top: 2.5rem; /* Dodajemy miejsce na pasek, żeby nie ucinał tytułu */
 }
 
+    /* Pasek gradientowy na górze filtra */
+    .filters-glass::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        /* Gradient niebiesko-fioletowo-zielony (jak w home) */
+        background: linear-gradient(90deg, #2563eb 0%, #a78bfa 50%, #10b981 100%);
+        z-index: 3;
+        border-top-left-radius: 24px;
+        border-top-right-radius: 24px;
+        box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
+    }
+
+/* Tytuł sekcji */
 .filter-title {
-    color: #0f172a; /* Ciemny granat */
+    color: #ffffff !important;
     font-weight: 800;
     font-size: 1.25rem;
-    margin-bottom: 1.5rem;
-    border-bottom: 2px solid #f1f5f9;
+    margin-bottom: 2rem;
     padding-bottom: 0.5rem;
 }
 
-/* Stylowanie inputów wewnątrz filtrów */
+/* Opisy kategorii */
 .filter-label {
     font-weight: 600;
     font-size: 0.85rem;
-    color: #64748b;
+    color: #e5e7eb !important; /* białe/jaśniejsze */
     margin-bottom: 0.4rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
+/* === CIEMNE INPUTY I SELECTY – DOMYŚLNE === */
 .filters-glass .form-control,
 .filters-glass .form-select {
-    background-color: #f8fafc !important;
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 12px !important;
-    color: #1e293b !important;
+    background-color: rgba(30, 41, 59, 0.9);
+    border: 1px solid #475569;
+    border-radius: 12px;
+    color: #ffffff;
     padding: 0.6rem 1rem;
     transition: all 0.2s;
 }
 
-    .filters-glass .form-control:focus,
-    .filters-glass .form-select:focus {
-        background-color: #fff !important;
-        border-color: #2563eb !important;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+    .filters-glass .form-control::placeholder {
+        color: rgba(148, 163, 184, 0.9);
     }
 
-/* Przyciski filtrów */
+    .filters-glass .form-control:focus,
+    .filters-glass .form-select:focus {
+        background-color: rgba(30, 41, 59, 1);
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35);
+    }
+
+/* Sugestie lokalizacji w ciemnym stylu */
+.filters-glass .list-group-item {
+    background-color: rgba(15, 23, 42, 0.98);
+    color: #e5e7eb;
+    border-color: #1f2937;
+}
+
+    .filters-glass .list-group-item:hover {
+        background-color: rgba(30, 64, 175, 0.8);
+        color: #ffffff;
+    }
+
+/* --- ZAAWANSOWANE FILTRY JAKO TAGI (MODYFIKACJA CHECKBOXÓW) --- */
+
+/* UKRYWAMY INPUT, ale musi być w DOM */
+.filters-glass .form-check-input {
+    /* Upewniamy się, że input jest niewidzialny i nie wpływa na layout */
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    /* Nadpisujemy Bootstrap, by nie wyświetlał swojego kwadratu */
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    pointer-events: none; /* Upewniamy się, że klikamy tylko w label */
+}
+
+/* Tło i tekst labela (tagu) */
+.filters-glass .custom-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* Podstawowy wygląd ciemnego filtru (jak przycisk secondary) */
+    background: rgba(30, 41, 59, 0.7) !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #475569 !important;
+    padding: 0.6rem 1.2rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 600;
+    user-select: none;
+    font-size: 0.9rem;
+}
+
+    /* Hover */
+    .filters-glass .custom-check:hover {
+        border-color: #2563eb !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+
+    /* === STYL AKTYWNY (ZAZNACZONY) === */
+    .filters-glass .custom-check.active {
+        background-color: #2563eb !important; /* Niebieskie tło */
+        border-color: #2563eb !important;
+        color: #ffffff !important; /* Biały tekst */
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        transform: translateY(-1px);
+    }
+
+        /* Dodatkowy "ptaszek" przed tekstem (w CSS) */
+        .filters-glass .custom-check.active::before {
+            content: '✔';
+            margin-right: 8px;
+            font-weight: 800;
+        }
+
+/* --- KONIEC MODYFIKACJI CHECKBOXÓW --- */
+
+/* === Przyciski (Pozostawione bez zmian) === */
 .btn-filter {
     border-radius: 12px;
     padding: 0.6rem 1.5rem;
@@ -83,78 +181,106 @@
     .btn-filter-primary:hover {
         background: #1d4ed8 !important;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
     }
 
 .btn-filter-secondary {
-    background: white !important;
-    color: #64748b !important;
-    border: 1px solid #cbd5e1 !important;
+    background: rgba(30, 41, 59, 0.7) !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #475569 !important;
 }
 
     .btn-filter-secondary:hover {
-        background: #f1f5f9 !important;
-        color: #0f172a !important;
+        background: rgba(51, 65, 85, 0.9) !important;
+        color: #ffffff !important;
     }
 
-/* === 3. KARTY OFERT (Premium) === */
-.offer-card {
-    display: block;
-    text-decoration: none;
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 1.5rem;
-    height: 100%;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+/* === WYMUSZONE CIEMNE TŁO DLA WYBRANYCH PÓL (dark-select) === */
+/* Zwiększona specyficzność dla 'dark-select', aby upewnić się, że nadpisuje style domyślne/frameworkowe */
+.filters-glass .dark-select,
+.filters-glass input.dark-select,
+.filters-glass select.dark-select {
+    background-color: rgba(30, 41, 59, 0.9) !important;
+    color: #ffffff !important;
+    border: 1px solid #475569 !important;
+    border-radius: 12px !important;
+    padding: 0.6rem 1rem !important;
 }
 
-    .offer-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    .filters-glass .dark-select:focus,
+    .filters-glass input.dark-select:focus,
+    .filters-glass select.dark-select:focus {
+        background-color: rgba(30, 41, 59, 1) !important;
+        border-color: #2563eb !important;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35) !important;
     }
 
-    /* Pasek akcentowy z lewej strony przy hoverze */
+    .filters-glass .dark-select::placeholder {
+        color: rgba(148, 163, 184, 0.9) !important;
+    }
+
+    .filters-glass .dark-select option {
+        background-color: rgba(15, 23, 42, 0.95);
+        color: #ffffff;
+    }
+
+/* === 3. KARTY OFERT – CIEMNE, JAK NA HOMEPAGE (Z PASKIEM GRADIENTU) === */
+.offer-card {
+    display: block;
+    background: rgba(15, 23, 42, 0.9) !important;
+    border-radius: 22px;
+    padding: 1.5rem;
+    height: 100%;
+    transition: all 0.25s ease;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    overflow: hidden;
+    text-decoration: none;
+    position: relative; /* Kluczowe dla ::before */
+    padding-top: 1.8rem; /* Dodajemy miejsce na pasek */
+}
+
+    /* Pasek gradientowy na górze karty oferty */
     .offer-card::before {
-        content: '';
+        content: "";
         position: absolute;
-        left: 0;
         top: 0;
-        bottom: 0;
-        width: 6px;
-        background: #2563eb;
-        opacity: 0;
-        transition: opacity 0.3s;
+        left: 0;
+        right: 0;
+        height: 4px;
+        /* Gradient niebiesko-fioletowo-zielony (jak w home) */
+        background: linear-gradient(90deg, #2563eb 0%, #a78bfa 50%, #10b981 100%);
+        z-index: 3;
+        border-top-left-radius: 22px;
+        border-top-right-radius: 22px;
+        box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
     }
 
-    .offer-card:hover::before {
-        opacity: 1;
+    .offer-card:hover {
+        transform: translateY(-6px);
+        border-color: #2563eb;
+        background: rgba(15, 23, 42, 1) !important;
     }
 
-/* Typografia w karcie */
+/* Tytuł i firma */
 .offer-title {
-    color: #0f172a;
+    color: #ffffff !important;
     font-weight: 800;
     font-size: 1.15rem;
     margin-bottom: 0.25rem;
-    line-height: 1.4;
 }
 
 .offer-company {
-    color: #64748b;
+    color: #cbd5e1 !important;
     font-size: 0.9rem;
-    font-weight: 500;
     margin-bottom: 1rem;
 }
 
+/* === Tagi (lokalizacja / typ / branża / wynagrodzenie) === */
 .offer-details {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
-    margin-top: auto; /* Wypycha detale na dół karty */
+    margin-top: auto;
 }
 
 .detail-tag {
@@ -167,52 +293,60 @@
     gap: 6px;
 }
 
+/* Lokalizacja – niebieska */
 .tag-location {
-    background: #f1f5f9;
-    color: #475569;
+    background: rgba(37, 99, 235, 0.22);
+    color: #bfdbfe !important;
 }
 
-.tag-salary {
-    background: #ecfdf5;
-    color: #059669;
-    border: 1px solid #d1fae5;
-}
-
+/* Typ pracy – jasnoniebieski */
 .tag-type {
-    background: #eff6ff;
-    color: #2563eb;
+    background: rgba(59, 130, 246, 0.18);
+    color: #93c5fd !important;
 }
 
+/* Branża – fiolet */
+.tag-industry {
+    background: rgba(129, 140, 248, 0.2);
+    color: #c7d2fe !important;
+}
+
+/* Wynagrodzenie – zielone */
+.tag-salary {
+    background: rgba(16, 185, 129, 0.18);
+    color: #22c55e !important;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+/* === Stopka karty === */
 .offer-footer {
     margin-top: 1.5rem;
     padding-top: 1rem;
-    border-top: 1px solid #f1f5f9;
+    border-top: 1px solid rgba(148, 163, 184, 0.2);
+    color: #cbd5e1;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.8rem;
-    color: #94a3b8;
+    font-size: 0.85rem;
 }
 
 .btn-view {
-    font-size: 0.85rem;
+    color: #60a5fa !important;
     font-weight: 700;
-    color: #2563eb;
     text-decoration: none;
 }
 
-/* Stan pusty */
+/* === PUSTY STAN === */
 .empty-state {
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(5px);
-    border: 2px dashed rgba(255,255,255,0.3);
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px dashed rgba(255, 255, 255, 0.25);
     border-radius: 24px;
     padding: 4rem;
     text-align: center;
     color: white;
 }
 
-/* Nagłówek strony */
+/* === NAGŁÓWEK STRONY === */
 .page-header {
     text-align: center;
     margin-bottom: 3rem;
@@ -221,8 +355,7 @@
 .page-title {
     font-weight: 800;
     font-size: 3rem;
-    margin-bottom: 0.5rem;
-    text-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .page-subtitle {

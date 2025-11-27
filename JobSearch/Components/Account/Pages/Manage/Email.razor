@@ -1,4 +1,5 @@
 ﻿@page "/Account/Manage/Email"
+@rendermode InteractiveServer
 
 @using System.ComponentModel.DataAnnotations
 @using System.Text
@@ -9,76 +10,173 @@
 
 @inject UserManager<ApplicationUser> UserManager
 @inject IEmailSender<ApplicationUser> EmailSender
-@inject IdentityUserAccessor UserAccessor
+@inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
 
-<PageTitle>Manage email</PageTitle>
+<PageTitle>Zarządzanie E-mailem</PageTitle>
 
-<h3>Manage email</h3>
+<div class="email-dashboard">
 
-<StatusMessage Message="@message"/>
-<div class="row">
-    <div class="col-md-6">
-        <form @onsubmit="OnSendEmailVerificationAsync" @formname="send-verification" id="send-verification-form" method="post">
-            <AntiforgeryToken />
-        </form>
-        <EditForm Model="Input" FormName="change-email" OnValidSubmit="OnValidSubmitAsync" method="post">
-            <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" role="alert" />
-            @if (isEmailConfirmed)
-            {
-                <div class="form-floating mb-3 input-group">
-                    <input type="text" value="@email" class="form-control" placeholder="Please enter your email." disabled />
-                    <div class="input-group-append">
-                        <span class="h-100 input-group-text text-success font-weight-bold">✓</span>
+    <!-- NAGŁÓWEK STRONY -->
+    <div class="page-header-center mb-5">
+        <h2 class="header-title">Adres E-mail</h2>
+        <p class="header-subtitle">Zarządzaj swoim adresem e-mail i bezpieczeństwem konta</p>
+    </div>
+
+    <!-- Wyświetlanie komunikatu z obsługą HTML (dla linków) -->
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="alert @(isError ? "alert-danger" : "alert-success") text-center mb-4 shadow-sm border-0">
+            @((MarkupString)message)
+        </div>
+    }
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card-glass p-5">
+
+                <!-- WIZYTÓWKA -->
+                <div class="email-badge-section mb-5">
+                    <div class="email-icon-circle">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-envelope-at-fill" viewBox="0 0 16 16">
+                            <path d="M2 2A2 2 0 0 0 .05 3.555L8 8.414l7.95-4.859A2 2 0 0 0 14 2H2Zm-2 9.8V4.698l5.803 3.546L0 11.801Zm6.761-2.97-6.57 4.026A2 2 0 0 0 2 14h6.256A4.493 4.493 0 0 1 8 12.5a4.49 4.49 0 0 1 1.606-3.446l-.367-.225L8 9.586l-1.239-.757ZM16 9.671l-3.268 2.014c.326.574.548 1.212.65 1.884l2.618-1.61V4.698l-5.803 3.546-.381.233 6.184 3.775Z" />
+                            <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm.5-5v1.5a.5.5 0 0 0 .5.5h.25a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.25a1.5 1.5 0 0 1 0-3h.25a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.25a.5.5 0 0 0-.5.5V11h-1v-1a.5.5 0 0 1 .5-.5h.25a1.5 1.5 0 0 1 0 3h-.25a.5.5 0 0 0-.5.5v.5h1Zm-2-1.5a.5.5 0 0 1 .5-.5h.25a1.5 1.5 0 0 1 0 3h-.25a.5.5 0 0 0-.5.5v.5h-1v-1.5a.5.5 0 0 1 .5-.5Z" />
+                        </svg>
                     </div>
-                    <label for="email" class="form-label">Email</label>
+                    <h3 class="current-email">@email</h3>
+
+                    <div class="mt-3">
+                        @if (isEmailConfirmed)
+                        {
+                            <span class="status-pill verified">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill me-1" viewBox="0 0 16 16">
+                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+                                </svg>
+                                Zweryfikowany
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="status-pill unverified">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle-fill me-2" viewBox="0 0 16 16">
+                                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+                                </svg>
+                                Niepotwierdzony
+                            </span>
+                        }
+                    </div>
                 </div>
-            }
-            else
-            {
-                <div class="form-floating mb-3">
-                    <input type="text" value="@email" class="form-control" placeholder="Please enter your email." disabled />
-                    <label for="email" class="form-label">Email</label>
-                    <button type="submit" class="btn btn-link" form="send-verification-form">Send verification email</button>
-                </div>
-            }
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.NewEmail" class="form-control" autocomplete="email" aria-required="true" placeholder="Please enter new email." />
-                <label for="new-email" class="form-label">New email</label>
-                <ValidationMessage For="() => Input.NewEmail" class="text-danger" />
+
+                <!-- SEKCJA WERYFIKACJI -->
+                @if (!isEmailConfirmed)
+                {
+                    <div class="verification-box mb-5 text-center">
+                        <p class="mb-3 fw-bold text-danger">Wymagane działanie:</p>
+                        <div class="d-flex justify-content-center">
+                            <button type="button" class="btn-save-pro large" @onclick="OnSendEmailVerificationAsync">
+                                <span class="btn-content">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-send-fill me-2" viewBox="0 0 16 16">
+                                        <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.476-.476 1.178Z" />
+                                    </svg>
+                                    Wyślij e-mail weryfikacyjny ponownie
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                    <hr class="mb-5 opacity-25" />
+                }
+
+                <!-- FORMULARZ ZMIANY E-MAILA -->
+                <EditForm Model="Input" FormName="change-email" OnValidSubmit="OnValidSubmitAsync">
+                    <DataAnnotationsValidator />
+                    <!-- Walidacja lokalna pod inputami -->
+
+                    <div class="modern-input-group centered-input mb-4 @(isEmailConfirmed ? "confirmed-mode" : "warning-mode")">
+                        <div class="input-icon-top @(isEmailConfirmed ? "success" : "warning")">
+                            @if (isEmailConfirmed)
+                            {
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+                                </svg>
+                            }
+                            else
+                            {
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+                                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+                                </svg>
+                            }
+                        </div>
+                        <label class="modern-label">Obecny E-mail</label>
+                        <input type="text" value="@email" class="modern-input text-center fw-bold" disabled />
+                    </div>
+
+                    <div class="modern-input-group centered-input mb-4">
+                        <div class="input-icon-top">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                            </svg>
+                        </div>
+                        <label class="modern-label">Wpisz nowy adres E-mail</label>
+                        <InputText @bind-Value="Input.NewEmail" class="modern-input text-center" autocomplete="email" aria-required="true" placeholder="nowy.adres@email.com" />
+                    </div>
+                    <div class="text-center mb-3">
+                        <ValidationMessage For="() => Input.NewEmail" class="text-danger small" />
+                    </div>
+
+                    <div class="d-flex justify-content-center mt-4">
+                        <button type="submit" class="btn-save-pro large">
+                            <span class="btn-content">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-repeat fs-5 me-2" viewBox="0 0 16 16">
+                                    <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z" />
+                                    <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z" />
+                                </svg>
+                                Zmień E-mail
+                            </span>
+                        </button>
+                    </div>
+
+                </EditForm>
+
             </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Change email</button>
-        </EditForm>
+        </div>
     </div>
 </div>
 
 @code {
     private string? message;
+    private bool isError = false;
     private ApplicationUser user = default!;
     private string? email;
     private bool isEmailConfirmed;
-
-    [CascadingParameter]
-    private HttpContext HttpContext { get; set; } = default!;
 
     [SupplyParameterFromForm(FormName = "change-email")]
     private InputModel Input { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
-        user = await UserAccessor.GetRequiredUserAsync(HttpContext);
-        email = await UserManager.GetEmailAsync(user);
-        isEmailConfirmed = await UserManager.IsEmailConfirmedAsync(user);
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var principal = authState.User;
 
-        Input.NewEmail ??= email;
+        if (principal.Identity?.IsAuthenticated == true)
+        {
+            user = await UserManager.GetUserAsync(principal);
+            if (user != null)
+            {
+                email = await UserManager.GetEmailAsync(user);
+                isEmailConfirmed = await UserManager.IsEmailConfirmedAsync(user);
+                if (string.IsNullOrEmpty(Input.NewEmail)) Input.NewEmail = email;
+            }
+        }
     }
 
     private async Task OnValidSubmitAsync()
     {
+        isError = false;
         if (Input.NewEmail is null || Input.NewEmail == email)
         {
-            message = "Your email is unchanged.";
+            message = "Twój e-mail pozostał niezmieniony.";
+            isError = true;
             return;
         }
 
@@ -89,17 +187,14 @@
             NavigationManager.ToAbsoluteUri("Account/ConfirmEmailChange").AbsoluteUri,
             new Dictionary<string, object?> { ["userId"] = userId, ["email"] = Input.NewEmail, ["code"] = code });
 
-        await EmailSender.SendConfirmationLinkAsync(user, Input.NewEmail, HtmlEncoder.Default.Encode(callbackUrl));
-
-        message = "Confirmation link to change email sent. Please check your email.";
+        // Symulacja linku (wyświetlenie na ekranie)
+        message = $"Link zmiany e-maila: <a href='{callbackUrl}' class='fw-bold text-primary'>KLIKNIJ TUTAJ</a>";
     }
 
     private async Task OnSendEmailVerificationAsync()
     {
-        if (email is null)
-        {
-            return;
-        }
+        if (email is null) return;
+        isError = false;
 
         var userId = await UserManager.GetUserIdAsync(user);
         var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
@@ -108,16 +203,14 @@
             NavigationManager.ToAbsoluteUri("Account/ConfirmEmail").AbsoluteUri,
             new Dictionary<string, object?> { ["userId"] = userId, ["code"] = code });
 
-        await EmailSender.SendConfirmationLinkAsync(user, email, HtmlEncoder.Default.Encode(callbackUrl));
-
-        message = "Verification email sent. Please check your email.";
+        // Symulacja linku
+        message = $"Link weryfikacyjny: <a href='{callbackUrl}' class='fw-bold text-primary'>KLIKNIJ TUTAJ</a>";
     }
 
     private sealed class InputModel
     {
-        [Required]
-        [EmailAddress]
-        [Display(Name = "New email")]
+        [Required(ErrorMessage = "Pole jest wymagane")]
+        [EmailAddress(ErrorMessage = "Niepoprawny format adresu.")]
         public string? NewEmail { get; set; }
     }
 }

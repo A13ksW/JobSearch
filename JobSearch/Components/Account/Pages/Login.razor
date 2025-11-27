@@ -14,60 +14,66 @@
 @inject AuthenticationStateProvider AuthStateProvider
 
 
-<PageTitle>Log in</PageTitle>
+<PageTitle>Logowanie</PageTitle>
 
-<h1>Log in</h1>
-<div class="row">
-    <div class="col-md-4">
-        <section>
+<div class="row justify-content-center pt-5">
+    <div class="col-12 text-center">
+        <h1>Logowanie</h1>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <section class="login-card-section">
             <StatusMessage Message="@errorMessage" />
             <EditForm Model="Input" OnValidSubmit="LoginUser" FormName="login">
                 <DataAnnotationsValidator />
-                <h2>Use a local account to log in.</h2>
+                <h2 class="text-center">Użyj lokalnego konta do logowania.</h2>
                 <hr />
                 <ValidationSummary class="text-danger" role="alert" />
 
                 @if (IsLockedOut)
                 {
-                    <div class="alert alert-warning">Your account is temporarily locked. Try again later.</div>
+                    <div class="alert alert-warning">Twoje konto zostało tymczasowo zablokowane. Spróbuj później.</div>
                 }
 
-                <div class="form-floating mb-3">
-                    <InputText id="email" @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
+                    <InputText id="email" @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
                     <ValidationMessage For="() => Input.Email" class="text-danger" />
                 </div>
-                <div class="form-floating mb-3">
-                    <InputText id="password" type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label for="password" class="form-label">Password</label>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Hasło</label>
+                    <InputText id="password" type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="hasło" />
                     <ValidationMessage For="() => Input.Password" class="text-danger" />
                 </div>
                 <div class="checkbox mb-3">
                     <label class="form-label">
                         <InputCheckbox @bind-Value="Input.RememberMe" class="darker-border-checkbox form-check-input" />
-                        Remember me
+                        Zapamiętaj mnie
                     </label>
                 </div>
                 <div>
-                    <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+                    <button type="submit" class="w-100 btn btn-lg btn-primary">Zaloguj się</button>
                 </div>
-                <div>
+                <div class="text-center mt-3">
                     <p>
-                        <a href="/Account/ForgotPassword">Forgot your password?</a>
+                        <a href="/Account/ForgotPassword">Nie pamiętasz hasła?</a>
                     </p>
                     <p>
-                        <a href="@(NavigationManager.GetUriWithQueryParameters("/Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</a>
+                        <a href="@(NavigationManager.GetUriWithQueryParameters("/Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Zarejestruj nowe konto</a>
                     </p>
                     <p>
-                        <a href="/Account/ResendEmailConfirmation">Resend email confirmation</a>
+                        <a href="/Account/ResendEmailConfirmation">Ponów wysyłkę potwierdzenia email</a>
                     </p>
                 </div>
             </EditForm>
         </section>
     </div>
-    <div class="col-md-6 col-md-offset-2">
+
+    <div class="col-md-6 col-lg-4 external-login-col">
         <section>
-            <h3>Use another service to log in.</h3>
+            <h3>Użyj innej usługi, aby się zalogować.</h3>
             <hr />
             <ExternalLoginPicker />
         </section>
@@ -111,16 +117,16 @@
             IsLockedOut = true;
             return;
         }
-        errorMessage = "Error: Invalid login attempt.";
+        errorMessage = "Błąd: Nieudana próba logowania.";
     }
 
     public class LoginInputModel
     {
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "Pole Email jest wymagane.")]
+        [EmailAddress(ErrorMessage = "Nieprawidłowy format Email.")]
         public string Email { get; set; } = "";
 
-        [Required]
+        [Required(ErrorMessage = "Pole Hasło jest wymagane.")]
         public string Password { get; set; } = "";
 
         public bool RememberMe { get; set; }

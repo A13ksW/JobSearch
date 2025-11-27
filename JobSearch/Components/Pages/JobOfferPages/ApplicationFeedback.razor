@@ -15,76 +15,76 @@
 
 @if (isLoading)
 {
-    <p><em>Ładowanie...</em></p>
+	<p><em>Ładowanie...</em></p>
 }
 else if (application == null)
 {
-    <div class="alert alert-warning">Nie znaleziono aplikacji.</div>
-    <a href="/my-applications" class="btn btn-secondary">Powrót</a>
+	<div class="alert alert-warning">Nie znaleziono aplikacji.</div>
+	<a href="/my-applications" class="btn btn-secondary">Powrót</a>
 }
 else
 {
-    <div class="card">
-        <div class="card-header">
-            Dotyczy oferty: <strong>@application.JobOffer?.Title</strong>
-            <br/>
-            <small class="text-muted">@application.JobOffer?.CompanyName</small>
-        </div>
-        <div class="card-body">
-            <h5 class="card-title text-danger">Twoja aplikacja została odrzucona.</h5>
-            <p class="card-text mt-3">
-                <strong>Wiadomość od rekrutera:</strong>
-            </p>
-            
-            <div class="alert alert-secondary p-4">
-                @if (string.IsNullOrEmpty(application.RejectionReason))
-                {
-                    <em class="text-muted">Pracodawca nie podał szczegółowego powodu odrzucenia.</em>
-                }
-                else
-                {
-                    @application.RejectionReason
-                }
-            </div>
+	<div class="card">
+		<div class="card-header text-center">
+			Dotyczy oferty: <strong>@application.JobOffer?.Title</strong>
+			<br />
+			<small class="text-muted d-block">@application.JobOffer?.CompanyName</small>
+		</div>
+		<div class="card-body">
+			<h5 class="card-title text-danger">Twoja aplikacja została odrzucona.</h5>
+			<p class="card-text mt-3">
+				<strong>Wiadomość od rekrutera:</strong>
+			</p>
 
-            <div class="mt-4">
-                <a href="/my-applications" class="btn btn-primary">Powrót do listy aplikacji</a>
-            </div>
-        </div>
-        <div class="card-footer text-muted">
-            Status zmieniono: @(application.StatusLastUpdated?.ToLocalTime().ToString("g") ?? "Brak daty")
-        </div>
-    </div>
+			<div class="alert alert-secondary p-4">
+				@if (string.IsNullOrEmpty(application.RejectionReason))
+				{
+					<em class="text-muted">Pracodawca nie podał szczegółowego powodu odrzucenia.</em>
+				}
+				else
+				{
+					@application.RejectionReason
+				}
+			</div>
+
+			<div class="d-grid mt-4">
+				<a href="/my-applications" class="btn btn-primary btn-list-return">Powrót do listy aplikacji</a>
+			</div>
+		</div>
+		<div class="card-footer text-muted">
+			Status zmieniono: @(application.StatusLastUpdated?.ToLocalTime().ToString("g") ?? "Brak daty")
+		</div>
+	</div>
 }
 
 @code {
-    [Parameter]
-    public int Id { get; set; }
+	[Parameter]
+	public int Id { get; set; }
 
-    private JobApplication? application;
-    private bool isLoading = true;
+	private JobApplication? application;
+	private bool isLoading = true;
 
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var currentUserId = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
+	protected override async Task OnInitializedAsync()
+	{
+		var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+		var currentUserId = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        if (string.IsNullOrEmpty(currentUserId))
-        {
-            NavigationManager.NavigateTo("Account/Login");
-            return;
-        }
+		if (string.IsNullOrEmpty(currentUserId))
+		{
+			NavigationManager.NavigateTo("Account/Login");
+			return;
+		}
 
-        // Pobierz aplikację
-        application = await JobOfferService.GetApplicationByIdAsync(Id);
+		// Pobierz aplikację
+		application = await JobOfferService.GetApplicationByIdAsync(Id);
 
-        // Zabezpieczenie: Użytkownik może zobaczyć feedback TYLKO do swojej własnej aplikacji
-        if (application == null || application.ApplicantId != currentUserId)
-        {
-            NavigationManager.NavigateTo("/my-applications");
-            return;
-        }
+		// Zabezpieczenie: Użytkownik może zobaczyć feedback TYLKO do swojej własnej aplikacji
+		if (application == null || application.ApplicantId != currentUserId)
+		{
+			NavigationManager.NavigateTo("/my-applications");
+			return;
+		}
 
-        isLoading = false;
-    }
+		isLoading = false;
+	}
 }

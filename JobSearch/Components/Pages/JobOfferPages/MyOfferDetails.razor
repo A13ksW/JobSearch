@@ -52,7 +52,8 @@
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Wynagrodzenie</span>
-                    <span class="stat-value text-success">@jobOffer.SalaryRange</span>
+                    <!-- DODANO PLN -->
+                    <span class="stat-value text-success">@jobOffer.SalaryRange PLN</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Aplikacje</span>
@@ -265,7 +266,8 @@
                                             <div class="action-form fade-in">
                                                 <label class="form-label-small text-success">Numer telefonu:</label>
                                                 <div class="d-flex gap-2">
-                                                    <input @bind="inputPhoneNumber" class="form-control input-phone" placeholder="9 cyfr" maxlength="9" />
+                                                    <!-- ZMIANA: Usunięto type/pattern, dodano @oninput do wymuszenia tylko cyfr w C# -->
+                                                    <input value="@inputPhoneNumber" @oninput="FilterPhoneNumber" class="form-control input-phone" placeholder="9 cyfr" maxlength="9" />
                                                     <button class="btn-action btn-invite" @onclick="() => ProcessStatusUpdate(app, ApplicationStatus.Zaproszony)">Wyślij</button>
                                                 </div>
                                             </div>
@@ -336,6 +338,14 @@
         applications = await JobOfferService.GetApplicationsForOfferAsync(Id);
     }
 
+    // Nowa metoda do filtrowania i akceptowania tylko cyfr
+    private void FilterPhoneNumber(ChangeEventArgs e)
+    {
+        string? newValue = e.Value?.ToString() ?? string.Empty;
+        // Akceptuj tylko cyfry i ogranicz do 9 znaków
+        inputPhoneNumber = new string(newValue.Where(char.IsDigit).Take(9).ToArray());
+    }
+
     private bool CanChangeDecision(JobApplication app)
     {
         if (!app.StatusLastUpdated.HasValue) return true;
@@ -368,7 +378,10 @@
     {
         try
         {
-            if (newStatus == ApplicationStatus.Zaproszony && (string.IsNullOrWhiteSpace(inputPhoneNumber) || inputPhoneNumber.Length != 9))
+            // Oczyszczanie numeru telefonu przed walidacją na wszelki wypadek (choć FilterPhoneNumber już to robi)
+            string cleanedPhoneNumber = new string(inputPhoneNumber.Where(char.IsDigit).ToArray());
+
+            if (newStatus == ApplicationStatus.Zaproszony && (string.IsNullOrWhiteSpace(cleanedPhoneNumber) || cleanedPhoneNumber.Length != 9))
             {
                 errorMessage = "Podaj poprawny 9-cyfrowy numer telefonu.";
                 errorAppId = app.Id;
@@ -382,11 +395,11 @@
                 return;
             }
 
-            await JobOfferService.UpdateApplicationStatusAsync(app.Id, newStatus, currentUserId!, inputPhoneNumber, inputRejectionReason);
+            await JobOfferService.UpdateApplicationStatusAsync(app.Id, newStatus, currentUserId!, cleanedPhoneNumber, inputRejectionReason);
 
             app.Status = newStatus;
             app.StatusLastUpdated = DateTime.UtcNow;
-            app.EmployerContactPhone = (newStatus == ApplicationStatus.Zaproszony) ? inputPhoneNumber : null;
+            app.EmployerContactPhone = (newStatus == ApplicationStatus.Zaproszony) ? cleanedPhoneNumber : null;
             app.RejectionReason = (newStatus == ApplicationStatus.Odrzucony) ? inputRejectionReason : null;
 
             activeActionId = null;

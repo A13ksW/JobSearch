@@ -18,9 +18,8 @@ namespace JobSearch.Data
 
         public virtual UserProfileCV? UserProfileCV { get; set; }
 
-        // --- DODAJ TÊ LINIÊ ---
         public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
-		public string AccountType { get; set; } = "Individual";
+        public string AccountType { get; set; } = "Individual";
 	}
 }

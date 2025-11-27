@@ -1,0 +1,143 @@
+﻿/* === 1. KONTENER GŁÓWNY I CENTROWANIE === */
+:host {
+    display: block;
+    color: #ffffff;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    /* Dodatkowe centrowanie pionowe dla lepszego wyglądu */
+    min-height: calc(100vh - 60px);
+    padding: 2rem 0;
+    display: flex;
+    justify-content: center; /* Centrowanie głównego bloku horyzontalnie */
+    align-items: flex-start;
+}
+
+/* Nagłówek 'Rejestracja' */
+h1 {
+    font-weight: 800;
+    font-size: 2.5rem;
+    color: #ffffff;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+    margin-bottom: 2rem;
+    text-align: center;
+    width: 100%;
+}
+
+/* === 2. GŁÓWNA KARTA REJESTRACJI === */
+.row {
+    justify-content: center;
+}
+
+.login-card-section { /* Celujemy w sekcję rejestracji */
+    /* Ustawienia tła karty */
+    background: rgba(15, 23, 42, 0.9) !important;
+    border-radius: 24px;
+    padding: 2.5rem;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+    /* Akcent gradientowy na górze karty */
+    .login-card-section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #2563eb 0%, #a78bfa 50%, #10b981 100%);
+        z-index: 3;
+        border-top-left-radius: 24px;
+        border-top-right-radius: 24px;
+    }
+
+/* Nagłówki sekcji w karcie */
+section h2, section h3 {
+    font-weight: 700;
+    color: #e5e7eb;
+    font-size: 1.25rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+/* === 3. POLA FORMULARZA === */
+.form-label {
+    font-weight: 600;
+    color: #e5e7eb !important;
+    margin-bottom: 0.4rem;
+}
+
+/* Ujednolicone inputy */
+.form-control, .form-select {
+    background-color: rgba(30, 41, 59, 0.95) !important;
+    border: 1px solid #475569 !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+    padding: 0.7rem 0.9rem !important;
+    border-radius: 12px !important;
+}
+
+    .form-control::placeholder {
+        color: #94a3b8 !important;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #2563eb !important;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35) !important;
+    }
+
+/* === 4. CHECKBOX I LINKI === */
+.checkbox label {
+    color: #e5e7eb !important;
+    font-weight: 500;
+}
+
+.text-danger {
+    color: #f87171 !important; /* Czerwony dla komunikatów walidacyjnych */
+}
+
+/* Linki */
+section a {
+    color: #60a5fa;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+    section a:hover {
+        text-decoration: underline;
+        color: #93c5fd;
+    }
+
+/* === 5. PRZYCISK LOGOWANIA/REJESTRACJI === */
+.btn-primary {
+    background-color: #2563eb !important;
+    border-color: #2563eb !important;
+    transition: all 0.2s;
+    border-radius: 12px;
+    font-weight: 700;
+}
+
+    .btn-primary:hover {
+        background-color: #1d4ed8 !important;
+        border-color: #1d4ed8 !important;
+    }
+
+/* === 6. LOGOWANIE ZEWNĘTRZNE (RIGHT COLUMN) === */
+.external-login-col {
+    /* Karta Logowania Zewnętrznego */
+    padding: 1.5rem;
+    background: rgba(15, 23, 42, 0.7);
+    border-radius: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    margin-top: 1.5rem;
+}
+
+    .external-login-col h3 {
+        font-weight: 700;
+        color: #e5e7eb;
+        font-size: 1.25rem;
+        text-align: center;
+    }

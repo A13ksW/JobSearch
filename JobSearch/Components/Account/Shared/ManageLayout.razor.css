@@ -1,0 +1,254 @@
+﻿/* Reset i główny wrapper */
+.dashboard-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    min-height: calc(100vh - 60px);
+    background-color: transparent;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+/* Karta Dashboardu */
+.settings-card {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    background: #ffffff;
+    border-radius: 40px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255,255,255,0.2);
+    overflow: hidden;
+    height: 85vh;
+    margin: auto;
+}
+
+/* === SIDEBAR (LEWA KOLUMNA) === */
+.dashboard-sidebar {
+    width: 280px;
+    background-color: #ffffff;
+    border-right: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+}
+
+.sidebar-header {
+    padding: 2.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    background: linear-gradient(to bottom, #ffffff, #fcfcfc);
+}
+
+.brand-box {
+    width: auto;
+    height: auto;
+    background: transparent;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2563eb;
+    font-size: 2.5rem;
+    box-shadow: none;
+    padding: 0;
+    margin-bottom: 5px;
+    animation: iconPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.header-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-left: none;
+    padding-left: 0;
+    margin-left: 0;
+    height: auto;
+    text-align: center;
+}
+
+    /* ZMIANA: Jeszcze większy margines, aby zrobić miejsce na kreskę */
+    .header-text h3 {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #1e293b;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 0 0 24px 0; /* Zwiększono do 24px */
+        position: relative;
+        /* Animacja wejścia tekstu */
+        opacity: 0;
+        animation: textSlideIn 0.8s ease-out 0.2s forwards;
+    }
+
+        /* KRESKA ODDZIELAJĄCA */
+        .header-text h3::after {
+            content: '';
+            position: absolute;
+            bottom: -12px; /* Idealnie pośrodku luki 24px */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #2563eb, #60a5fa);
+            border-radius: 2px;
+            animation: lineGrow 0.6s ease-out 0.8s forwards;
+        }
+
+    .header-text small {
+        color: #94a3b8;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        opacity: 0;
+        display: block;
+        margin-top: 0; /* Usunięto dodatkowy margines górny, bo h3 ma duży dolny */
+        animation: fadeIn 0.6s ease-out 1s forwards;
+    }
+
+.sidebar-content {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+    /* Scrollbar dla sidebara */
+    .sidebar-content::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .sidebar-content::-webkit-scrollbar-thumb {
+        background-color: #e2e8f0;
+        border-radius: 4px;
+    }
+
+.sidebar-footer {
+    padding: 1.5rem;
+    border-top: 1px solid #f1f5f9;
+    background-color: #fcfcfc;
+}
+
+.info-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    background-color: #f0fdf4;
+    color: #15803d;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    border: 1px solid #dcfce7;
+}
+
+/* === CONTENT (PRAWA KOLUMNA) === */
+.dashboard-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+    position: relative;
+    background-color: #ffffff;
+}
+
+.content-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 3rem;
+    width: 100%;
+}
+
+/* Responsywność */
+@media (max-width: 992px) {
+    .dashboard-wrapper {
+        padding: 1rem;
+        height: auto;
+        min-height: auto;
+        display: block;
+    }
+
+    .settings-card {
+        flex-direction: column;
+        height: auto;
+        border-radius: 24px;
+    }
+
+    .dashboard-sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .content-container {
+        padding: 1.5rem;
+    }
+}
+
+/* Animacje */
+.animate-fade-in {
+    animation: zoomIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes iconPop {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes textSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes lineGrow {
+    0% {
+        width: 0;
+    }
+
+    100% {
+        width: 50px;
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}

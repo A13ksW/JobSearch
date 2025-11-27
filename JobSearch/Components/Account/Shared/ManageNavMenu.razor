@@ -3,47 +3,86 @@
 
 @inject SignInManager<ApplicationUser> SignInManager
 
-<ul class="nav nav-pills flex-column">
-    <li class="nav-item">
-        <NavLink class="nav-link" href="Account/Manage/Auth">Authentication</NavLink>
-    </li>
-    <li class="nav-item">
-        <NavLink class="nav-link" href="Account/Manage" Match="NavLinkMatch.All">Profile</NavLink>
-    </li>
-    <li class="nav-item">
-        <NavLink class="nav-link" href="Account/Manage/MyCV">Moje CV</NavLink>
-    </li>
-    <li class="nav-item">
-        <NavLink class="nav-link" href="Account/Manage/Email">Email</NavLink>
-    </li>
-    <li class="nav-item">
-        <NavLink class="nav-link" href="Account/Manage/ChangePassword">Password</NavLink>
-    </li>
-    @if (hasExternalLogins)
+<div class="nav-menu-container">
+    <ul class="nav flex-column">
 
-    {
+        <!-- SEKCJA: PROFIL -->
         <li class="nav-item">
-            <NavLink class="nav-link" href="Account/Manage/ExternalLogins">External logins</NavLink>
+            <NavLink class="nav-link-custom" href="Account/Manage" Match="NavLinkMatch.All">
+                <div class="nav-icon-left"><i class="bi bi-person-circle"></i></div>
+                <span class="nav-text">Dane konta</span>
+                <div class="nav-icon-right"><i class="bi bi-chevron-right"></i></div>
+            </NavLink>
         </li>
-    }
-    <li class="nav-item">
-        <NavLink class="nav-link" href="Account/Manage/TwoFactorAuthentication">Two-factor authentication</NavLink>
-    </li>
-    <li class="nav-item">
-        <NavLink class="nav-link" href="Account/Manage/PersonalData">Personal data</NavLink>
-    </li>
-</ul>
+
+        <AuthorizeView Policy="CanSearchJobs">
+            <Authorized>
+                <li class="nav-item">
+                    <NavLink class="nav-link-custom" href="Account/Manage/MyCV">
+                        <div class="nav-icon-left"><i class="bi bi-file-earmark-person"></i></div>
+                        <span class="nav-text">Kreator CV</span>
+                        <div class="nav-icon-right"><i class="bi bi-chevron-right"></i></div>
+                    </NavLink>
+                </li>
+            </Authorized>
+        </AuthorizeView>
+
+        <!-- SEPARATOR Z KATEGORIĄ -->
+        <li class="nav-category">
+            <span>Bezpieczeństwo</span>
+        </li>
+
+        <!-- SEKCJA: BEZPIECZEŃSTWO -->
+        <li class="nav-item">
+            <NavLink class="nav-link-custom" href="Account/Manage/EMail">
+                <div class="nav-icon-left"><i class="bi bi-envelope"></i></div>
+                <span class="nav-text">Email</span>
+                <div class="nav-icon-right"><i class="bi bi-chevron-right"></i></div>
+            </NavLink>
+        </li>
+
+        <li class="nav-item">
+            <NavLink class="nav-link-custom" href="Account/Manage/ChangePassword">
+                <div class="nav-icon-left"><i class="bi bi-key"></i></div>
+                <span class="nav-text">Hasło</span>
+                <div class="nav-icon-right"><i class="bi bi-chevron-right"></i></div>
+            </NavLink>
+        </li>
+
+        @if (hasExternalLogins)
+        {
+            <li class="nav-item">
+                <NavLink class="nav-link-custom" href="Account/Manage/ExternalLogins">
+                    <div class="nav-icon-left"><i class="bi bi-google"></i></div>
+                    <span class="nav-text">Logowanie zewn.</span>
+                    <div class="nav-icon-right"><i class="bi bi-chevron-right"></i></div>
+                </NavLink>
+            </li>
+        }
+
+        <li class="nav-item">
+            <NavLink class="nav-link-custom" href="Account/Manage/TwoFactorAuthentication">
+                <div class="nav-icon-left"><i class="bi bi-shield-lock"></i></div>
+                <span class="nav-text">Weryfikacja (2FA)</span>
+                <div class="nav-icon-right"><i class="bi bi-chevron-right"></i></div>
+            </NavLink>
+        </li>
+
+        <li class="nav-item">
+            <NavLink class="nav-link-custom" href="Account/Manage/PersonalData">
+                <div class="nav-icon-left"><i class="bi bi-hdd"></i></div>
+                <span class="nav-text">Dane osobowe</span>
+                <div class="nav-icon-right"><i class="bi bi-chevron-right"></i></div>
+            </NavLink>
+        </li>
+    </ul>
+</div>
 
 @code {
     private bool hasExternalLogins;
 
-
-
     protected override async Task OnInitializedAsync()
-
     {
-
         hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
-
     }
 }

@@ -14,9 +14,18 @@
     <div class="container">
 
         <div class="mb-4 fade-in">
-            <a href="/offers" class="btn-back-glass">
-                <i class="bi bi-arrow-left me-2"></i> Powrót do listy
-            </a>
+            @if (Source == "applications")
+            {
+                <a href="/my-applications" class="btn-back-glass">
+                    <i class="bi bi-arrow-left me-2"></i> Powrót do Aplikacji
+                </a>
+            }
+            else
+            {
+                <a href="/offers" class="btn-back-glass">
+                    <i class="bi bi-arrow-left me-2"></i> Powrót do listy
+                </a>
+            }
         </div>
 
         @if (jobOffer == null)
@@ -141,10 +150,35 @@
                                 </div>
                             </div>
 
+                            <!-- SEKCJNA PRZYCISKÓW APLIKOWANIA -->
                             <AuthorizeView>
+                                <NotAuthorized>
+                                    <a href="@loginUrl" class="btn btn-outline-primary w-100 rounded-pill fw-bold py-2">
+                                        Zaloguj się, aby aplikować
+                                    </a>
+                                </NotAuthorized>
                                 <Authorized>
-                                    @if (currentUserId != jobOffer.CreatedByUserId)
+                                    @* LOGIKA DLA ZALOGOWANYCH UŻYTKOWNIKÓW *@
+
+                                    @if (currentUserId == jobOffer.CreatedByUserId)
                                     {
+                                        @* 1. Właściciel oferty *@
+                                        <div class="alert alert-secondary text-center m-0 border-0 fw-bold animate-fade-up">
+                                            <i class="bi bi-person-workspace me-2"></i>
+                                            To twoja oferta
+                                        </div>
+                                    }
+                                    else if (!isCandidate)
+                                    {
+                                        @* 2. Firma (użytkownik niebędący kandydatem "Individual") *@
+                                        <div class="alert alert-warning text-center m-0 border-0 fw-bold animate-fade-up" style="background-color: #fff3cd; color: #856404;">
+                                            <i class="bi bi-briefcase-fill me-2"></i>
+                                            Nie możesz aplikować - Jesteś kontem firmowym
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        @* 3. Kandydat (Individual) *@
                                         @if (hasApplied)
                                         {
                                             <button class="btn-apply-now disabled">
@@ -158,18 +192,7 @@
                                             </button>
                                         }
                                     }
-                                    else
-                                    {
-                                        <div class="alert alert-secondary text-center m-0 border-0 fw-bold">
-                                            To Twoja oferta
-                                        </div>
-                                    }
                                 </Authorized>
-                                <NotAuthorized>
-                                    <a href="@loginUrl" class="btn btn-outline-primary w-100 rounded-pill fw-bold py-2">
-                                        Zaloguj się, aby aplikować
-                                    </a>
-                                </NotAuthorized>
                             </AuthorizeView>
 
                         </div>
@@ -185,23 +208,31 @@
     [Parameter]
     public int Id { get; set; }
 
+    [SupplyParameterFromQuery]
+    public string? Source { get; set; }
+
     private JobOffer? jobOffer;
     private string? currentUserId;
     private bool hasApplied = false;
     private string loginUrl = string.Empty;
     private string? feedbackMessage;
     private bool isError;
+    private bool isCandidate = false; // Flaga określająca czy użytkownik może aplikować (Individual)
 
     protected override async Task OnInitializedAsync()
     {
         loginUrl = $"Account/Login?returnUrl={NavigationManager.ToBaseRelativePath(NavigationManager.Uri)}";
 
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        currentUserId = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var user = authState.User;
+        currentUserId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        // Sprawdzamy, czy użytkownik ma typ konta "Individual" (kandydat)
+        isCandidate = user.HasClaim(c => c.Type == "account_type" && c.Value == "Individual");
 
         jobOffer = await JobOfferService.GetByIdAsync(Id);
 
-        if (jobOffer == null || (jobOffer.Status != OfferStatus.Opublikowana && jobOffer.CreatedByUserId != currentUserId && !authState.User.IsInRole("Admin")))
+        if (jobOffer == null || (jobOffer.Status != OfferStatus.Opublikowana && jobOffer.CreatedByUserId != currentUserId && !user.IsInRole("Admin")))
         {
             NavigationManager.NavigateTo("/offers");
             return;

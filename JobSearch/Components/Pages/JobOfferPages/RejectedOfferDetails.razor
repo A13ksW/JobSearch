@@ -1,0 +1,112 @@
+﻿@page "/my-offers/rejected/{Id:int}"
+@using System.Security.Claims
+@using JobSearch.Data
+@using JobSearch.Services
+@using Microsoft.AspNetCore.Authorization
+@inject IJobOfferService JobOfferService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+@attribute [Authorize]
+
+<PageTitle>Powód odrzucenia oferty</PageTitle>
+
+<div class="page-container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+
+            <h1 class="text-center mb-5">Powód odrzucenia</h1>
+
+            @if (isLoading)
+            {
+                <div class="text-center py-5">
+                    <div class="spinner-border text-danger" role="status"></div>
+                </div>
+            }
+            else if (offer == null)
+            {
+                <div class="alert alert-danger">
+                    Nie znaleziono oferty lub nie masz uprawnień do jej wyświetlenia.
+                </div>
+                <a href="/my-offers" class="btn btn-secondary mt-3">Powrót do Moich Ofert</a>
+            }
+            else
+            {
+                <div class="card-rejected">
+
+                    <div class="card-header-block text-center">
+                        <h4 class="card-title text-danger">
+                            <i class="bi bi-x-octagon-fill me-2"></i> Oferta została odrzucona
+                        </h4>
+                        <p class="card-subtitle text-muted">
+                            @offer.Title w firmie @offer.CompanyName
+                        </p>
+                    </div>
+
+                    <hr />
+
+                    <div class="rejection-details text-center">
+                        <h5 class="fw-bold mb-3">Komentarz moderatora:</h5>
+
+                        <div class="alert-moderation">
+                            @if (string.IsNullOrWhiteSpace(offer.ModerationComment))
+                            {
+                                <em class="text-muted">Moderator nie podał szczegółowego powodu.</em>
+                            }
+                            else
+                            {
+                                @((MarkupString)offer.ModerationComment.Replace("\n", "<br />"))
+                            }
+                        </div>
+                    </div>
+
+                    <hr class="mt-4" />
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="/my-offers" class="btn btn-secondary-outline">
+                            <i class="bi bi-arrow-left"></i> Powrót do Moich Ofert
+                        </a>
+
+                        <a href="@($"/my-offers/edit/{offer.Id}")" class="btn btn-warning-outline">
+                            <i class="bi bi-pencil"></i> Edytuj i wyślij ponownie
+                        </a>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private JobOffer? offer;
+    private bool isLoading = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var currentUserId = authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(currentUserId))
+        {
+            NavigationManager.NavigateTo("Account/Login");
+            return;
+        }
+
+        offer = await JobOfferService.GetByIdAsync(Id);
+
+        // Walidacja: Czy oferta istnieje, czy należy do użytkownika I czy jest odrzucona
+        if (offer == null || offer.CreatedByUserId != currentUserId || offer.Status != OfferStatus.Odrzucona)
+        {
+            NavigationManager.NavigateTo("/my-offers");
+            return;
+        }
+
+        isLoading = false;
+    }
+
+    private string GetIndustryLabel(IndustryCategory category) => category.ToString();
+}

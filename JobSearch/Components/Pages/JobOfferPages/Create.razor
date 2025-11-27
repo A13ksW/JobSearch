@@ -30,7 +30,7 @@
                 <div class="col-md-4">
                     <label for="nip" class="form-label">NIP Firmy</label>
                     <div class="input-group">
-                        <InputText id="nip" @bind-Value="JobOffer.Nip" class="form-control" aria-required="true" maxlength="10" ReadOnly="@isNipVerified" placeholder="Wpisz NIP" />
+                        <input id="nip" @bind="JobOffer.Nip" class="form-control" aria-required="true" maxlength="10" readonly="@isNipVerified" placeholder="Wpisz NIP" />
                         <button class="btn btn-verify" type="button" @onclick="HandleNipValidation" disabled="@(isNipValidating || isNipVerified)">
                             @(isNipValidating ? "..." : "Weryfikuj")
                         </button>
@@ -43,19 +43,19 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Nazwa Firmy</label>
-                    <InputText @bind-Value="JobOffer.CompanyName" class="form-control" ReadOnly="true" placeholder="Uzupełni się automatycznie" />
+                    <input @bind="JobOffer.CompanyName" class="form-control" readonly="true" placeholder="Uzupełni się automatycznie" />
                     <ValidationMessage For="() => JobOffer.CompanyName" class="text-danger small" />
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Branża</label>
-                    <InputSelect class="form-select" @bind-Value="JobOffer.IndustryCategory">
+                    <select class="form-select" @bind="JobOffer.IndustryCategory">
                         <option value="">-- Wybierz --</option>
                         @foreach (IndustryCategory category in Enum.GetValues(typeof(IndustryCategory)))
                         {
                             if (category == IndustryCategory.None) continue;
                             <option value="@category">@GetIndustryLabel(category)</option>
                         }
-                    </InputSelect>
+                    </select>
                     <ValidationMessage For="() => JobOffer.IndustryCategory" class="text-danger small" />
                 </div>
             </div>
@@ -64,7 +64,7 @@
             <div class="row g-4">
                 <div class="col-md-4">
                     <label class="form-label">Tytuł Stanowiska</label>
-                    <InputText @bind-Value="JobOffer.Title" class="form-control fw-bold" placeholder="np. Senior .NET Developer" />
+                    <input @bind="JobOffer.Title" class="form-control fw-bold" placeholder="np. Senior .NET Developer" />
                     <ValidationMessage For="() => JobOffer.Title" class="text-danger small" />
                 </div>
                 <div class="col-md-4">
@@ -95,7 +95,7 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Email kontaktowy</label>
-                    <InputText @bind-Value="JobOffer.ContactInfo" class="form-control" placeholder="rekrutacja@firma.pl" />
+                    <input @bind="JobOffer.ContactInfo" class="form-control" placeholder="rekrutacja@firma.pl" />
                     <ValidationMessage For="() => JobOffer.ContactInfo" class="text-danger small" />
                 </div>
             </div>
@@ -103,12 +103,12 @@
             <div class="row g-4 mt-2">
                 <div class="col-md-6">
                     <label class="form-label">Opis Stanowiska</label>
-                    <InputTextArea @bind-Value="JobOffer.Description" class="form-control" rows="6" placeholder="Opis roli..." />
+                    <textarea @bind="JobOffer.Description" class="form-control" rows="6" placeholder="Opis roli..."></textarea>
                     <ValidationMessage For="() => JobOffer.Description" class="text-danger small" />
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Wymagania Szczegółowe</label>
-                    <InputTextArea @bind-Value="JobOffer.Requirements" class="form-control" rows="6" placeholder="- C#&#10;- SQL..." />
+                    <textarea @bind="JobOffer.Requirements" class="form-control" rows="6" placeholder="- C#, SQL..."></textarea>
                     <ValidationMessage For="() => JobOffer.Requirements" class="text-danger small" />
                 </div>
             </div>
@@ -117,28 +117,28 @@
             <div class="row g-4">
                 <div class="col-md-3">
                     <label class="form-label">Wymiar</label>
-                    <InputSelect @bind-Value="JobOffer.EmplType" class="form-control">
+                    <select @bind="JobOffer.EmplType" class="form-control">
                         @foreach (var type in Enum.GetValues(typeof(EmploymentType)).Cast<EmploymentType>())
                         {
                             <option value="@type">@type</option>
                         }
-                    </InputSelect>
+                    </select>
                     <ValidationMessage For="() => JobOffer.EmplType" class="text-danger small" />
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Tryb</label>
-                    <InputSelect @bind-Value="JobOffer.JobType" class="form-control">
+                    <select @bind="JobOffer.JobType" class="form-control">
                         @foreach (var type in Enum.GetValues(typeof(JobType)).Cast<JobType>())
                         {
                             <option value="@type">@type</option>
                         }
-                    </InputSelect>
+                    </select>
                     <ValidationMessage For="() => JobOffer.JobType" class="text-danger small" />
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Płaca (Min)</label>
                     <div class="input-group">
-                        <InputNumber @bind-Value="JobOffer.SalaryMin" class="form-control" placeholder="0" />
+                        <input @bind="JobOffer.SalaryMin" class="form-control" type="number" placeholder="0" />
                         <span class="input-group-text">PLN</span>
                     </div>
                     <ValidationMessage For="() => JobOffer.SalaryMin" class="text-danger small" />
@@ -146,7 +146,7 @@
                 <div class="col-md-3">
                     <label class="form-label">Płaca (Max)</label>
                     <div class="input-group">
-                        <InputNumber @bind-Value="JobOffer.SalaryMax" class="form-control" placeholder="0" />
+                        <input @bind="JobOffer.SalaryMax" class="form-control" type="number" placeholder="0" />
                         <span class="input-group-text">PLN</span>
                     </div>
                     <ValidationMessage For="() => JobOffer.SalaryMax" class="text-danger small" />
@@ -158,11 +158,11 @@
             <div class="row g-4 mb-4">
                 <div class="col-md-8">
                     <label class="form-label">Benefity (opcjonalnie)</label>
-                    <InputText @bind-Value="JobOffer.Benefits" class="form-control" placeholder="np. Multisport, Owocowe czwartki" />
+                    <input @bind="JobOffer.Benefits" class="form-control" placeholder="np. Multisport, Owocowe czwartki" />
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Ważna do</label>
-                    <InputDate @bind-Value="JobOffer.ApplicationDeadline" class="form-control" min="@today" />
+                    <input @bind="JobOffer.ApplicationDeadline" class="form-control" type="date" min="@today" />
                     <ValidationMessage For="() => JobOffer.ApplicationDeadline" class="text-danger small" />
                 </div>
             </div>
@@ -171,19 +171,19 @@
 
             <div class="options-container mb-5">
                 <label class="custom-check @(JobOffer.RequiresExperience ? "active" : "")">
-                    <InputCheckbox @bind-Value="JobOffer.RequiresExperience" /> Doświadczenie
+                    <input type="checkbox" @bind="JobOffer.RequiresExperience" /> Doświadczenie
                 </label>
                 <label class="custom-check @(JobOffer.IsOnlineRecruitment ? "active" : "")">
-                    <InputCheckbox @bind-Value="JobOffer.IsOnlineRecruitment" /> Rekrutacja Online
+                    <input type="checkbox" @bind="JobOffer.IsOnlineRecruitment" /> Rekrutacja Online
                 </label>
                 <label class="custom-check @(JobOffer.RequiresSanitaryBook ? "active" : "")">
-                    <InputCheckbox @bind-Value="JobOffer.RequiresSanitaryBook" /> Sanepid
+                    <input type="checkbox" @bind="JobOffer.RequiresSanitaryBook" /> Sanepid
                 </label>
                 <label class="custom-check @(JobOffer.RequiresStudentStatus ? "active" : "")">
-                    <InputCheckbox @bind-Value="JobOffer.RequiresStudentStatus" /> Student
+                    <input type="checkbox" @bind="JobOffer.RequiresStudentStatus" /> Student
                 </label>
                 <label class="custom-check @(JobOffer.RequiresDisabilityCertificate ? "active" : "")">
-                    <InputCheckbox @bind-Value="JobOffer.RequiresDisabilityCertificate" /> Orzeczenie
+                    <input type="checkbox" @bind="JobOffer.RequiresDisabilityCertificate" /> Orzeczenie
                 </label>
             </div>
 
@@ -242,6 +242,7 @@
             else
             {
                 isNipVerified = false;
+                JobOffer.CompanyName = null; // Clear company name if verification fails
                 nipValidationMessage = result.ErrorMessage ?? "Błąd weryfikacji.";
             }
         }

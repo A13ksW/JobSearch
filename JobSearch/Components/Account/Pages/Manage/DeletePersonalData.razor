@@ -3,39 +3,69 @@
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Identity
 @using JobSearch.Data
-
+// Dodajemy wymagany using dla kontekstu bazy danych
+@using Microsoft.EntityFrameworkCore
 @inject UserManager<ApplicationUser> UserManager
 @inject SignInManager<ApplicationUser> SignInManager
 @inject IdentityUserAccessor UserAccessor
 @inject IdentityRedirectManager RedirectManager
 @inject ILogger<DeletePersonalData> Logger
+// INJEKCJA: Kontekst bazy danych (do usuwania powiązanych danych)
+@inject JobSearch.Data.ApplicationDbContext DbContext
 
-<PageTitle>Delete Personal Data</PageTitle>
+<PageTitle>Usuń Dane Osobowe</PageTitle>
 
-<StatusMessage Message="@message" />
+<div class="security-container delete-container">
+    <h2 class="page-title">Trwałe Usunięcie Konta</h2>
+    <p class="page-subtitle">Ta akcja jest nieodwracalna.</p>
 
-<h3>Delete Personal Data</h3>
+    <StatusMessage Message="@message" />
 
-<div class="alert alert-warning" role="alert">
-    <p>
-        <strong>Deleting this data will permanently remove your account, and this cannot be recovered.</strong>
-    </p>
-</div>
+    <div class="security-card delete-card">
 
-<div>
-    <EditForm Model="Input" FormName="delete-user" OnValidSubmit="OnValidSubmitAsync" method="post">
-        <DataAnnotationsValidator />
-        <ValidationSummary class="text-danger" role="alert" />
-        @if (requirePassword)
-        {
-            <div class="form-floating mb-3">
-                <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Please enter your password." />
-                <label for="password" class="form-label">Password</label>
-                <ValidationMessage For="() => Input.Password" class="text-danger" />
-            </div>
-        }
-        <button class="w-100 btn btn-lg btn-danger" type="submit">Delete data and close my account</button>
-    </EditForm>
+        <div class="alert-warning irreversible-warning" role="alert">
+            <h4 class="alert-title">
+                <i class="bi bi-exclamation-octagon-fill me-2"></i> PERMANENTNE USUNIĘCIE KONTA
+            </h4>
+            <p>
+                <strong>Usunięcie danych spowoduje trwałe i nieodwracalne usunięcie Twojego konta. Tego procesu nie można cofnąć!</strong>
+            </p>
+        </div>
+
+        <div class="delete-form-area">
+
+            <EditForm Model="Input" FormName="delete-user" OnValidSubmit="OnValidSubmitAsync" method="post">
+                <DataAnnotationsValidator />
+
+                <ValidationSummary class="text-danger validation-summary" role="alert" />
+
+                @if (requirePassword)
+                {
+                    <div class="form-floating mb-4 custom-floating">
+                        <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Wprowadź hasło" />
+                        <label for="password" class="form-label">Wprowadź Hasło do Potwierdzenia</label>
+                        <ValidationMessage For="() => Input.Password" class="text-danger validation-message" />
+                    </div>
+                }
+
+                <h5 class="delete-confirmation-prompt">
+                    Aby potwierdzić trwałe usunięcie konta,
+                    @if (requirePassword)
+                    {
+                        <span>potwierdź swoje hasło i kliknij przycisk.</span>
+                    }
+                    else
+                    {
+                        <span>kliknij przycisk poniżej.</span>
+                    }
+                </h5>
+
+                <button class="btn-security-danger delete-final-button" type="submit">
+                    <i class="bi bi-trash3-fill me-2"></i> Usuń dane i zamknij moje konto
+                </button>
+            </EditForm>
+        </div>
+    </div>
 </div>
 
 @code {
@@ -60,20 +90,38 @@
     {
         if (requirePassword && !await UserManager.CheckPasswordAsync(user, Input.Password))
         {
-            message = "Error: Incorrect password.";
+            message = "Błąd - Nieprawidłowe hasło.";
             return;
         }
 
+        // =========================================================================
+        // ROZWIĄZANIE BŁĘDU SQL (Usunięcie powiązanych JobApplications przed usunięciem użytkownika)
+        // =========================================================================
+
+        // 1. Usuń wszystkie powiązane Aplikacje o Pracę (JobApplications)
+        var userApplications = await DbContext.JobApplications
+                                            .Where(ja => ja.ApplicantId == user.Id)
+                                            .ToListAsync();
+
+        if (userApplications.Any())
+        {
+            DbContext.JobApplications.RemoveRange(userApplications);
+            // Musimy zapisać zmiany w kontekście, aby usunąć aplikacje przed próbą usunięcia użytkownika.
+            await DbContext.SaveChangesAsync();
+        }
+
+        // 2. Usuń użytkownika
         var result = await UserManager.DeleteAsync(user);
+
         if (!result.Succeeded)
         {
-            throw new InvalidOperationException("Unexpected error occurred deleting user.");
+            throw new InvalidOperationException("Wystąpił nieoczekiwany błąd podczas usuwania użytkownika.");
         }
 
         await SignInManager.SignOutAsync();
 
         var userId = await UserManager.GetUserIdAsync(user);
-        Logger.LogInformation("User with ID '{UserId}' deleted themselves.", userId);
+        Logger.LogInformation("Użytkownik z ID '{UserId}' usunął swoje konto.", userId);
 
         RedirectManager.RedirectToCurrentPage();
     }
@@ -81,6 +129,7 @@
     private sealed class InputModel
     {
         [DataType(DataType.Password)]
+        [Required(ErrorMessage = "Wprowadzenie hasła jest wymagane do potwierdzenia usunięcia.")]
         public string Password { get; set; } = "";
     }
 }

@@ -1,231 +1,451 @@
-﻿/* === 1. KONTENER === */
+﻿/* === 1. KONTEKST STRONY HOME === */
 .home-container {
-    padding-top: 2rem;
+    padding-top: 3rem;
     padding-bottom: 4rem;
-    color: white;
+    color: #ffffff;
+    text-align: center;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    /* DODANY OGÓLNY, BARDZO SUBTELNY GRADIENT NA TŁO STRONY */
+    background: radial-gradient(circle at 10% 90%, rgba(37, 99, 235, 0.05) 0%, transparent 20%), radial-gradient(circle at 90% 10%, rgba(16, 185, 129, 0.05) 0%, transparent 20%);
 }
 
-/* === 2. ANIMACJE === */
-.animate-fade-up {
-    animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
+/* === 2. PODSTAWOWA ANIMACJA WEJŚCIA === */
+/* ... (bez zmian) ... */
 
-.delay-1 {
-    animation-delay: 0.1s;
-}
-
-.delay-2 {
-    animation-delay: 0.2s;
-}
-
-@keyframes fadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* === 3. HERO SECTION (Z-INDEX FIX) === */
-/* To jest wrapper dla całej górnej sekcji. 
-   Musi mieć wysoki z-index, aby lista miast przykryła statystyki */
+/* === 3. HERO BANER (Z PASKIEM GRADIENTOWYM NA GÓRZE) === */
 .hero-wrapper {
     position: relative;
-    z-index: 1000;
-    text-align: center;
-    margin-bottom: 4rem;
-    padding: 3rem 1rem;
+    z-index: 2;
+    max-width: 920px;
+    margin-inline: auto;
+    margin-bottom: 3rem;
+    border-radius: 24px;
+    /* KLUCZOWA ZMIANA TŁA: Dodajemy gradient liniowy (pasek) jako pierwszy element tła */
+    background:
+    /* 1. Pasek gradientowy u góry (górne tło) */
+    linear-gradient(90deg, #2563eb 0%, #a78bfa 50%, #10b981 100%) 0 0 / 100% 5px no-repeat, /* Pozycja: 0 0, Rozmiar: 100% szerokości, 5px wysokości */
+    /* 2. Tło właściwe i akcenty radialne (drugie tło) */
+    radial-gradient(circle at 0% 0%, rgba(248, 250, 252, 0.12), transparent 55%), radial-gradient(circle at 100% 0%, rgba(96, 165, 250, 0.35), transparent 55%), radial-gradient(circle at 30% 70%, rgba(37, 99, 235, 0.2), transparent 60%), rgba(15, 23, 42, 0.78); /* Baza */
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(148, 163, 184, 0.7);
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.8);
+    /* KLUCZOWA NAPRAWA: Zapewniamy widoczność listy sugestii */
+    overflow: visible;
+    /* Dostosowujemy padding, aby pasek nie nachodził na tytuł, ale był renderowany W MIEJSCU OBRAMOWANIA */
+    padding: 2.5rem 2rem;
+    /* USUWAMY ::before */
 }
+
+    /* USUWAMY NIEPOTRZEBNY PSEUDO-ELEMENT */
+    .hero-wrapper::before {
+        content: none;
+    }
+
 
 .hero-title {
     font-weight: 800;
-    color: white;
-    text-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    margin-bottom: 1rem;
+    color: #ffffff;
+    text-shadow: 0 4px 18px rgba(15, 23, 42, 0.7);
+    letter-spacing: 0.02em;
 }
 
 .hero-subtitle {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
-}
-
-/* === 4. WYSZUKIWARKA (FLEXBOX FIX) === */
-.hero-search-container {
-    max-width: 650px;
+    color: rgba(249, 250, 251, 0.9);
+    font-size: 1.05rem;
+    max-width: 32rem;
     margin: 0 auto;
-    position: relative;
 }
 
-/* Kontener szklany jest teraz Flexboxem - to trzyma input i przycisk w jednej linii */
+/* === 4. WYSZUKIWARKA === */
+.hero-search-container {
+    margin-top: 2rem;
+    position: relative;
+    z-index: 100; /* Zapewnienie, że to jest na wierzchu */
+}
+
 .search-glass {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.15) !important;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50px;
-    padding: 6px; /* Odstęp dla przycisku wewnątrz */
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
-    transition: all 0.3s ease;
+    gap: 0.75rem;
+    background: rgba(15,23,42,0.9) !important;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-radius: 999px;
+    padding: 0.4rem 0.45rem;
+    border: 1px solid rgba(148,163,184,0.9);
+    box-shadow: none;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
 }
 
     .search-glass:focus-within {
-        background: rgba(255, 255, 255, 0.25) !important;
-        box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.3);
+        border-color: rgba(59,130,246,0.95);
+        background: rgba(15,23,42,0.97) !important;
+        transform: translateY(-1px);
     }
 
-/* Input rozciąga się na dostępną przestrzeń */
 .search-input {
     flex-grow: 1;
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    color: white !important;
-    font-size: 1.1rem;
-    padding-left: 1.5rem;
+    color: #ffffff !important;
+    font-size: 1.02rem;
+    padding-left: 1.4rem;
     height: 45px;
+    text-align: left;
 }
 
     .search-input::placeholder {
-        color: rgba(255, 255, 255, 0.8);
+        color: rgba(209,213,219,0.9);
     }
 
-/* Przycisk ma stały rozmiar i nie spada */
 .search-btn {
-    flex-shrink: 0;
-    border-radius: 50px;
-    padding: 0 2rem;
+    border-radius: 999px;
+    padding-inline: 1.8rem;
     height: 45px;
     font-weight: 700;
-    background: white !important;
-    color: #2563eb !important;
+    letter-spacing: 0.05em;
+    background-color: #2563eb !important;
     border: none !important;
-    transition: transform 0.2s;
+    color: #ffffff !important;
+    text-transform: uppercase;
+    box-shadow: none;
+    transition: background-color 0.15s, transform 0.15s;
 }
 
     .search-btn:hover {
-        transform: scale(1.05);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        background-color: #1d4ed8 !important;
+        transform: translateY(-1px);
     }
 
-/* === LISTA PODPOWIEDZI === */
+    .search-btn:active {
+        transform: translateY(0);
+    }
+
+/* Podpowiedzi - ZMIANA NA CIEMNE TŁO */
 .suggestions-list {
     position: absolute;
-    top: 110%; /* Lekko poniżej paska */
-    left: 15px;
-    right: 15px; /* Szerokość dopasowana do paska */
-    background: white !important;
-    border-radius: 12px;
+    top: 110%;
+    left: 0;
+    right: 0;
+    margin-top: 0.35rem;
+    border-radius: 16px;
     overflow: hidden;
-    z-index: 2000; /* Najwyższy priorytet */
-    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    background: rgba(15, 23, 42, 0.98) !important;
+    box-shadow: 0 20px 55px rgba(15, 23, 42, 0.8);
+    z-index: 30;
+    text-align: left;
+    border: 1px solid #1e293b;
 }
 
     .suggestions-list .list-group-item {
-        background: white !important;
-        color: #0f172a !important;
-        border-bottom: 1px solid #f1f5f9;
-        padding: 12px 20px;
-        text-align: left;
-        cursor: pointer;
+        background: rgba(15, 23, 42, 0.9) !important;
+        color: #e5e7eb !important;
+        border-bottom: 1px solid #1e293b;
+        padding-block: 0.55rem;
+        padding-inline: 1rem;
+        font-size: 0.9rem;
     }
 
         .suggestions-list .list-group-item:hover {
-            background-color: #f0f9ff !important;
-            color: #0284c7 !important;
+            background-color: #1e3a8a !important;
+            color: #ffffff !important;
         }
 
-/* === 5. STATYSTYKI (Warstwa niższa) === */
+/* === 5. STATYSTYKI === */
 .stats-wrapper {
     position: relative;
-    z-index: 1; /* Niższy z-index niż Hero, żeby lista go przykryła */
+    z-index: 1;
+    margin-bottom: 3rem;
+    background: radial-gradient(circle at 50% 50%, rgba(96, 165, 250, 0.1) 0%, transparent 35%);
 }
 
 .stat-card {
-    background: rgba(255, 255, 255, 0.1) !important;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    border-radius: 16px;
-    padding: 1.5rem;
+    background: rgba(15,23,42,0.9) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 20px;
+    padding: 1.45rem 1.3rem;
     text-align: center;
-    transition: transform 0.3s ease;
-    color: white !important;
-    height: 100%;
+    color: #f9fafb !important;
+    border: 1px solid rgba(148,163,184,0.85) !important;
+    box-shadow: none;
+    transition: transform 0.2s, border-color 0.2s, background 0.2s;
+    position: relative;
+    z-index: 2;
+    /* DODANIE SUBTELNEGO PASEKA NA GÓRZE KARTY STATYSTYKI */
+    box-shadow: none;
+    overflow: hidden;
+    padding-top: 1.8rem; /* Zwiększenie, by zmieścić pasek */
 }
 
+    /* Pseudo-element dla paska na górze statystyk */
+    .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        /* Niebieski gradient akcentowy */
+        background: linear-gradient(90deg, #2563eb 0%, #a78bfa 50%, #10b981 100%);
+        z-index: 3;
+        /* Zaokrąglenie górnych rogów */
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
+    }
+
+    /* Przeniesienie padding-top z powrotem do content-card */
+    .stat-card .stat-value,
+    .stat-card .stat-label {
+        position: relative;
+        z-index: 4;
+        margin-top: 0;
+    }
+
     .stat-card:hover {
-        transform: translateY(-5px);
-        background: rgba(255, 255, 255, 0.2) !important;
+        transform: translateY(-4px);
+        border-color: rgba(59,130,246,0.95) !important;
+        box-shadow: 0 24px 50px rgba(15, 23, 42, 0.9);
     }
 
 .stat-value {
-    font-size: 2.5rem;
+    font-size: 2.3rem;
     font-weight: 800;
-    margin-bottom: 0.25rem;
-    color: white !important;
+    line-height: 1.1;
 }
 
 .stat-label {
-    text-transform: uppercase;
+    margin-top: 0.15rem;
     font-size: 0.8rem;
-    letter-spacing: 1px;
-    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: #e5e7eb;
 }
 
-/* === 6. TREŚĆ === */
-.content-card {
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 2rem;
-    color: #0f172a !important;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2) !important;
-    height: 100%;
+/* === 6. GŁÓWNE KONTENERY === */
+.home-main {
+    position: relative;
+    z-index: 1;
+    /* DODANIE TŁA DEKORACYJNEGO ZA KARTAMI GŁÓWNYMI */
+    background: radial-gradient(circle at 10% 10%, rgba(37, 99, 235, 0.1) 0%, transparent 40%), radial-gradient(circle at 90% 90%, rgba(16, 185, 129, 0.1) 0%, transparent 40%);
 }
 
+.home-container .content-card {
+    background: rgba(15, 23, 42, 0.94) !important;
+    color: #ffffff !important;
+    border-radius: 26px;
+    padding: 2rem 1.8rem;
+    border: 1px solid rgba(148,163,184,0.9) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    position: relative;
+    z-index: 2;
+    /* DODANIE SUBTELNEGO PASEKA NA GÓRZE KARTY GŁÓWNEJ */
+    border-top: none; /* Usuwamy kolidujące obramowanie */
+    overflow: hidden; /* KLUCZOWE: Obcina wystający gradient */
+}
+
+    /* Używamy pseudo-elementu, aby dodać gradient na górze content-card */
+    .home-container .content-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        /* Gradient niebiesko-fioletowo-zielony */
+        background: linear-gradient(90deg, #2563eb 0%, #a78bfa 50%, #10b981 100%);
+        z-index: 3;
+        /* KLUCZOWA POPRAWKA: Zaokrąglenie górnych rogów pseudo-elementu */
+        border-top-left-radius: 26px;
+        border-top-right-radius: 26px;
+    }
+
+    /* Nagłówki sekcji – „Najnowsze oferty”, „Co chcesz zrobić” */
+    .home-container .content-card h4 {
+        color: #ffffff !important;
+        text-align: center !important;
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    /* Pierwsza karta: nagłówek i link pod nim, wyśrodkowane */
+    .home-container .content-card .d-flex.justify-content-between.align-items-center {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+        text-align: center;
+    }
+
+/* Podtytuły sekcji (gdyby były) */
+.home-section-subtitle {
+    text-align: center !important;
+    color: #d1d5db !important;
+    width: 100%;
+}
+
+/* Link „Wszystkie →” w ciemnej karcie */
+.home-container .content-card .btn-link,
+.home-container .content-card a.home-section-link {
+    color: #bfdbfe !important;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+    .home-container .content-card .btn-link:hover,
+    .home-container .content-card a.home-section-link:hover {
+        color: #eff6ff !important;
+    }
+
+/* === 7. OFERTY – METADANE POD TYTUŁEM === */
 .offer-item {
     display: block;
     text-decoration: none;
-    background: white !important;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    transition: all 0.2s;
+    background: #0b1220 !important;
+    color: #ffffff !important;
+    border-radius: 18px;
+    padding: 1rem 1.1rem;
+    margin-bottom: 0.6rem;
+    border: 1px solid #1e293b;
     border-left: 4px solid transparent;
+    box-shadow: none;
+    transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+    text-align: left;
 }
 
     .offer-item:hover {
-        background: #f1f5f9 !important;
-        transform: translateX(5px);
+        background: #162033 !important;
+        transform: translateY(-2px);
         border-left-color: #2563eb;
     }
 
+/* Ustawienia linii z lokalizacją, wynagrodzeniem i typem pracy */
+.offer-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.offer-meta-left {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: flex-start;
+}
+
+/* Tekst w środku oferty – biały dla głównych elementów */
+.offer-item h5,
+.offer-item h6,
+.offer-item .text-dark,
+.offer-item .text-muted,
+.offer-item .text-secondary {
+    color: #ffffff !important;
+    text-align: center !important;
+    width: 100%;
+}
+
+/* Lokalizacja – STYL TAGU + POGRUBIENIE */
+.offer-location {
+    background: rgba(37, 99, 235, 0.22);
+    color: #bfdbfe !important;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-weight: 700 !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Wynagrodzenie – STYL TAGU + POGRUBIENIE */
+.offer-salary {
+    background: rgba(16, 185, 129, 0.18);
+    color: #22c55e !important;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-weight: 700 !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.offer-salary-currency {
+    color: #22c55e !important;
+}
+
+/* ZMIANA: Styl dla Typu Pracy (JobType) */
+.offer-jobtype {
+    background: rgba(129, 140, 248, 0.2) !important; /* Fioletowe tło */
+    color: #c7d2fe !important; /* Jasny fioletowy tekst */
+    padding: 4px 10px !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    text-transform: none !important;
+    font-size: 0.9rem !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+
+/* === 8. KAFELKI ROLI (Kandydat / Pracodawca) === */
 .role-card {
     padding: 1.5rem;
-    border-radius: 16px;
-    background: #f8fafc !important;
-    text-align: center;
-    transition: all 0.3s;
-    border: 1px solid #e2e8f0 !important;
-    color: #0f172a !important;
+    border-radius: 18px;
+    background: #0b1220 !important;
+    border: 1px solid #1e293b !important;
+    color: #ffffff !important;
+    box-shadow: none;
+    transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+    text-align: center !important;
 }
 
     .role-card:hover {
-        background: white !important;
+        background: #162033 !important;
         border-color: #2563eb !important;
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(37, 99, 235, 0.15) !important;
+        transform: translateY(-4px);
     }
 
 .role-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    color: #2563eb !important;
+    display: block;
+    font-size: 2.4rem;
+    margin-bottom: 0.9rem;
+    color: #93c5fd !important;
+}
+
+/* === 9. PRZYCISKI W KONTENERACH === */
+.home-container .content-card .btn-primary,
+.home-container .content-card .btn-outline-success,
+.home-container .content-card .btn-success {
+    border-radius: 999px;
+    box-shadow: none;
+    font-weight: 600;
+}
+
+/* === 10. RESPONSYWNOŚĆ === */
+@media (max-width: 991.98px) {
+    .hero-wrapper {
+        padding-inline: 1.4rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .hero-title {
+        font-size: 2.1rem;
+    }
+
+    .content-card {
+        padding: 1.5rem 1.25rem;
+    }
+
+    .offer-meta {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }

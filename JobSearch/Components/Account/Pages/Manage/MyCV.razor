@@ -13,142 +13,348 @@
 
 <PageTitle>Moje CV</PageTitle>
 
-<h3>Kreator CV</h3>
+<div class="cv-dashboard">
 
-@if (isLoading)
-{
-    <p><em>Ładowanie...</em></p>
-}
-else if (cv == null)
-{
-    <div class="alert alert-info">Nie masz jeszcze utworzonego profilu CV.</div>
-    <button class="btn btn-primary" @onclick="CreateCvProfile">Stwórz profil CV</button>
-}
-else
-{
-    <EditForm Model="cv" OnValidSubmit="SaveProfile" FormName="cv-profile">
-        <DataAnnotationsValidator />
-        <ValidationSummary class="text-danger" />
+    <!-- NAGŁÓWEK -->
+    <div class="page-header-center mb-5">
+        <h2 class="header-title">Kreator CV</h2>
+        <p class="header-subtitle">Stwórz profesjonalny profil zawodowy, który przyciągnie pracodawców</p>
+    </div>
 
-        @if (!string.IsNullOrEmpty(saveStatusMessage))
-        {
-            <div class="alert alert-success" role="alert">@saveStatusMessage</div>
-        }
-
-        <h4 class="mt-4">Dane do e-CV</h4>
-        <div class="card card-body">
-
-            <label class="form-label fw-bold">Lata doświadczenia</label>
-            <div class="cv-button-group mb-3">
-                <label class="btn cv-btn-outline @(cv.ExperienceYears == ExperienceYearsRange.Zero ? "active" : "")" @onclick="() => { cv.ExperienceYears = ExperienceYearsRange.Zero; StateHasChanged(); }"><strong>0</strong> lat</label>
-                <label class="btn cv-btn-outline @(cv.ExperienceYears == ExperienceYearsRange.LessThanOne ? "active" : "")" @onclick="() => { cv.ExperienceYears = ExperienceYearsRange.LessThanOne; StateHasChanged(); }"><strong>&lt;1</strong> rok</label>
-                <label class="btn cv-btn-outline @(cv.ExperienceYears == ExperienceYearsRange.OneToThree ? "active" : "")" @onclick="() => { cv.ExperienceYears = ExperienceYearsRange.OneToThree; StateHasChanged(); }"><strong>1-3</strong> lata</label>
-                <label class="btn cv-btn-outline @(cv.ExperienceYears == ExperienceYearsRange.ThreePlus ? "active" : "")" @onclick="() => { cv.ExperienceYears = ExperienceYearsRange.ThreePlus; StateHasChanged(); }"><strong>3+</strong> lat</label>
+    @if (isLoading)
+    {
+        <div class="d-flex justify-content-center align-items-center py-5" style="min-height: 400px;">
+            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Ładowanie...</span>
             </div>
-
-            <label class="form-label fw-bold">Status edukacji</label>
-            <div class="cv-button-group mb-3">
-                <label class="btn cv-btn-outline @(cv.EducationStatus == EducationStatus.Student ? "active" : "")" @onclick="() => { cv.EducationStatus = EducationStatus.Student; StateHasChanged(); }"><strong>Student</strong></label>
-                <label class="btn cv-btn-outline @(cv.EducationStatus == EducationStatus.Absolwent ? "active" : "")" @onclick="() => { cv.EducationStatus = EducationStatus.Absolwent; StateHasChanged(); }"><strong>Absolwent</strong></label>
-                <label class="btn cv-btn-outline @(cv.EducationStatus == EducationStatus.Inne ? "active" : "")" @onclick="() => { cv.EducationStatus = EducationStatus.Inne; StateHasChanged(); }"><strong>Inne</strong></label>
+        </div>
+    }
+    else if (cv == null)
+    {
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="empty-state-card animate-fade-up">
+                    <div class="empty-icon-wrapper mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="bi bi-file-earmark-person text-primary opacity-50" viewBox="0 0 16 16">
+                            <path d="M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+                            <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V9.255S12 9 8 9s-5 .255-5 .255V2a1 1 0 0 1 1-1h5.5v2z" />
+                        </svg>
+                    </div>
+                    <h3 class="fw-bold mb-3">Nie masz jeszcze profilu CV</h3>
+                    <p class="text-muted mb-4">Stwórz go teraz, aby w pełni korzystać z możliwości serwisu i aplikować jednym kliknięciem.</p>
+                    <button class="btn-save-pro large" @onclick="CreateCvProfile">
+                        <span class="btn-content">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus-circle-fill me-2" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z" />
+                            </svg>
+                            Stwórz profil CV
+                        </span>
+                    </button>
+                </div>
             </div>
+        </div>
+    }
+    else
+    {
+        <EditForm Model="cv" OnValidSubmit="SaveProfile" FormName="cv-profile">
+            <DataAnnotationsValidator />
 
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="cv.FieldOfStudy" class="form-control" placeholder="Kierunek studiów" />
-                <label>Kierunek studiów</label>
-            </div>
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="cv.University" class="form-control" placeholder="Uczelnia" />
-                <label>Uczelnia</label>
-            </div>
-
-            <label class="form-label fw-bold">Znajomość języków i umiejętności</label>
-            @foreach (var lang in cv.Languages.ToList())
+            @if (!string.IsNullOrEmpty(saveStatusMessage))
             {
-                <div class="d-flex gap-2 mb-2">
-                    <input value="@lang.LanguageName" class="form-control" readonly />
-                    <input value="@lang.LanguageLevel" class="form-control" readonly />
-                    <button type="button" class="btn btn-danger" @onclick="() => DeleteLanguage(lang)">Usuń</button>
+                <div class="alert alert-success shadow-sm border-0 text-center mb-5 animate-fade-up d-flex align-items-center justify-content-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+                    </svg>
+                    @saveStatusMessage
                 </div>
             }
 
-            <div class="d-flex gap-2 mb-3">
-                <InputSelect @bind-Value="newLanguage.LanguageName" class="form-select">
-                    <option value="">-- Wybierz język --</option>
-                    @foreach (var lang in commonLanguages)
-                    {
-                        <option value="@lang">@lang</option>
-                    }
-                </InputSelect>
+            <div class="row g-4">
 
-                <InputSelect @bind-Value="newLanguage.LanguageLevel" class="form-select">
-                    <option value="">-- Wybierz poziom --</option>
-                    @foreach (var level in languageLevels)
-                    {
-                        <option value="@level">@level</option>
-                    }
-                </InputSelect>
-                <button type="button" class="btn btn-success" @onclick="SaveNewLanguage">Dodaj</button>
+                <!-- KARTA 1: DOŚWIADCZENIE I EDUKACJA -->
+                <div class="col-xl-6">
+                    <div class="card-glass h-100 p-4 animate-fade-up delay-1">
+                        <div class="card-header-custom text-center mb-4 pb-3 border-bottom-soft">
+                            <div class="icon-box-header mx-auto mb-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-briefcase-fill" viewBox="0 0 16 16">
+                                    <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v1.384l7.614 2.03a1.5 1.5 0 0 0 .772 0L16 5.884V4.5A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1h-3zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5z" />
+                                    <path d="M0 12.5A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5V6.85L8.129 8.947a.5.5 0 0 1-.258 0L0 6.85v5.65z" />
+                                </svg>
+                            </div>
+                            <h5 class="fw-bold text-dark m-0">Doświadczenie i Edukacja</h5>
+                        </div>
+
+                        <div class="mb-4 text-center">
+                            <label class="modern-label-header mb-2">Lata doświadczenia</label>
+                            <div class="selection-grid">
+                                <div class="selection-item @(cv.ExperienceYears == ExperienceYearsRange.Zero ? "active" : "")"
+                                     @onclick="() => SetExp(ExperienceYearsRange.Zero)">
+                                    0 lat
+                                </div>
+                                <div class="selection-item @(cv.ExperienceYears == ExperienceYearsRange.LessThanOne ? "active" : "")"
+                                     @onclick="() => SetExp(ExperienceYearsRange.LessThanOne)">
+                                    &lt; 1 rok
+                                </div>
+                                <div class="selection-item @(cv.ExperienceYears == ExperienceYearsRange.OneToThree ? "active" : "")"
+                                     @onclick="() => SetExp(ExperienceYearsRange.OneToThree)">
+                                    1-3 lata
+                                </div>
+                                <div class="selection-item @(cv.ExperienceYears == ExperienceYearsRange.ThreePlus ? "active" : "")"
+                                     @onclick="() => SetExp(ExperienceYearsRange.ThreePlus)">
+                                    3+ lat
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 text-center">
+                            <label class="modern-label-header mb-2">Status edukacji</label>
+                            <div class="selection-grid">
+                                <div class="selection-item @(cv.EducationStatus == EducationStatus.Student ? "active" : "")"
+                                     @onclick="() => SetEdu(EducationStatus.Student)">
+                                    Student
+                                </div>
+                                <div class="selection-item @(cv.EducationStatus == EducationStatus.Absolwent ? "active" : "")"
+                                     @onclick="() => SetEdu(EducationStatus.Absolwent)">
+                                    Absolwent
+                                </div>
+                                <div class="selection-item @(cv.EducationStatus == EducationStatus.Inne ? "active" : "")"
+                                     @onclick="() => SetEdu(EducationStatus.Inne)">
+                                    Inne
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modern-input-group centered-input mb-3">
+                            <div class="input-icon-top">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-mortarboard-fill" viewBox="0 0 16 16">
+                                    <path d="M8.211 2.047a.5.5 0 0 0-.422 0l-7.5 3.5a.5.5 0 0 0 .025.917l7.5 3a.5.5 0 0 0 .372 0L14 7.14V13a1 1 0 0 0-1-1v2h3v-2a1 1 0 0 0-1-1V6.739l.686-.275a.5.5 0 0 0 .025-.917l-7.5-3.5Z" />
+                                    <path d="M4.176 9.032a.5.5 0 0 0-.656.327l-.5 1.7a.5.5 0 0 0 .294.605l4.5 1.8a.5.5 0 0 0 .372 0l4.5-1.8a.5.5 0 0 0 .294-.605l-.5-1.7a.5.5 0 0 0-.656-.327L8 10.466 4.176 9.032Z" />
+                                </svg>
+                            </div>
+                            <label class="modern-label text-center w-100">Kierunek studiów</label>
+                            <InputText @bind-Value="cv.FieldOfStudy" class="modern-input text-center" placeholder="np. Informatyka" />
+                        </div>
+
+                        <div class="modern-input-group centered-input">
+                            <div class="input-icon-top">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-building" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M14.763.075A.5.5 0 0 1 15 .5v15a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5V14h-1v1.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V10a.5.5 0 0 1 .342-.474L6 7.64V4.5a.5.5 0 0 1 .276-.447l8-4a.5.5 0 0 1 .487.022zM6 8.694 1 10.36V15h5V8.694zM7 15h2v-1.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5V15h2V1.309l-7 3.5V15z" />
+                                    <path d="M2 11h1v1H2v-1zm2 0h1v1H4v-1zm-2 2h1v1H2v-1zm2 0h1v1H4v-1zm4-4h1v1H8V9zm2 0h1v1h-1V9zm-2 2h1v1H8v-1zm2 0h1v1h-1v-1zm2-2h1v1h-1V9zm0 2h1v1h-1v-1zM8 7h1v1H8V7zm2 0h1v1h-1V7zm2 0h1v1h-1V7zM8 5h1v1H8V5zm2 0h1v1h-1V5zm2 0h1v1h-1V5zm0-2h1v1h-1V3z" />
+                                </svg>
+                            </div>
+                            <label class="modern-label text-center w-100">Uczelnia</label>
+                            <InputText @bind-Value="cv.University" class="modern-input text-center" placeholder="np. Politechnika Poznańska" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KARTA 2: KOMPETENCJE -->
+                <div class="col-xl-6">
+                    <div class="card-glass h-100 p-4 animate-fade-up delay-2">
+                        <div class="card-header-custom text-center mb-4 pb-3 border-bottom-soft">
+                            <div class="icon-box-header mx-auto mb-2 color-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-translate" viewBox="0 0 16 16">
+                                    <path d="M4.545 6.714 4.11 8H3l1.862-5h1.284L8 8H6.833l-.435-1.286H4.545zm1.634-.736L5.5 3.956h-.049l-.679 2.022H6.18z" />
+                                    <path d="M0 2a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v3h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-3H2a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2zm7.138 9.995c.193.301.402.583.63.846-.748.575-1.673 1.001-2.768 1.292.178.217.451.635.555.867 1.125-.359 2.08-.844 2.886-1.494.777.665 1.739 1.165 2.93 1.472.133-.254.414-.673.629-.89-1.125-.253-2.057-.694-2.82-1.284.681-.747 1.222-1.651 1.621-2.757H14V8h-3v1.047h.765c-.318.844-.74 1.546-1.272 2.13a6.066 6.066 0 0 1-.415-.492 1.988 1.988 0 0 1-.94.31z" />
+                                </svg>
+                            </div>
+                            <h5 class="fw-bold text-dark m-0">Kompetencje</h5>
+                        </div>
+
+                        <!-- JĘZYKI -->
+                        <label class="modern-label-header mb-2">Języki obce</label>
+                        <div class="list-container mb-3">
+                            @foreach (var lang in cv.Languages.ToList())
+                            {
+                                <div class="list-item-row">
+                                    <div class="item-info">
+                                        <span class="fw-bold text-dark">@lang.LanguageName</span>
+                                        <span class="badge-level">@lang.LanguageLevel</span>
+                                    </div>
+                                    <button type="button" class="btn-icon-remove" @onclick="() => DeleteLanguage(lang)" title="Usuń">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                            <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            }
+                            @if (!cv.Languages.Any())
+                            {
+                                <div class="empty-list-placeholder">
+                                    <small>Brak dodanych języków</small>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- DODAWANIE JĘZYKA -->
+                        <div class="add-row mb-4 justify-content-center">
+                            <InputSelect @bind-Value="newLanguage.LanguageName" class="form-select-custom text-center">
+                                <option value="">-- Wybierz Język --</option>
+                                @foreach (var l in commonLanguages)
+                                {
+                                    <option value="@l">@l</option>
+                                }
+                            </InputSelect>
+                            <InputSelect @bind-Value="newLanguage.LanguageLevel" class="form-select-custom text-center" style="max-width: 100px;">
+                                <option value="">-- Poziom --</option>
+                                @foreach (var l in languageLevels)
+                                {
+                                    <option value="@l">@l</option>
+                                }
+                            </InputSelect>
+                            <button type="button" class="btn-add-small" @onclick="SaveNewLanguage">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- UMIEJĘTNOŚCI -->
+                        <label class="modern-label-header mb-2 mt-2">Umiejętności</label>
+                        <div class="skills-cloud mb-3 justify-content-center">
+                            @foreach (var skill in cv.Skills.ToList())
+                            {
+                                <span class="skill-tag animate-pop">
+                                    @skill.SkillName
+                                    <span class="remove-skill" @onclick="() => DeleteSkill(skill)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                            <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z" />
+                                        </svg>
+                                    </span>
+                                </span>
+                            }
+                            @if (!cv.Skills.Any())
+                            {
+                                <div class="empty-list-placeholder w-100">
+                                    <small>Brak dodanych umiejętności</small>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- DODAWANIE UMIEJĘTNOŚCI -->
+                        <div class="add-row justify-content-center">
+                            <InputText @bind-Value="newSkillName" class="form-input-custom text-center" placeholder="Wpisz umiejętność (np. C#, Scrum)..." />
+                            <button type="button" class="btn-add-small" @onclick="SaveNewSkill">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KARTA 3: PREFERENCJE I LINKI -->
+                <div class="col-12">
+                    <div class="card-glass p-4 animate-fade-up delay-3">
+                        <div class="text-center mb-4 border-bottom pb-3">
+                            <h5 class="fw-bold text-dark m-0">Preferencje i Linki</h5>
+                        </div>
+
+                        <div class="row g-4 mt-1">
+                            <!-- PREFERENCJE TEKSTOWE -->
+                            <div class="col-md-6">
+                                <div class="modern-input-group centered-input mb-3">
+                                    <div class="input-icon-top">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-tags-fill" viewBox="0 0 16 16">
+                                            <path d="M2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586V2zm3.5 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z" />
+                                            <path d="M1.293 7.793A1 1 0 0 1 1 7.086V2a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l.043-.043-7.457-7.457z" />
+                                        </svg>
+                                    </div>
+                                    <label class="modern-label text-center w-100">Preferowane Kategorie</label>
+                                    <InputTextArea @bind-Value="cv.PreferredCategories" class="modern-textarea text-center" placeholder="np. IT, Marketing..." rows="2" />
+                                </div>
+
+                                <div class="modern-input-group centered-input mb-3">
+                                    <div class="input-icon-top">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-diagram-3-fill" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5v-1zM8.5 5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1zM0 11.5A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm4.5.5A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm4.5.5a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1z" />
+                                        </svg>
+                                    </div>
+                                    <label class="modern-label text-center w-100">Preferowane Działy</label>
+                                    <InputTextArea @bind-Value="cv.PreferredDepartments" class="modern-textarea text-center" placeholder="np. Rozwój oprogramowania, HR..." rows="2" />
+                                </div>
+
+                                <div class="modern-input-group centered-input mb-3">
+                                    <div class="input-icon-top">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+                                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" />
+                                        </svg>
+                                    </div>
+                                    <label class="modern-label text-center w-100">Preferowane Lokalizacje</label>
+                                    <InputTextArea @bind-Value="cv.PreferredLocations" class="modern-textarea text-center" placeholder="np. Warszawa, Zdalnie..." rows="2" />
+                                </div>
+                            </div>
+
+                            <!-- PREFERENCJE PRZEŁĄCZNIKI -->
+                            <div class="col-md-6 d-flex flex-column justify-content-center">
+                                <div class="text-center mb-5">
+                                    <label class="modern-label-header mb-3">Praca zdalna?</label>
+                                    <div class="toggle-group justify-content-center">
+                                        <span class="@(cv.RemoteWork == WorkPreference.Tak ? "active" : "")" @onclick="() => SetRemote(WorkPreference.Tak)">Tak</span>
+                                        <span class="@(cv.RemoteWork == WorkPreference.Nie ? "active" : "")" @onclick="() => SetRemote(WorkPreference.Nie)">Nie</span>
+                                        <span class="@(cv.RemoteWork == WorkPreference.Obojętnie ? "active" : "")" @onclick="() => SetRemote(WorkPreference.Obojętnie)">Obojętnie</span>
+                                    </div>
+                                </div>
+                                <div class="text-center mb-3">
+                                    <label class="modern-label-header mb-3">Relokacja?</label>
+                                    <div class="toggle-group justify-content-center">
+                                        <span class="@(cv.Relocation == WorkPreference.Tak ? "active" : "")" @onclick="() => SetRelocation(WorkPreference.Tak)">Tak</span>
+                                        <span class="@(cv.Relocation == WorkPreference.Nie ? "active" : "")" @onclick="() => SetRelocation(WorkPreference.Nie)">Nie</span>
+                                        <span class="@(cv.Relocation == WorkPreference.Obojętnie ? "active" : "")" @onclick="() => SetRelocation(WorkPreference.Obojętnie)">Obojętnie</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LINKI -->
+                        <div class="border-top pt-4 mt-4">
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="modern-input-group centered-input">
+                                        <div class="input-icon-top">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-linkedin" viewBox="0 0 16 16">
+                                                <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.015zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z" />
+                                            </svg>
+                                        </div>
+                                        <label class="modern-label text-center w-100">LinkedIn URL</label>
+                                        <InputText @bind-Value="cv.LinkedInUrl" class="modern-input text-center" placeholder="https://linkedin.com/in/..." />
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="modern-input-group centered-input">
+                                        <div class="input-icon-top">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-cloud-arrow-up-fill" viewBox="0 0 16 16">
+                                                <path d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2zm2.354 5.146a.5.5 0 0 1-.708.708L8.5 6.707V10.5a.5.5 0 0 1-1 0V6.707L6.354 7.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2z" />
+                                            </svg>
+                                        </div>
+                                        <label class="modern-label text-center w-100">Plik CV (Link)</label>
+                                        <InputText @bind-Value="cv.CvFileUrl" class="modern-input text-center" placeholder="Dropbox / Google Drive..." />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
-            <label class="form-label fw-bold">Dodatkowe umiejętności</label>
-            <div class="d-flex flex-wrap gap-2 mb-2">
-                @foreach (var skill in cv.Skills.ToList())
-                {
-                    <span class="badge bg-secondary d-flex align-items-center gap-1 fs-6">
-                        @skill.SkillName
-                        <button type="button" class="btn-close btn-close-white" style="font-size: 0.5rem;" @onclick="() => DeleteSkill(skill)"></button>
+
+            <!-- PRZYCISK ZAPISU -->
+            <div class="d-flex justify-content-center mt-5 mb-5">
+                <button type="submit" class="btn-save-pro large">
+                    <span class="btn-content">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-check2-circle me-2 fs-5" viewBox="0 0 16 16">
+                            <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0z" />
+                            <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z" />
+                        </svg>
+                        Zapisz profil CV
                     </span>
-                }
-            </div>
-            <div class="input-group mb-3">
-                <InputText @bind-Value="newSkillName" class="form-control" placeholder="Wpisz umiejętność (np. C#) i kliknij Dodaj" />
-                <button type="button" class="btn btn-success" @onclick="SaveNewSkill">Dodaj</button>
-            </div>
-        </div>
-
-        <h4 class="mt-4">Preferencje</h4>
-        <div class="card card-body">
-            <div class="mb-3">
-                <label class="form-label">Preferowane kategorie (oddzielone przecinkami)</label>
-                <InputTextArea @bind-Value="cv.PreferredCategories" class="form-control" placeholder="IT - Mobile, IT - PM, IT - BI & Data" />
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Preferowane działy (oddzielone przecinkami)</label>
-                <InputTextArea @bind-Value="cv.PreferredDepartments" class="form-control" placeholder="IT, Finanse, HR" />
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Preferowane lokalizacje (oddzielone przecinkami)</label>
-                <InputTextArea @bind-Value="cv.PreferredLocations" class="form-control" placeholder="Poznań, Zdalnie" />
+                </button>
             </div>
 
-            <label class="form-label fw-bold">Czy chcesz pracować zdalnie?</label>
-            <div class="cv-button-group mb-3">
-                <label class="btn cv-btn-outline @(cv.RemoteWork == WorkPreference.Nie ? "active" : "")" @onclick="() => { cv.RemoteWork = WorkPreference.Nie; StateHasChanged(); }">Nie</label>
-                <label class="btn cv-btn-outline @(cv.RemoteWork == WorkPreference.Tak ? "active" : "")" @onclick="() => { cv.RemoteWork = WorkPreference.Tak; StateHasChanged(); }">Tak</label>
-                <label class="btn cv-btn-outline @(cv.RemoteWork == WorkPreference.Obojętnie ? "active" : "")" @onclick="() => { cv.RemoteWork = WorkPreference.Obojętnie; StateHasChanged(); }">Obojętnie</label>
-            </div>
-
-            <label class="form-label fw-bold">Czy dopuszczasz możliwość relokacji?</label>
-            <div class="cv-button-group mb-3">
-                <label class="btn cv-btn-outline @(cv.Relocation == WorkPreference.Nie ? "active" : "")" @onclick="() => { cv.Relocation = WorkPreference.Nie; StateHasChanged(); }">Nie</label>
-                <label class="btn cv-btn-outline @(cv.Relocation == WorkPreference.Tak ? "active" : "")" @onclick="() => { cv.Relocation = WorkPreference.Tak; StateHasChanged(); }">Tak</label>
-                <label class="btn cv-btn-outline @(cv.Relocation == WorkPreference.Obojętnie ? "active" : "")" @onclick="() => { cv.Relocation = WorkPreference.Obojętnie; StateHasChanged(); }">Obojętnie</label>
-            </div>
-
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="cv.LinkedInUrl" class="form-control" placeholder="Link do LinkedIn" />
-                <label>Link do LinkedIn</label>
-            </div>
-
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="cv.CvFileUrl" class="form-control" placeholder="Link do pliku CV (np. Dropbox, Google Drive)" />
-                <label>Link do pliku CV (np. Dropbox, Google Drive)</label>
-            </div>
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-lg w-100 mt-4">Zapisz cały profil CV</button>
-    </EditForm>
-}
+        </EditForm>
+    }
+</div>
 
 @code {
     private bool isLoading = true;
@@ -159,20 +365,15 @@ else
     private CVLanguage newLanguage = new();
     private string newSkillName = string.Empty;
 
-    // --- DODANO LISTY DLA DROPDOWNÓW ---
     private List<string> languageLevels = new List<string> { "A1", "A2", "B1", "B2", "C1", "C2" };
     private List<string> commonLanguages = new List<string>
     {
-        "Polski", "Angielski", "Niemiecki", "Francuski", "Hiszpański",
-        "Włoski", "Ukraiński", "Rosyjski", "Czeski", "Słowacki",
-        "Niderlandzki", "Szwedzki", "Norweski", "Duński", "Portugalski"
+        "Angielski", "Niemiecki", "Francuski", "Hiszpański", "Włoski", "Rosyjski", "Ukraiński"
     };
 
-    // Metoda pomocnicza do ładowania danych
     private async Task LoadCvData()
     {
         if (string.IsNullOrEmpty(currentUserId)) return;
-
         await using var context = await DbContextFactory.CreateDbContextAsync();
         cv = await context.UserProfileCVs
             .Include(c => c.Languages)
@@ -199,16 +400,10 @@ else
     private async Task CreateCvProfile()
     {
         if (string.IsNullOrEmpty(currentUserId)) return;
-
         await using var context = await DbContextFactory.CreateDbContextAsync();
-
-        var newCv = new UserProfileCV
-            {
-                UserId = currentUserId
-            };
+        var newCv = new UserProfileCV { UserId = currentUserId };
         context.UserProfileCVs.Add(newCv);
         await context.SaveChangesAsync();
-
         cv = newCv;
         cv.Languages = new List<CVLanguage>();
         cv.Skills = new List<CVSkill>();
@@ -217,81 +412,55 @@ else
     private async Task SaveProfile()
     {
         if (cv == null) return;
-
         await using var context = await DbContextFactory.CreateDbContextAsync();
-
         context.UserProfileCVs.Update(cv);
-
         await context.SaveChangesAsync();
-        saveStatusMessage = "Profil CV został zaktualizowany!";
-
+        saveStatusMessage = "Zmiany zostały zapisane pomyślnie!";
         await LoadCvData();
     }
+
+    private void SetExp(ExperienceYearsRange val) { if (cv != null) cv.ExperienceYears = val; }
+    private void SetEdu(EducationStatus val) { if (cv != null) cv.EducationStatus = val; }
+    private void SetRemote(WorkPreference val) { if (cv != null) cv.RemoteWork = val; }
+    private void SetRelocation(WorkPreference val) { if (cv != null) cv.Relocation = val; }
 
     private async Task SaveNewLanguage()
     {
         if (cv == null || string.IsNullOrWhiteSpace(newLanguage.LanguageName) || string.IsNullOrWhiteSpace(newLanguage.LanguageLevel)) return;
-
         await using var context = await DbContextFactory.CreateDbContextAsync();
-
-        var lang = new CVLanguage
-            {
-                UserProfileCVId = cv.Id,
-                LanguageName = newLanguage.LanguageName,
-                LanguageLevel = newLanguage.LanguageLevel
-            };
-
+        var lang = new CVLanguage { UserProfileCVId = cv.Id, LanguageName = newLanguage.LanguageName, LanguageLevel = newLanguage.LanguageLevel };
         context.CVLanguages.Add(lang);
         await context.SaveChangesAsync();
-
         newLanguage = new();
         await LoadCvData();
-        StateHasChanged();
     }
 
     private async Task DeleteLanguage(CVLanguage lang)
     {
         if (cv == null) return;
-
         await using var context = await DbContextFactory.CreateDbContextAsync();
-
         context.CVLanguages.Remove(lang);
         await context.SaveChangesAsync();
-
         await LoadCvData();
-        StateHasChanged();
     }
 
     private async Task SaveNewSkill()
     {
         if (cv == null || string.IsNullOrWhiteSpace(newSkillName)) return;
-
         await using var context = await DbContextFactory.CreateDbContextAsync();
-
-        var skill = new CVSkill
-            {
-                UserProfileCVId = cv.Id,
-                SkillName = newSkillName
-            };
-
+        var skill = new CVSkill { UserProfileCVId = cv.Id, SkillName = newSkillName };
         context.CVSkills.Add(skill);
         await context.SaveChangesAsync();
-
         newSkillName = string.Empty;
         await LoadCvData();
-        StateHasChanged();
     }
 
     private async Task DeleteSkill(CVSkill skill)
     {
         if (cv == null) return;
-
         await using var context = await DbContextFactory.CreateDbContextAsync();
-
         context.CVSkills.Remove(skill);
         await context.SaveChangesAsync();
-
         await LoadCvData();
-        StateHasChanged();
     }
 }

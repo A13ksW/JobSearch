@@ -14,7 +14,7 @@
 @inject IdentityRedirectManager RedirectManager
 @inject ILogger<EnableAuthenticator> Logger
 
-<PageTitle>Configure authenticator app</PageTitle>
+<PageTitle>Konfiguracja aplikacji uwierzytelniającej</PageTitle>
 
 @if (recoveryCodes is not null)
 {
@@ -22,56 +22,90 @@
 }
 else
 {
-    <StatusMessage Message="@message" />
-    <h3>Configure authenticator app</h3>
-    <div>
-        <p>To use an authenticator app go through the following steps:</p>
-        <ol class="list">
-            <li>
-                <p>
-                    Download a two-factor authenticator app like Microsoft Authenticator for
-                    <a href="https://go.microsoft.com/fwlink/?Linkid=825072">Android</a> and
-                    <a href="https://go.microsoft.com/fwlink/?Linkid=825073">iOS</a> or
-                    Google Authenticator for
-                    <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&amp;hl=en">Android</a> and
-                    <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8">iOS</a>.
-                </p>
-            </li>
-            <li>
-                <p>
-                    Zeskanuj kod QR albo przepisz ten klucz:
-                    <kbd>@sharedKey</kbd>
-                    do aplikacji uwierzytelniającej. Spacje i wielkość liter nie mają znaczenia.
-                </p>
+    <div class="security-container">
+        <h2 class="page-title">Skonfiguruj Aplikację Authenticator</h2>
+        <p class="page-subtitle">Wprowadź warstwę bezpieczeństwa opartą na czasie.</p>
 
-                @if (!string.IsNullOrEmpty(qrCodeImage))
-                {
-                    <img src="@qrCodeImage"
-                         alt="QR code for authenticator app"
-                         style="width: 250px; height: 250px;" />
-                }
-            </li>
-            <li>
-                <p>
-                    Once you have scanned the QR code or input the key above, your two factor authentication app will provide you
-                    with a unique code. Enter the code in the confirmation box below.
-                </p>
-                <div class="row">
-                    <div class="col-md-6">
-                        <EditForm Model="Input" FormName="send-code" OnValidSubmit="OnValidSubmitAsync" method="post">
-                            <DataAnnotationsValidator />
-                            <div class="form-floating mb-3">
-                                <InputText @bind-Value="Input.Code" class="form-control" autocomplete="off" placeholder="Please enter the code." />
-                                <label for="code" class="control-label form-label">Verification Code</label>
-                                <ValidationMessage For="() => Input.Code" class="text-danger" />
-                            </div>
-                            <button type="submit" class="w-100 btn btn-lg btn-primary">Verify</button>
-                            <ValidationSummary class="text-danger" role="alert" />
-                        </EditForm>
+        <StatusMessage Message="@message" />
+
+        <div class="security-card setup-card">
+
+            <p class="setup-intro">Aby użyć aplikacji uwierzytelniającej, wykonaj poniższe kroki:</p>
+
+            <ol class="step-list">
+
+                <li class="step-item">
+                    <div class="step-content">
+                        <span class="step-number">1</span>
+                        <p class="step-title">Pobierz aplikację uwierzytelniającą</p>
+                        <p class="step-text">
+                            Zainstaluj aplikację taką jak Microsoft Authenticator lub Google Authenticator na swoim telefonie.
+                        </p>
+                        <div class="download-links">
+                            <a href="https://go.microsoft.com/fwlink/?Linkid=825072" target="_blank" class="download-link">MS Authenticator (Android)</a> |
+                            <a href="https://go.microsoft.com/fwlink/?Linkid=825073" target="_blank" class="download-link">MS Authenticator (iOS)</a>
+                            <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&amp;hl=en" target="_blank" class="download-link">Google Auth (Android)</a> |
+                            <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8" target="_blank" class="download-link">Google Auth (iOS)</a>
+                        </div>
                     </div>
-                </div>
-            </li>
-        </ol>
+                </li>
+
+                <li class="step-item">
+                    <div class="step-content">
+                        <span class="step-number">2</span>
+                        <p class="step-title">Skanuj lub Wprowadź Klucz</p>
+                        <p class="step-text">
+                            Zeskanuj poniższy kod QR **albo** przepisz klucz do aplikacji.
+                        </p>
+
+                        <div class="qr-key-area">
+                            @if (!string.IsNullOrEmpty(qrCodeImage))
+                            {
+                                <div class="qr-code-box">
+                                    <img src="@qrCodeImage"
+                                         alt="QR code for authenticator app"
+                                         class="qr-code-image" />
+                                </div>
+                            }
+
+                            <div class="key-display">
+                                <p class="key-label">Klucz udostępniony (Shared Key):</p>
+                                <kbd class="shared-key-code">@sharedKey</kbd>
+                                <p class="key-note">Spacje i wielkość liter nie mają znaczenia.</p>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="step-item">
+                    <div class="step-content">
+                        <span class="step-number">3</span>
+                        <p class="step-title">Wprowadź Kod Weryfikacyjny</p>
+                        <p class="step-text">
+                            Po zeskanowaniu, aplikacja uwierzytelniająca poda Ci unikalny, 6-cyfrowy kod. Wpisz go poniżej, aby zakończyć konfigurację.
+                        </p>
+
+                        <div class="verification-form-area">
+                            <EditForm Model="Input" FormName="send-code" OnValidSubmit="OnValidSubmitAsync" method="post">
+                                <DataAnnotationsValidator />
+
+                                <div class="form-floating mb-4">
+                                    <InputText @bind-Value="Input.Code" class="form-control" autocomplete="off" placeholder="Wprowadź kod weryfikacyjny" />
+                                    <label for="code" class="control-label form-label">Kod Weryfikacyjny</label>
+
+                                    <ValidationMessage For="() => Input.Code" class="text-danger validation-message" />
+                                </div>
+
+                                <button type="submit" class="btn-security-action w-100">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Zweryfikuj i Włącz 2FA
+                                </button>
+
+                            </EditForm>
+                        </div>
+                    </div>
+                </li>
+            </ol>
+        </div>
     </div>
 }
 
@@ -184,10 +218,12 @@ else
 
     private sealed class InputModel
     {
-        [Required]
-        [StringLength(7, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        // DODANO: Komunikat po polsku
+        [Required(ErrorMessage = "Pole Kod Weryfikacyjny jest wymagane.")]
+        [StringLength(7, ErrorMessage = "Kod musi mieć od {2} do {1} znaków.", MinimumLength = 6)]
         [DataType(DataType.Text)]
-        [Display(Name = "Verification Code")]
+        // DODANO: Atrybut Display, aby komunikat walidacji był po polsku
+        [Display(Name = "Kod Weryfikacyjny")]
         public string Code { get; set; } = "";
     }
 }

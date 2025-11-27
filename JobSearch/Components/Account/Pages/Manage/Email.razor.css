@@ -1,0 +1,278 @@
+﻿/* === KONTENER I ANIMACJE === */
+.email-dashboard {
+    animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    padding-bottom: 80px;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* === NAGŁÓWEK STRONY === */
+.page-header-center {
+    text-align: center;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.header-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 0.2rem;
+    letter-spacing: -0.5px;
+}
+
+.header-subtitle {
+    color: #64748b;
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* === KARTA GLASS === */
+.card-glass {
+    background: #ffffff;
+    border-radius: 40px; /* Mocne zaokrąglenie */
+    box-shadow: 0 20px 50px -10px rgba(0,0,0,0.06);
+    border: 1px solid #f1f5f9;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.card-glass:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 30px 60px -15px rgba(0,0,0,0.08);
+}
+
+/* Ozdobny pasek na górze karty */
+.card-glass::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, #2563eb, #60a5fa);
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* === WIZYTÓWKA (GÓRNA SEKCJA) === */
+.email-badge-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.email-icon-circle {
+    width: 90px;
+    height: 90px;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    color: #2563eb;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.15);
+}
+
+.current-email {
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0;
+    font-size: 1.6rem;
+    word-break: break-all;
+}
+
+/* Status (Pigułka) */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-pill.verified {
+    background-color: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #dcfce7;
+}
+
+.status-pill.unverified {
+    background-color: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+/* === INPUTY PIONOWE (MODERN GROUP) === */
+/* Używamy ::deep, aby style przeniknęły do standardowych komponentów formularza */
+
+::deep .modern-input-group.centered-input {
+    background-color: #f8fafc;
+    border: 2px solid transparent;
+    border-radius: 24px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+::deep .modern-input-group.centered-input:focus-within {
+    background-color: #ffffff;
+    border-color: #2563eb;
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.1);
+    transform: scale(1.01);
+}
+
+/* Ikona nad inputem */
+::deep .input-icon-top {
+    width: 48px;
+    height: 48px;
+    background-color: #eff6ff;
+    color: #2563eb;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 5px;
+}
+
+::deep .input-icon-top.success { background-color: #dcfce7; color: #16a34a; }
+::deep .input-icon-top.warning { background-color: #ffedd5; color: #ea580c; }
+
+/* Etykieta */
+::deep .modern-label, ::deep .form-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 1px;
+    margin: 0;
+    text-align: center;
+    width: 100%;
+    padding: 0; /* Reset paddingu bootstrapa */
+}
+
+/* Pole tekstowe */
+::deep .modern-input, ::deep .form-control {
+    background-color: transparent;
+    border: none;
+    text-align: center;
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 1.2rem;
+    padding: 5px 0;
+    height: auto;
+    box-shadow: none !important; /* Usuwa niebieską poświatę bootstrapa */
+}
+
+::deep .form-control:disabled {
+    background-color: transparent;
+    color: #64748b;
+    opacity: 0.8;
+}
+
+::deep .form-control::placeholder {
+    color: #cbd5e1;
+    font-weight: 400;
+}
+
+/* Obsługa input-group (dla ikonki 'ptaszka' obok maila) */
+::deep .input-group-text {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin-left: 10px;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* === PRZYCISK PREMIUM (Używany dla obu przycisków) === */
+::deep .btn-save-pro {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 32px;
+    font-weight: 700;
+    font-size: 1rem;
+    box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 280px; /* Minimalna szerokość dla ładnego wyglądu */
+    cursor: pointer;
+}
+
+/* Efekt Shine */
+::deep .btn-save-pro::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+::deep .btn-save-pro:hover::before {
+    left: 100%;
+}
+
+::deep .btn-save-pro:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px -5px rgba(37, 99, 235, 0.5);
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+}
+
+::deep .btn-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Box weryfikacji */
+.verification-box {
+    background-color: #fff7ed;
+    border: 1px dashed #fdba74;
+    padding: 20px;
+    border-radius: 24px;
+    margin-bottom: 2rem;
+    /* Aby przycisk wewnątrz był wyśrodkowany */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Komunikaty walidacji */
+::deep .alert {
+    border-radius: 16px;
+    border: none;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    text-align: center;
+}

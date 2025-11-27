@@ -1,26 +1,366 @@
-﻿.cv-button-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+﻿/* === ANIMACJE I KONTENER === */
+.cv-dashboard {
+    animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    padding-bottom: 80px;
 }
 
-    /* Styl dla 'guzika' który jest labelką */
-    .cv-button-group .cv-btn-outline {
-        border: 1px solid #ced4da;
-        border-radius: 20px;
-        padding: 0.5rem 1rem;
-        cursor: pointer;
-        transition: background-color 0.2s ease, border-color 0.2s ease;
-        background-color: #fff;
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
 
-        .cv-button-group .cv-btn-outline:hover {
-            background-color: #f8f9fa;
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.delay-1 {
+    animation-delay: 0.1s;
+}
+
+.delay-2 {
+    animation-delay: 0.2s;
+}
+
+.delay-3 {
+    animation-delay: 0.3s;
+}
+
+/* === NAGŁÓWEK === */
+.page-header-center {
+    text-align: center;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding-bottom: 1.5rem;
+}
+
+.header-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 0.2rem;
+    letter-spacing: -0.5px;
+}
+
+.header-subtitle {
+    color: #64748b;
+    font-size: 1rem;
+}
+
+/* === KARTY (GLASS) === */
+.card-glass {
+    background: #ffffff;
+    border-radius: 32px;
+    box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05);
+    border: 1px solid #f1f5f9;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.2s;
+}
+
+    .card-glass:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 50px -10px rgba(0,0,0,0.08);
+    }
+
+/* === GRID WYBORU (CHIPS) === */
+.selection-grid {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.selection-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 10px;
+    border-radius: 50px;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 80px;
+}
+
+    .selection-item:hover {
+        background: #fff;
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .selection-item.active {
+        background: #2563eb;
+        color: white;
+        border-color: #2563eb;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+/* === NOWOCZESNE INPUTY (PIONOWE I WYŚRODKOWANE) === */
+.modern-input-group.centered-input {
+    background-color: #f8fafc;
+    border: 2px solid transparent;
+    border-radius: 24px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+}
+
+    .modern-input-group.centered-input:focus-within {
+        background: #ffffff;
+        border-color: #2563eb;
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.1);
+        transform: scale(1.01);
+    }
+
+.input-icon-top {
+    width: 50px;
+    height: 50px;
+    background-color: #eff6ff;
+    color: #2563eb;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.1);
+}
+
+    .input-icon-top svg {
+        width: 24px;
+        height: 24px;
+    }
+
+.icon-box-header {
+    width: 42px;
+    height: 42px;
+    background: #eff6ff;
+    color: #2563eb;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.5rem; /* Centrowanie */
+}
+
+    .icon-box-header.color-2 {
+        background: #f0fdf4;
+        color: #16a34a;
+    }
+
+    .icon-box-header.color-3 {
+        background: #fff7ed;
+        color: #ea580c;
+    }
+
+.modern-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 1px;
+    margin: 0;
+    text-align: center;
+    width: 100%;
+}
+
+.modern-label-header {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #334155;
+    text-align: center;
+    display: block;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.modern-input, .modern-textarea {
+    border: none;
+    background: transparent;
+    font-weight: 600;
+    color: #1e293b;
+    padding: 0;
+    outline: none;
+    width: 100%;
+    text-align: center;
+}
+
+.modern-textarea {
+    resize: none;
+}
+
+/* === DODAWANIE ELEMENTÓW === */
+.add-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.form-select-custom, .form-input-custom {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px;
+    background: #f8fafc;
+    font-size: 0.9rem;
+    text-align: center;
+    flex: 1;
+}
+
+.btn-add-small {
+    background: #10b981;
+    color: white;
+    border: none;
+    width: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+    .btn-add-small:hover {
+        background: #059669;
+    }
+
+/* === LISTY === */
+.list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.list-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border: 1px solid #f1f5f9;
+    padding: 12px 20px;
+    border-radius: 16px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.badge-level {
+    background: #e0f2fe;
+    color: #0284c7;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-weight: 700;
+    margin-left: 10px;
+}
+
+.btn-icon-remove {
+    border: none;
+    background: transparent;
+    color: #ef4444;
+    transition: transform 0.2s;
+}
+
+    .btn-icon-remove:hover {
+        transform: scale(1.2);
+    }
+
+/* === TAGI SKILLS === */
+.skills-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.skill-tag {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+}
+
+.remove-skill {
+    cursor: pointer;
+    color: #cbd5e1;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+    .remove-skill:hover {
+        color: #ef4444;
+    }
+
+/* === PREFERENCJE (Toggle) === */
+.toggle-group {
+    display: flex;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 50px;
+    gap: 5px;
+}
+
+    .toggle-group span {
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        color: #64748b;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+        .toggle-group span.active {
+            background: #fff;
+            color: #2563eb;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            font-weight: 800;
         }
 
-        /* Kiedy labelka ma klasę .active (nadawaną przez @onclick), zmienia styl */
-        .cv-button-group .cv-btn-outline.active {
-            background-color: #212529; /* Ciemny (jak na zrzucie) */
-            color: #fff;
-            border-color: #212529;
-        }
+/* === PRZYCISK ZAPISZ === */
+.btn-save-pro.large {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 16px 60px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4);
+    transition: transform 0.2s;
+}
+
+    .btn-save-pro.large:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 15px 40px rgba(37, 99, 235, 0.5);
+    }
+
+.btn-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Empty State */
+.empty-state-card {
+    text-align: center;
+    background: #fff;
+    padding: 4rem;
+    border-radius: 40px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+}
+
+.empty-icon {
+    color: #e2e8f0;
+    margin-bottom: 1rem;
+}
