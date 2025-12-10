@@ -6,10 +6,12 @@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Identity
 
 @inject IDbContextFactory<ApplicationDbContext> DbContextFactory
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
 
 <PageTitle>Moje CV</PageTitle>
 
@@ -404,6 +406,14 @@
         var newCv = new UserProfileCV { UserId = currentUserId };
         context.UserProfileCVs.Add(newCv);
         await context.SaveChangesAsync();
+
+        var user = await UserManager.FindByIdAsync(currentUserId);
+        if (user != null && !user.HasCv)
+        {
+            user.HasCv = true;
+            await UserManager.UpdateAsync(user);
+        }
+
         cv = newCv;
         cv.Languages = new List<CVLanguage>();
         cv.Skills = new List<CVSkill>();

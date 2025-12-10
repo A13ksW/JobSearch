@@ -105,7 +105,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     // Wyłączamy wymóg znaku specjalnego, aby pasowało do Twoich oczekiwań
     options.Password.RequireNonAlphanumeric = false;
 
-    options.SignIn.RequireConfirmedAccount = false; // demo
+    options.SignIn.RequireConfirmedAccount = true; 
 })
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>()

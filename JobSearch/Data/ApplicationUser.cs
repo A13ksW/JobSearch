@@ -21,5 +21,12 @@ namespace JobSearch.Data
         public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
         public string AccountType { get; set; } = "Individual";
+
+		public bool HasCv { get; set; }
+
+		public bool IsProfileComplete =>
+        !string.IsNullOrWhiteSpace(DisplayName) &&
+        !string.IsNullOrWhiteSpace(PhoneNumber) &&
+        HasCv;
 	}
 }

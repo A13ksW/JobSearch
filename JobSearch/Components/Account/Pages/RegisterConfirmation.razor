@@ -10,23 +10,27 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Register confirmation</PageTitle>
+<PageTitle>Potwierdzenie rejestracji</PageTitle>
 
-<h1>Register confirmation</h1>
+<div class="container">
+    <h1>Potwierdzenie rejestracji</h1>
 
-<StatusMessage Message="@statusMessage" />
+    <StatusMessage Message="@statusMessage" />
 
-@if (emailConfirmationLink is not null)
-{
-    <p>
-        This app does not currently have a real email sender registered, see <a href="https://aka.ms/aspaccountconf">these docs</a> for how to configure a real email sender.
-        Normally this would be emailed: <a href="@emailConfirmationLink">Click here to confirm your account</a>
-    </p>
-}
-else
-{
-    <p>Please check your email to confirm your account.</p>
-}
+    @if (emailConfirmationLink is not null)
+    {
+        <p>
+            Ta aplikacja nie ma obecnie skonfigurowanego prawdziwego wysyłania e-maili.
+            W normalnych warunkach ten link zostałby wysłany na maila:
+            <br /><br />
+            <a href="@emailConfirmationLink">Kliknij tutaj, aby potwierdzić konto</a>
+        </p>
+    }
+    else
+    {
+        <p>Sprawdź swoją skrzynkę odbiorczą i kliknij w link aktywacyjny, aby potwierdzić konto.</p>
+    }
+</div>
 
 @code {
     private string? emailConfirmationLink;
@@ -52,11 +56,12 @@ else
         if (user is null)
         {
             HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-            statusMessage = "Error finding user for unspecified email";
+            statusMessage = "Błąd: Nie znaleziono użytkownika dla podanego adresu email.";
         }
         else if (EmailSender is IdentityNoOpEmailSender)
         {
-            // Once you add a real email sender, you should remove this code that lets you confirm the account
+            // Gdy dodasz prawdziwego dostawcę e-mail, ten kod nie będzie się wykonywał.
+            // Służy on do symulacji potwierdzenia w środowisku lokalnym.
             var userId = await UserManager.GetUserIdAsync(user);
             var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));

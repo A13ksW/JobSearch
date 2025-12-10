@@ -4,8 +4,10 @@
 @using JobSearch.Data
 @using JobSearch.Services
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
 @inject IJobOfferService JobOfferService
 @inject NavigationManager NavigationManager
+@inject UserManager<ApplicationUser> UserManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>@jobOffer?.Title</PageTitle>
@@ -55,6 +57,18 @@
                             <div class="alert @(isError ? "alert-danger" : "alert-success") mb-4 shadow-sm border-0">
                                 <i class="bi @(isError ? "bi-exclamation-circle-fill" : "bi-check-circle-fill") me-2"></i>
                                 @feedbackMessage
+
+                                @if (isError)
+                                {
+                                    <div class="mt-3 d-flex gap-2">
+                                        <a href="/Account/Manage" class="btn btn-sm btn-outline-primary">
+                                            Uzupełnij profil
+                                        </a>
+                                        <a href="/Account/Manage/MyCV" class="btn btn-sm btn-outline-secondary">
+                                            Utwórz CV
+                                        </a>
+                                    </div>
+                                }
                             </div>
                         }
 
@@ -252,6 +266,21 @@
             return;
         }
 
+        var userEntity = await UserManager.FindByIdAsync(currentUserId);
+        if (userEntity == null)
+        {
+            NavigationManager.NavigateTo(loginUrl);
+            return;
+        }
+
+        if (!userEntity.IsProfileComplete)
+        {
+            feedbackMessage = "Nie możesz jeszcze aplikować na oferty. Uzupełnij swój profil (imię i nazwisko jako nazwę wyświetlaną oraz numer telefonu) oraz utwórz swoje CV na stronie w zakładce „Moje CV”.";
+            isError = true;
+            StateHasChanged();
+            return;
+        }
+
         try
         {
             bool success = await JobOfferService.ApplyForOfferAsync(jobOffer.Id, currentUserId);
@@ -273,6 +302,7 @@
             feedbackMessage = $"Błąd serwera: {ex.Message}";
             isError = true;
         }
+
         StateHasChanged();
     }
 }
