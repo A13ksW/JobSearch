@@ -149,7 +149,6 @@ else
 
     private sealed class EditUserDto
     {
-        [Required(ErrorMessage = "Wymagana nazwa.")]
         public string? DisplayName { get; set; }
         public string? AccountType { get; set; }
         public DateTime? LockoutEnd { get; set; }
