@@ -1,4 +1,121 @@
-﻿/* === 1. KONTENER GŁÓWNY === */
+﻿@page
+
+"/admin/users/{id}"
+
+@using JobSearch.Data
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using System.ComponentModel.DataAnnotations
+
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "Admin")]
+@inject UserManager<ApplicationUser > UserManager
+@inject RoleManager<IdentityRole > RoleManager
+@inject NavigationManager Nav
+
+<div class="text-center" >
+<h1 > Edycja użytkownika</h1 >
+</div >
+
+@if (user is null) {
+    <p>Ładowanie...</p>
+}
+
+else {
+    <div class="row justify-content-center"> <div class="col-md-6 col-lg-4"> <EditForm Model="@model" OnValidSubmit="Save"> <DataAnnotationsValidator /> <ValidationSummary class="text-danger" /> <div class="mb-3"> <label class="form-label">Email</label> <input class="form-control" value="@user.Email" disabled /> </div> <div class="mb-3"> <label class="form-label">Nazwa</label> <input @bind="model.DisplayName" class="form-control" placeholder="Nazwa" /> <ValidationMessage For="() => model.DisplayName" class="text-danger" /> </div> <div class="mb-3"> <label class="form-label">Typ konta:</label> <select @bind="model.AccountType" class="form-select"> <option value="">Wybierz typ konta</option> <option value="Individual">Osoba prywatna</option> <option value="Company">Firma</option> </select> <ValidationMessage For="() => model.AccountType" class="text-danger" /> </div> <div class="mb-3"> <label class="form-label">Zablokuj do:</label> <input @bind="model.LockoutEnd" class="form-control" type="date" /> <ValidationMessage For="() => model.LockoutEnd" class="text-danger" /> </div> <div class="mb-3"> <label class="form-label">Rola:</label> <select @bind="model.Role" class="form-select"> <option value="">Wybierz rolę</option> <option value="User">User</option> <option value="Moderator">Moderator</option> <option value="Admin">Admin</option> </select> <ValidationMessage For="() => model.Role" class="text-danger" /> </div> <div class="mb-3"> <h5 class="text-light">Reset hasła</h5> <div class="input-group"> <input @bind="newPassword" type="password" class="form-control" placeholder="Nowe hasło" /> <button type="button" class="btn btn-secondary" @onclick="ResetPassword">Ustaw hasło</button> </div> </div> <div class="d-grid gap-2"> <button type="submit" class="w-100 btn btn-lg btn-primary">Zapisz</button> <button type="button" class="btn btn-secondary" @onclick="Back">Wróć</button> </div> </EditForm> </div> </div>
+}
+
+@code {
+    [Parameter] public string id {
+        get;
+        set;
+    }
+
+    = "";
+    private ApplicationUser? user;
+    private EditUserDto model = new();
+    private HashSet<string> selectedRoles = new();
+    private List<string> allRoles = new();
+    private string newPassword = "";
+
+    protected override async Task OnParametersSetAsync() {
+        user = await UserManager.FindByIdAsync(id);
+        if (user is null) return;
+        model .DisplayName = user.DisplayName;
+        model .AccountType = user.AccountType;
+        model .LockoutEnd = user.LockoutEnd?.UtcDateTime;
+        var roles = await UserManager.GetRolesAsync(user);
+        model .Role = roles.FirstOrDefault();
+    }
+
+    private async Task Save() {
+        if (user is null) return;
+        user .DisplayName = model.DisplayName;
+        user .AccountType = model.AccountType;
+        user .LockoutEnd = model.LockoutEnd.HasValue ? new DateTimeOffset(DateTime.SpecifyKind(model.LockoutEnd.Value, DateTimeKind.Utc)) : null;
+        await UserManager.UpdateAsync(user);
+        var currentRoles = await UserManager.GetRolesAsync(user);
+        if (currentRoles.Any())
+
+{
+    await UserManager.RemoveFromRolesAsync(user, currentRoles);
+}
+
+if (!string.IsNullOrWhiteSpace(model.Role)) {
+    if (!await RoleManager.RoleExistsAsync(model.Role))
+
+{
+    await RoleManager.CreateAsync(new IdentityRole(model.Role));
+}
+
+await UserManager.AddToRoleAsync(user, model.Role);
+}
+Back();
+}
+
+private void ToggleRole(string role, bool isChecked) {
+    if (isChecked) selectedRoles.Add(role);
+    else selectedRoles.Remove(role);
+    StateHasChanged();
+}
+
+private async Task ResetPassword() {
+    if (user is null || string.IsNullOrWhiteSpace(newPassword)) return;
+    var token = await UserManager.GeneratePasswordResetTokenAsync(user);
+    await UserManager.ResetPasswordAsync(user, token, newPassword);
+    newPassword = "";
+}
+
+private void Back() = > Nav.NavigateTo("/admin/users");
+
+private sealed class EditUserDto {
+    [Required(ErrorMessage = "Wymagana nazwa.")] public string? DisplayName
+
+{
+    get;
+    set;
+}
+
+public string? AccountType {
+    get;
+    set;
+}
+
+public DateTime? LockoutEnd {
+    get;
+    set;
+}
+
+public string? Role {
+    get;
+    set;
+}
+
+}
+}
+
+/* === 1. KONTENER GŁÓWNY === */
 :host {
     display: block;
     color: #ffffff;
@@ -90,6 +207,13 @@ h1 {
 .form-select:focus {
     border-color: #2563eb !important;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35) !important;
+}
+
+/* --- ZMIANA KOLORU IKONKI KALENDARZA NA BIAŁY --- */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+    opacity: 0.8;
 }
 
 /* Reset hasła - przycisk dodatkowy */

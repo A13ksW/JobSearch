@@ -1,10 +1,22 @@
-﻿/* === KONTENER === */
+﻿/* === 1. KONTENER GŁÓWNY I CENTROWANIE (analogicznie do razor.css) === */
+:host {
+    display: block;
+    color: #ffffff;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    min-height: calc(100vh - 60px);
+    padding: 4rem 0;
+    display: flex;
+    justify-content: center; /* centrowanie horyzontalne */
+    align-items: flex-start; /* początek pionowo jak w .container */
+}
+
+/* Kontener logiki auth – tylko pomocniczy, żeby nie psuć istniejącego HTML */
 .auth-container {
     display: flex;
     justify-content: center;
-    align-items: center;
-    min-height: 60vh;
-    padding: 2rem;
+    align-items: stretch;
+    width: 100%;
+    padding: 0 1.5rem;
     animation: fadeIn 0.6s ease-out forwards;
 }
 
@@ -20,156 +32,194 @@
     }
 }
 
-/* === KARTA GLASS === */
+/* === 2. KARTA (jak .container z razor.css) === */
 .auth-card {
-    background: #ffffff;
-    border-radius: 40px;
-    box-shadow: 0 20px 50px -10px rgba(0,0,0,0.1);
-    border: 1px solid #f1f5f9;
-    padding: 3rem;
+    background: rgba(15, 23, 42, 0.9) !important; /* ciemna karta */
+    border-radius: 24px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    padding: 2.5rem;
     width: 100%;
-    max-width: 500px;
+    max-width: 600px;
     text-align: center;
     position: relative;
     overflow: hidden;
 }
 
-    /* Pasek ozdobny */
+    /* Pasek ozdobny – jak w .container::before, tylko dla auth-card */
     .auth-card::before {
         content: '';
         position: absolute;
         top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 80px;
+        left: 0;
+        right: 0;
         height: 4px;
-        background: linear-gradient(90deg, #2563eb, #60a5fa);
-        border-bottom-left-radius: 4px;
-        border-bottom-right-radius: 4px;
+        /* zielono-niebieski jak w razor.css */
+        background: linear-gradient(90deg, #10b981 0%, #2563eb 100%);
+        z-index: 3;
+        border-top-left-radius: 24px;
+        border-top-right-radius: 24px;
     }
 
-/* === IKONA STATUSU === */
+/* === 3. IKONA STATUSU === */
 .icon-header {
     display: flex;
     justify-content: center;
 }
 
 .status-icon-circle {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
+    width: 72px;
+    height: 72px;
+    border-radius: 999px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 1rem;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    margin-bottom: 1.25rem;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    background: radial-gradient(circle at 30% 0%, rgba(148, 163, 184, 0.4), rgba(15, 23, 42, 1));
 }
 
     .status-icon-circle svg {
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
     }
 
+    /* Akcenty kolorystyczne dla sukcesu/błędu */
     .status-icon-circle.success {
-        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
-        color: #16a34a;
+        color: #22c55e;
+        border-color: rgba(34, 197, 94, 0.6);
+        box-shadow: 0 18px 40px rgba(34, 197, 94, 0.3);
     }
 
     .status-icon-circle.error {
-        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-        color: #dc2626;
+        color: #f97373;
+        border-color: rgba(239, 68, 68, 0.7);
+        box-shadow: 0 18px 40px rgba(248, 113, 113, 0.3);
     }
 
-/* === TEKSTY === */
+/* === 4. TYPOGRAFIA I KOMUNIKATY === */
 .auth-title {
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-weight: 800;
-    color: #1e293b;
+    color: #10b981; /* zielony akcent jak w h1 z razor.css */
+    margin-bottom: 1rem;
+}
+
+.auth-card p {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: #cbd5e1;
     margin-bottom: 1.5rem;
 }
 
+    /* Linki w treści */
+    .auth-card p a {
+        color: #60a5fa;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+        .auth-card p a:hover {
+            text-decoration: underline;
+            color: #93c5fd;
+        }
+
+/* Ogólne pudełko na komunikat (zamiast jasnych boxów) */
 .status-message-box {
-    padding: 1.5rem;
-    border-radius: 20px;
-    font-size: 1rem;
-    margin-bottom: 2rem;
+    padding: 1.25rem;
+    border-radius: 16px;
+    font-size: 0.95rem;
+    margin-bottom: 1.75rem;
+    text-align: left;
 }
 
+/* Sukces – delikatne zielone tło na ciemnym motywie */
 .success-box {
-    background-color: #f0fdf4;
-    color: #166534;
-    border: 1px solid #dcfce7;
+    background: rgba(22, 163, 74, 0.12);
+    color: #bbf7d0;
+    border: 1px solid rgba(34, 197, 94, 0.6);
 }
 
+/* Błąd – czerwony akcent jak .status-message.error */
 .error-box {
-    background-color: #fef2f2;
-    color: #991b1b;
-    border: 1px solid #fecaca;
+    background: rgba(127, 29, 29, 0.35);
+    color: #fecaca;
+    border: 1px solid rgba(248, 113, 113, 0.7);
 }
 
-/* === PRZYCISK === */
-.btn-back-home, .btn-save-pro {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    color: white;
+/* Dodatkowa klasa status-message.error (jeśli używasz) */
+.status-message.error {
+    color: #ef4444;
+    font-weight: 700;
+}
+
+/* === 5. PRZYCISKI (ciemny motyw, gradient jak w razor.css) === */
+.btn-back-home,
+.btn-save-pro {
+    background: linear-gradient(135deg, #10b981 0%, #2563eb 100%);
+    color: #ffffff;
     text-decoration: none;
-    padding: 14px 32px;
-    border-radius: 50px;
+    padding: 0.9rem 2.4rem;
+    border-radius: 999px;
     font-weight: 700;
     display: inline-block;
-    box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
-    transition: transform 0.2s;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.9);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
     border: none;
     cursor: pointer;
 }
 
-    .btn-back-home:hover, .btn-save-pro:hover {
-        transform: translateY(-3px);
-        color: white;
+    .btn-back-home:hover,
+    .btn-save-pro:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 40px rgba(15, 23, 42, 1);
+        color: #ffffff;
     }
 
-/* INPUTY (Dla ResendEmail) */
+/* === 6. INPUTY (ResendEmail – dopasowane do ciemnej karty) === */
 ::deep .modern-input-group.centered-input {
-    background-color: #f8fafc;
-    border: 2px solid transparent;
-    border-radius: 24px;
-    padding: 20px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    border-radius: 20px;
+    padding: 1.25rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 0.75rem;
     transition: all 0.2s ease;
 }
 
     ::deep .modern-input-group.centered-input:focus-within {
-        background: #ffffff;
+        background: rgba(15, 23, 42, 1);
         border-color: #2563eb;
-        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.1);
-        transform: scale(1.01);
+        box-shadow: 0 10px 30px rgba(37, 99, 235, 0.25);
+        transform: translateY(-1px);
     }
 
 ::deep .input-icon-top {
-    width: 50px;
-    height: 50px;
-    background-color: #eff6ff;
-    color: #2563eb;
-    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    background: rgba(37, 99, 235, 0.12);
+    color: #60a5fa;
+    border-radius: 999px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.9);
 }
 
     ::deep .input-icon-top svg {
-        width: 24px;
-        height: 24px;
+        width: 22px;
+        height: 22px;
     }
 
 ::deep .modern-label {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
     font-weight: 700;
     color: #94a3b8;
-    letter-spacing: 1px;
+    letter-spacing: 0.08em;
     margin: 0;
     text-align: center;
     width: 100%;
@@ -179,10 +229,15 @@
     border: none;
     background: transparent;
     font-weight: 600;
-    color: #1e293b;
+    color: #e5e7eb;
     padding: 0;
     outline: none;
     width: 100%;
     text-align: center;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
 }
+
+    /* Placeholder na ciemnym tle */
+    ::deep .modern-input::placeholder {
+        color: #64748b;
+    }

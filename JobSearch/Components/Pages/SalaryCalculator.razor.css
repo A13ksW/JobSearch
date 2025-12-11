@@ -1,0 +1,473 @@
+﻿/* === 1. GŁÓWNY KONTENER I ANIMACJA === */
+.pracuj-wrapper {
+    max-width: 1200px;
+    margin: 2.5rem auto 4rem;
+    padding: 0 1.5rem;
+    color: #ffffff;
+}
+
+.calculator-card {
+    background: rgba(15, 23, 42, 0.95);
+    border-radius: 20px;
+    padding: 2.2rem 2.5rem;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.7);
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+    /* NOWY: Gradientowy pasek NA GÓRZE karty */
+    .calculator-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px; /* Grubość paska */
+        background: linear-gradient(90deg, #2563eb 0%, #a78bfa 50%, #10b981 100%);
+        z-index: 2;
+    }
+
+    /* Usunięto przesunięcie marginesu, które było dla paska bocznego */
+    .calculator-card > * {
+        position: relative;
+        z-index: 1;
+    }
+
+/* Prosta animacja wejścia */
+.animate-fade-up {
+    animation: fadeUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes fadeUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* === 2. GÓRNY PANEL: KWOTA, BRUTTO/NETTO === */
+
+.calc-title {
+    font-weight: 800;
+    font-size: 2rem;
+    color: #ffffff;
+    margin-bottom: 1.75rem;
+    text-align: center;
+}
+
+.top-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    /* Centrowanie elementów, skoro nie ma już przycisku po prawej */
+    justify-content: center;
+}
+
+.amount-container {
+    flex: 1 1 260px;
+    max-width: 400px; /* Ograniczenie szerokości dla estetyki */
+}
+
+.small-label {
+    display: block;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-bottom: 0.4rem;
+}
+
+.custom-input-group {
+    background-color: rgba(15, 23, 42, 0.9);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #475569;
+}
+
+.amount-input {
+    font-size: 1.4rem;
+    font-weight: 700;
+    padding: 0.9rem 1.1rem;
+    text-align: right;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.currency-text {
+    background-color: #1e293b;
+    border: none;
+    font-weight: 700;
+    color: #cbd5e1;
+    padding-inline: 1.1rem;
+}
+
+/* Style inputów i selectów */
+.form-control,
+.form-select {
+    background-color: rgba(30, 41, 59, 0.9);
+    border: 1px solid #475569;
+    border-radius: 10px;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.95rem;
+    color: #ffffff;
+    transition: all 0.2s;
+}
+
+    .form-control:focus,
+    .form-select:focus {
+        background-color: rgba(30, 41, 59, 1);
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35);
+        outline: none;
+    }
+
+    .form-control::placeholder {
+        color: #6b7280;
+    }
+
+    .form-control:disabled,
+    .form-control[readonly] {
+        background-color: rgba(30, 41, 59, 0.5);
+        color: #94a3b8;
+        opacity: 0.9;
+    }
+
+.input-group-text {
+    background-color: #1e293b;
+    border: 1px solid #475569;
+    color: #cbd5e1;
+    font-weight: 600;
+}
+
+/* === 3. PRZEŁĄCZNIK BRUTTO/NETTO === */
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0.9rem;
+    background-color: rgba(15, 23, 42, 0.8);
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    flex-wrap: wrap;
+    height: fit-content; /* Dopasowanie do inputa obok */
+}
+
+.radio-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #e5e7eb;
+    font-size: 0.9rem;
+}
+
+    .radio-option:hover {
+        background-color: rgba(30, 64, 175, 0.2);
+    }
+
+.custom-radio {
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    border: 2px solid #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    position: relative;
+}
+
+    .custom-radio .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background-color: transparent;
+        transition: transform 0.2s, background-color 0.2s;
+        transform: scale(0.2);
+    }
+
+    .custom-radio.checked {
+        border-color: #2563eb;
+        background: radial-gradient(circle at 30% 30%, #38bdf8, #2563eb);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.4);
+    }
+
+        .custom-radio.checked .dot {
+            background-color: #ffffff;
+            transform: scale(1);
+        }
+
+.radio-option.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* === 4. PRZYCISKI "OBLICZ" === */
+
+/* UKRYWAMY PRZYCISK GÓRNY */
+.btn-oblicz-top {
+    display: none !important;
+}
+
+/* Stylujemy tylko przycisk dolny */
+.btn-oblicz-bottom {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 40%, #0ea5e9 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 999px;
+    padding: 0.8rem 2.5rem; /* Powiększony, skoro jest jedyny */
+    font-weight: 700;
+    font-size: 1rem;
+    box-shadow: 0 10px 30px rgba(37, 99, 235, 0.45);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+    .btn-oblicz-bottom:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 40px rgba(37, 99, 235, 0.6);
+        filter: brightness(1.05);
+    }
+
+    .btn-oblicz-bottom:active {
+        transform: translateY(1px) scale(0.98);
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    }
+
+.bottom-action {
+    display: flex;
+    justify-content: center; /* Wyśrodkowanie przycisku */
+    margin-top: 2rem;
+}
+
+/* === 5. TABS – RODZAJ UMOWY === */
+
+.tabs-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    margin-bottom: 1.7rem;
+    margin-top: 0.5rem;
+    justify-content: center; /* Wyśrodkowanie tabów */
+}
+
+.tab-btn {
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    padding: 0.45rem 1.1rem;
+    background: rgba(15, 23, 42, 0.8);
+    color: #e5e7eb;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    .tab-btn:hover {
+        border-color: #2563eb;
+        background: rgba(37, 99, 235, 0.15);
+    }
+
+    .tab-btn.active {
+        background: linear-gradient(135deg, #1d4ed8, #2563eb);
+        border-color: transparent;
+        color: #ffffff;
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.5);
+    }
+
+/* === 6. FORMULARZ – WIERSZE, KOLUMNY, LABELKI === */
+
+.form-container {
+    background: radial-gradient(circle at top left, rgba(37, 99, 235, 0.25), transparent 55%), radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.18), transparent 55%), rgba(15, 23, 42, 0.9);
+    border-radius: 18px;
+    padding: 2.2rem 1.6rem 1.6rem; /* Zwiększony padding góra dla paska */
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    position: relative; /* Ważne dla pozycjonowania paska gradientowego */
+    overflow: hidden;
+}
+
+    /* NOWY: Gradientowy pasek NA GÓRZE formularza */
+    .form-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px; /* Nieco cieńszy niż główny */
+        background: linear-gradient(90deg, #2563eb 0%, #a78bfa 50%, #10b981 100%);
+        z-index: 2;
+        opacity: 0.7; /* Nieco delikatniejszy */
+    }
+
+.form-group-row {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+}
+
+.label-col {
+    flex: 0 0 260px;
+}
+
+.input-col {
+    flex: 1 1 240px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.main-label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #e5e7eb;
+}
+
+.req {
+    color: #f97316;
+    margin-left: 0.2rem;
+}
+
+.sub-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-top: 0.15rem;
+}
+
+/* Tak/Nie w wierszach */
+.yes-no-toggle {
+    display: inline-flex;
+    gap: 0.75rem;
+    padding: 0.25rem 0.4rem;
+    background-color: rgba(15, 23, 42, 0.7);
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.styled-select {
+    min-width: 260px;
+}
+
+.divider {
+    border-color: rgba(148, 163, 184, 0.25);
+    margin: 1.5rem 0;
+}
+
+/* === 7. BOX Z WYNIKIEM === */
+
+.result-box {
+    margin-top: 2.5rem;
+    padding: 1.8rem 2rem;
+    border-radius: 20px;
+    background: radial-gradient(circle at top, rgba(34, 197, 94, 0.18), transparent 60%), rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    box-shadow: 0 16px 40px rgba(22, 163, 74, 0.45);
+    text-align: center;
+}
+
+.result-amount {
+    font-size: 2.3rem;
+    font-weight: 800;
+    color: #bbf7d0;
+}
+
+    .result-amount small {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #a7f3d0;
+    }
+
+.result-label {
+    margin-top: 0.2rem;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #cbd5e1;
+}
+
+.result-annual {
+    margin-top: 0.7rem;
+    font-size: 0.9rem;
+    color: #94a3b8;
+}
+
+/* === 8. RESPONSYWNOŚĆ === */
+
+@media (max-width: 992px) {
+    .calculator-card {
+        padding: 1.8rem 1.6rem;
+    }
+
+    .form-group-row {
+        align-items: flex-start;
+    }
+
+    .input-col {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .top-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .amount-container {
+        max-width: 100%;
+    }
+
+    .toggle-container {
+        justify-content: center;
+    }
+
+    .label-col,
+    .input-col {
+        flex: 1 1 100%;
+    }
+
+    .label-col {
+        margin-bottom: 0.35rem;
+    }
+
+    .styled-select {
+        width: 100%;
+    }
+
+    .result-box {
+        padding-inline: 1.4rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .calc-title {
+        font-size: 1.6rem;
+    }
+
+    .tabs-row {
+        gap: 0.5rem;
+    }
+
+    .tab-btn {
+        font-size: 0.78rem;
+        padding-inline: 0.8rem;
+    }
+}

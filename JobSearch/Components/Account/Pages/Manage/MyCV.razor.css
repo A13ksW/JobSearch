@@ -351,15 +351,71 @@
     gap: 10px;
 }
 
-/* Empty State */
+/* === Empty State – wyróżniony komunikat o CV === */
 .empty-state-card {
     text-align: center;
-    background: #fff;
+    background: #ffffff;
     padding: 4rem;
     border-radius: 40px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+    box-shadow: 0 10px 40px rgba(15, 23, 42, 0.08);
+    border: 1px solid #e5e7eb;
+    position: relative;
 }
 
+.empty-state-pro {
+    background: radial-gradient(circle at top left, #e0edff 0, #ffffff 45%);
+    border: 1px solid #dbeafe;
+}
+
+.empty-state-badge {
+    display: flex;
+    justify-content: center;
+}
+
+.badge-pill {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    color: #1d4ed8;
+    background: #e0ebff;
+    border-radius: 999px;
+    padding: 6px 14px;
+}
+
+.empty-title {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.03em;
+}
+
+    .empty-title span {
+        color: #2563eb;
+    }
+
+.empty-subtitle {
+    color: #64748b;
+    font-size: 0.98rem;
+    max-width: 460px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+    .empty-subtitle strong {
+        color: #0f172a;
+    }
+
+.empty-hint {
+    font-size: 0.8rem;
+    color: #9ca3af;
+}
+
+.empty-icon-wrapper svg {
+    filter: drop-shadow(0 10px 25px rgba(37, 99, 235, 0.35));
+}
+
+/* stary selector – zostawiony na wszelki wypadek, jeśli gdzieś używasz */
 .empty-icon {
     color: #e2e8f0;
     margin-bottom: 1rem;

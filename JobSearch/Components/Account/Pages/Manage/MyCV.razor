@@ -35,15 +35,28 @@
     {
         <div class="row justify-content-center">
             <div class="col-md-8 col-lg-6">
-                <div class="empty-state-card animate-fade-up">
+                <div class="empty-state-card empty-state-pro animate-fade-up">
+
+                    <div class="empty-state-badge mb-3">
+                        <span class="badge-pill">Rekomendowane dla Ciebie</span>
+                    </div>
+
                     <div class="empty-icon-wrapper mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="bi bi-file-earmark-person text-primary opacity-50" viewBox="0 0 16 16">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="bi bi-file-earmark-person text-primary opacity-75" viewBox="0 0 16 16">
                             <path d="M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
                             <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V9.255S12 9 8 9s-5 .255-5 .255V2a1 1 0 0 1 1-1h5.5v2z" />
                         </svg>
                     </div>
-                    <h3 class="fw-bold mb-3">Nie masz jeszcze profilu CV</h3>
-                    <p class="text-muted mb-4">Stwórz go teraz, aby w pełni korzystać z możliwości serwisu i aplikować jednym kliknięciem.</p>
+
+                    <h2 class="empty-title mb-2">
+                        Nie masz jeszcze <span>profilu CV</span>
+                    </h2>
+
+                    <p class="empty-subtitle mb-4">
+                        Stwórz go teraz, aby w pełni korzystać z możliwości serwisu i
+                        <strong>aplikować jednym kliknięciem</strong>.
+                    </p>
+
                     <button class="btn-save-pro large" @onclick="CreateCvProfile">
                         <span class="btn-content">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus-circle-fill me-2" viewBox="0 0 16 16">
@@ -52,6 +65,10 @@
                             Stwórz profil CV
                         </span>
                     </button>
+
+                    <p class="empty-hint mt-3">
+                        Zajmie to tylko kilka minut, a Twoje dane zapiszą się automatycznie.
+                    </p>
                 </div>
             </div>
         </div>

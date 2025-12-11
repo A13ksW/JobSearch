@@ -5,7 +5,8 @@
 <PageTitle>Kalkulator Wynagrodzeń Pro</PageTitle>
 
 <div class="pracuj-wrapper">
-    <div class="calculator-card">
+    @* EditForm jest wymagany, aby InputNumber działał poprawnie *@
+    <EditForm Model="Input" class="calculator-card">
 
         <h2 class="calc-title">Oblicz wynagrodzenie</h2>
 
@@ -13,19 +14,20 @@
             <div class="amount-container">
                 <label class="small-label">Podaj wynagrodzenie</label>
                 <div class="input-group custom-input-group">
-                    <InputNumber @bind-Value="Input.Amount" class="form-control amount-input" placeholder="0,00" @oninput="OnAmountChange" />
+                    @* Usunięto oninput/onchange wywołujące obliczenia *@
+                    <InputNumber @bind-Value="Input.Amount" class="form-control amount-input" placeholder="0,00" />
                     <span class="input-group-text currency-text">zł</span>
                 </div>
             </div>
 
             <div class="toggle-container">
-                <div class="radio-option" @onclick='() => UpdateAmountType(AmountType.Gross)'>
+                <div class="radio-option" @onclick='() => Input.AmountType = AmountType.Gross'>
                     <div class="custom-radio @(Input.AmountType == AmountType.Gross ? "checked" : "")">
                         <div class="dot"></div>
                     </div>
                     <span>brutto</span>
                 </div>
-                <div class="radio-option" @onclick='() => UpdateAmountType(AmountType.Net)'>
+                <div class="radio-option" @onclick='() => Input.AmountType = AmountType.Net'>
                     <div class="custom-radio @(Input.AmountType == AmountType.Net ? "checked" : "")">
                         <div class="dot"></div>
                     </div>
@@ -33,20 +35,22 @@
                 </div>
             </div>
 
-            <button class="btn-oblicz-top" @onclick="Calculate">Oblicz</button>
+            @* Przycisk górny usunięty w CSS, ale logicznie zostawiamy calculate tutaj, jeśli CSS go pokaże *@
+            <button type="button" class="btn-oblicz-top" @onclick="Calculate">Oblicz</button>
         </div>
 
         <div class="tabs-row">
-            <button class="tab-btn @(Input.ContractType == ContractType.UoP ? "active" : "")" @onclick="() => SetContract(ContractType.UoP)">
+            @* Zmiana zakładki zmienia tylko typ umowy w modelu, nie wywołuje Calculate() *@
+            <button type="button" class="tab-btn @(Input.ContractType == ContractType.UoP ? "active" : "")" @onclick="() => Input.ContractType = ContractType.UoP">
                 umowa o pracę
             </button>
-            <button class="tab-btn @(Input.ContractType == ContractType.Zlecenie ? "active" : "")" @onclick="() => SetContract(ContractType.Zlecenie)">
+            <button type="button" class="tab-btn @(Input.ContractType == ContractType.Zlecenie ? "active" : "")" @onclick="() => Input.ContractType = ContractType.Zlecenie">
                 umowa zlecenie
             </button>
-            <button class="tab-btn @(Input.ContractType == ContractType.Dzielo ? "active" : "")" @onclick="() => SetContract(ContractType.Dzielo)">
+            <button type="button" class="tab-btn @(Input.ContractType == ContractType.Dzielo ? "active" : "")" @onclick="() => Input.ContractType = ContractType.Dzielo">
                 umowa o dzieło
             </button>
-            <button class="tab-btn @(Input.ContractType == ContractType.B2B ? "active" : "")" @onclick="() => SetContract(ContractType.B2B)">
+            <button type="button" class="tab-btn @(Input.ContractType == ContractType.B2B ? "active" : "")" @onclick="() => Input.ContractType = ContractType.B2B">
                 kontrakt B2B
             </button>
         </div>
@@ -82,11 +86,11 @@
                     </div>
                     <div class="input-col">
                         <div class="yes-no-toggle">
-                            <div class="radio-option" @onclick="() => { Input.UoP_JointTaxation = true; Calculate(); }">
+                            <div class="radio-option" @onclick="() => Input.UoP_JointTaxation = true">
                                 <div class="custom-radio @(Input.UoP_JointTaxation ? "checked" : "")"><div class="dot"></div></div>
                                 <span>tak</span>
                             </div>
-                            <div class="radio-option" @onclick="() => { Input.UoP_JointTaxation = false; Calculate(); }">
+                            <div class="radio-option" @onclick="() => Input.UoP_JointTaxation = false">
                                 <div class="custom-radio @(!Input.UoP_JointTaxation ? "checked" : "")"><div class="dot"></div></div>
                                 <span>nie</span>
                             </div>
@@ -100,7 +104,8 @@
                     </div>
                     <div class="input-col">
                         <div class="input-group" style="width: 120px; margin-left: auto;">
-                            <input type="number" @bind="Input.AccidentRate" @bind:event="oninput" @onkeyup="Calculate" class="form-control text-end" />
+                            @* Usunięto onkeyup="Calculate" *@
+                            <input type="number" @bind="Input.AccidentRate" class="form-control text-end" />
                             <span class="input-group-text">%</span>
                         </div>
                     </div>
@@ -112,11 +117,11 @@
                     </div>
                     <div class="input-col">
                         <div class="yes-no-toggle">
-                            <div class="radio-option" @onclick="() => { Input.UsePPK = true; Calculate(); }">
+                            <div class="radio-option" @onclick="() => Input.UsePPK = true">
                                 <div class="custom-radio @(Input.UsePPK ? "checked" : "")"><div class="dot"></div></div>
                                 <span>tak</span>
                             </div>
-                            <div class="radio-option" @onclick="() => { Input.UsePPK = false; Calculate(); }">
+                            <div class="radio-option" @onclick="() => Input.UsePPK = false">
                                 <div class="custom-radio @(!Input.UsePPK ? "checked" : "")"><div class="dot"></div></div>
                                 <span>nie</span>
                             </div>
@@ -132,7 +137,8 @@
                         <span class="main-label">Wybierz opcję<span class="req">*</span></span>
                     </div>
                     <div class="input-col">
-                        <select class="form-select styled-select" @bind="Input.Zlecenie_Status" @bind:after="Calculate">
+                        @* Usunięto @bind:after="Calculate" *@
+                        <select class="form-select styled-select" @bind="Input.Zlecenie_Status">
                             <option value="@ZlecenieStatus.Standard">ZUS płacę u tego pracodawcy</option>
                             <option value="@ZlecenieStatus.EmployedElsewhere">ZUS płacę u innego pracodawcy</option>
                             <option value="@ZlecenieStatus.StudentUnder26">Jestem studentem do 26 roku życia</option>
@@ -148,11 +154,11 @@
                         </div>
                         <div class="input-col">
                             <div class="yes-no-toggle">
-                                <div class="radio-option" @onclick="() => { Input.Zlecenie_Sickness = true; Calculate(); }">
+                                <div class="radio-option" @onclick="() => Input.Zlecenie_Sickness = true">
                                     <div class="custom-radio @(Input.Zlecenie_Sickness ? "checked" : "")"><div class="dot"></div></div>
                                     <span>tak</span>
                                 </div>
-                                <div class="radio-option" @onclick="() => { Input.Zlecenie_Sickness = false; Calculate(); }">
+                                <div class="radio-option" @onclick="() => Input.Zlecenie_Sickness = false">
                                     <div class="custom-radio @(!Input.Zlecenie_Sickness ? "checked" : "")"><div class="dot"></div></div>
                                     <span>nie</span>
                                 </div>
@@ -167,7 +173,7 @@
                 <div class="form-group-row">
                     <div class="label-col"><span class="main-label">Składka ZUS<span class="req">*</span></span></div>
                     <div class="input-col">
-                        <select class="form-select styled-select" @bind="Input.B2B_ZusType" @bind:after="Calculate">
+                        <select class="form-select styled-select" @bind="Input.B2B_ZusType">
                             <option value="@B2BZusType.UlgaNaStart">Brak składki ZUS ('Ulga na start')</option>
                             <option value="@B2BZusType.Preferencyjny">Preferencyjny ZUS (24 m-ce)</option>
                             <option value="@B2BZusType.Duzy">Pełny ZUS</option>
@@ -178,7 +184,7 @@
                 <div class="form-group-row">
                     <div class="label-col"><span class="main-label">Podatek dochodowy<span class="req">*</span></span></div>
                     <div class="input-col">
-                        <select class="form-select styled-select" @bind="Input.B2B_TaxType" @bind:after="Calculate">
+                        <select class="form-select styled-select" @bind="Input.B2B_TaxType">
                             <option value="@B2BTaxType.Linear">Liniowy (19%)</option>
                             <option value="@B2BTaxType.Scale">Skala podatkowa (12%, 32%)</option>
                             <option value="@B2BTaxType.LumpSum">Ryczałt</option>
@@ -191,7 +197,7 @@
                     <div class="form-group-row">
                         <div class="label-col"><span class="main-label">Stawka ryczałtu<span class="req">*</span></span></div>
                         <div class="input-col">
-                            <select class="form-select styled-select" @bind="Input.B2B_LumpSumRate" @bind:after="Calculate">
+                            <select class="form-select styled-select" @bind="Input.B2B_LumpSumRate">
                                 <option value="0.17">17%</option>
                                 <option value="0.15">15%</option>
                                 <option value="0.14">14%</option>
@@ -210,15 +216,26 @@
                     <div class="input-col">
                         <div class="yes-no-toggle">
                             <div class="radio-option @(Input.B2B_ZusType == B2BZusType.UlgaNaStart ? "disabled" : "")"
-                                 @onclick="() => { if (Input.B2B_ZusType != B2BZusType.UlgaNaStart) { Input.B2B_Sickness = true; Calculate(); } }">
+                                 @onclick="() => { if (Input.B2B_ZusType != B2BZusType.UlgaNaStart) Input.B2B_Sickness = true; }">
                                 <div class="custom-radio @(Input.B2B_Sickness ? "checked" : "")"><div class="dot"></div></div>
                                 <span>tak</span>
                             </div>
                             <div class="radio-option @(Input.B2B_ZusType == B2BZusType.UlgaNaStart ? "disabled" : "")"
-                                 @onclick="() => { if (Input.B2B_ZusType != B2BZusType.UlgaNaStart) { Input.B2B_Sickness = false; Calculate(); } }">
+                                 @onclick="() => { if (Input.B2B_ZusType != B2BZusType.UlgaNaStart) Input.B2B_Sickness = false; }">
                                 <div class="custom-radio @(!Input.B2B_Sickness ? "checked" : "")"><div class="dot"></div></div>
                                 <span>nie</span>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group-row">
+                    <div class="label-col"><span class="main-label">Koszty uzyskania przychodu</span></div>
+                    <div class="input-col">
+                        <div class="input-group">
+                            @* Usunięto onkeyup="Calculate" *@
+                            <input type="number" @bind="Input.B2B_Costs" class="form-control text-end" placeholder="0" />
+                            <span class="input-group-text currency-text">zł</span>
                         </div>
                     </div>
                 </div>
@@ -232,11 +249,11 @@
                     <div class="label-col"><span class="main-label">Czy pracujesz w miejscu zamieszkania?<span class="req">*</span></span></div>
                     <div class="input-col">
                         <div class="yes-no-toggle">
-                            <div class="radio-option" @onclick="() => { Input.UoP_WorkAtResidence = true; Calculate(); }">
+                            <div class="radio-option" @onclick="() => Input.UoP_WorkAtResidence = true">
                                 <div class="custom-radio @(Input.UoP_WorkAtResidence ? "checked" : "")"><div class="dot"></div></div>
                                 <span>tak</span>
                             </div>
-                            <div class="radio-option" @onclick="() => { Input.UoP_WorkAtResidence = false; Calculate(); }">
+                            <div class="radio-option" @onclick="() => Input.UoP_WorkAtResidence = false">
                                 <div class="custom-radio @(!Input.UoP_WorkAtResidence ? "checked" : "")"><div class="dot"></div></div>
                                 <span>nie</span>
                             </div>
@@ -250,11 +267,11 @@
                     </div>
                     <div class="input-col">
                         <div class="yes-no-toggle">
-                            <div class="radio-option" @onclick="() => { Input.IsUnder26 = true; Calculate(); }">
+                            <div class="radio-option" @onclick="() => Input.IsUnder26 = true">
                                 <div class="custom-radio @(Input.IsUnder26 ? "checked" : "")"><div class="dot"></div></div>
                                 <span>tak</span>
                             </div>
-                            <div class="radio-option" @onclick="() => { Input.IsUnder26 = false; Calculate(); }">
+                            <div class="radio-option" @onclick="() => Input.IsUnder26 = false">
                                 <div class="custom-radio @(!Input.IsUnder26 ? "checked" : "")"><div class="dot"></div></div>
                                 <span>nie</span>
                             </div>
@@ -265,18 +282,17 @@
 
             @if (Input.ContractType == ContractType.Zlecenie)
             {
-
                 <div class="form-group-row">
                     <div class="label-col">
                         <span class="main-label">Ulga dla osób poniżej 26. roku życia<span class="req">*</span></span>
                     </div>
                     <div class="input-col">
                         <div class="yes-no-toggle">
-                            <div class="radio-option" @onclick="() => { Input.IsUnder26 = true; Calculate(); }">
+                            <div class="radio-option" @onclick="() => Input.IsUnder26 = true">
                                 <div class="custom-radio @(Input.IsUnder26 ? "checked" : "")"><div class="dot"></div></div>
                                 <span>tak</span>
                             </div>
-                            <div class="radio-option" @onclick="() => { Input.IsUnder26 = false; Calculate(); }">
+                            <div class="radio-option" @onclick="() => Input.IsUnder26 = false">
                                 <div class="custom-radio @(!Input.IsUnder26 ? "checked" : "")"><div class="dot"></div></div>
                                 <span>nie</span>
                             </div>
@@ -292,7 +308,7 @@
                         <span class="main-label">Koszt uzyskania przychodu<span class="req">*</span></span>
                     </div>
                     <div class="input-col">
-                        <select class="form-select styled-select" @bind="Input.KupPercent" @bind:after="Calculate">
+                        <select class="form-select styled-select" @bind="Input.KupPercent">
                             <option value="0,2">20% (Standard)</option>
                             <option value="0,5">50% (Prawa autorskie)</option>
                         </select>
@@ -300,357 +316,24 @@
                 </div>
             }
 
-            @if (Input.ContractType == ContractType.B2B)
-            {
-                <div class="form-group-row">
-                    <div class="label-col"><span class="main-label">Koszty uzyskania przychodu</span></div>
-                    <div class="input-col">
-                        <div class="input-group">
-                            <input type="number" @bind="Input.B2B_Costs" @bind:event="oninput" @onkeyup="Calculate" class="form-control text-end" placeholder="0" />
-                            <span class="input-group-text currency-text">zł</span>
-                        </div>
-                    </div>
-                </div>
-            }
-
+            @* Jedyny wyzwalacz obliczeń *@
             <div class="bottom-action">
-                <button class="btn-oblicz-bottom" @onclick="Calculate">Oblicz</button>
+                <button type="button" class="btn-oblicz-bottom" @onclick="Calculate">Oblicz</button>
             </div>
 
         </div>
+    </EditForm>
 
-        @if (Result != null)
-        {
-            <div class="result-box">
-                <div class="result-amount">@Result.Net.ToString("N2") <small>zł</small></div>
-                <div class="result-label">netto (na rękę)</div>
-                <div class="result-annual">wynagrodzenie roczne: @((Result.Net * 12).ToString("N2")) zł netto (na rękę)</div>
-            </div>
-        }
+    @if (Result != null)
+    {
+        <div class="result-box animate-fade-up">
+            <div class="result-amount">@Result.Net.ToString("N2") <small>zł</small></div>
+            <div class="result-label">netto (na rękę)</div>
+            <div class="result-annual">wynagrodzenie roczne: @((Result.Net * 12).ToString("N2")) zł netto (na rękę)</div>
+        </div>
+    }
 
-    </div>
 </div>
-
-<style>
-    /* ========== STYLES ========== */
-    :root {
-        --primary-blue: #536be1;
-        --text-dark: #191919;
-        --text-grey: #6e6e6e;
-        --border-color: #e4e6ea;
-        --bg-color: #f7f9fa;
-        --active-tab-border: #536be1;
-        --active-tab-bg: #eff2ff;
-        --active-tab-text: #3d52b9;
-    }
-
-    .pracuj-wrapper {
-        font-family: 'Open Sans', 'Segoe UI', sans-serif;
-        background-color: var(--bg-color);
-        padding: 40px;
-        display: flex;
-        justify-content: center;
-    }
-
-    .calculator-card {
-        background: #fff;
-        width: 100%;
-        max-width: 900px;
-        border-radius: 8px;
-        padding: 40px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-
-    .calc-title {
-        font-size: 24px;
-        font-weight: 700;
-        color: var(--text-dark);
-        margin-bottom: 25px;
-    }
-
-    /* TOP BAR */
-    .top-bar {
-        display: flex;
-        align-items: flex-end;
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-
-    .amount-container {
-        flex: 1;
-    }
-
-    .small-label {
-        font-size: 13px;
-        color: var(--text-grey);
-        margin-bottom: 5px;
-        display: block;
-    }
-
-    .custom-input-group {
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        padding: 5px;
-        display: flex;
-        align-items: center;
-    }
-
-    .amount-input {
-        border: none;
-        font-size: 18px;
-        font-weight: 600;
-        text-align: right;
-        padding-right: 10px;
-    }
-
-        .amount-input:focus {
-            box-shadow: none;
-        }
-
-    .currency-text {
-        background: transparent;
-        border: none;
-        font-weight: 600;
-        color: var(--text-grey);
-    }
-
-    .toggle-container {
-        display: flex;
-        gap: 20px;
-        padding-bottom: 12px;
-    }
-
-    .btn-oblicz-top {
-        background-color: var(--primary-blue);
-        color: white;
-        border: none;
-        border-radius: 25px;
-        padding: 10px 40px;
-        font-weight: 700;
-        height: 48px;
-    }
-
-        .btn-oblicz-top:hover {
-            background-color: #3d52b9;
-        }
-
-    /* TABS */
-    .tabs-row {
-        display: flex;
-        border: 1px solid var(--border-color);
-        border-radius: 30px;
-        overflow: hidden;
-        margin-bottom: 30px;
-    }
-
-    .tab-btn {
-        flex: 1;
-        background: white;
-        border: none;
-        padding: 15px 0;
-        font-weight: 600;
-        color: var(--text-grey);
-        cursor: pointer;
-        transition: all 0.2s;
-        border-right: 1px solid var(--border-color);
-    }
-
-        .tab-btn:last-child {
-            border-right: none;
-        }
-
-        .tab-btn:hover {
-            background-color: #f9f9f9;
-        }
-
-        .tab-btn.active {
-            color: var(--active-tab-text);
-            background-color: var(--active-tab-bg);
-            border-bottom: 3px solid var(--active-tab-border);
-        }
-
-    /* FORM ROWS */
-    .form-container {
-        background-color: #fcfcfc;
-        border: 1px solid #f0f0f0;
-        border-radius: 8px;
-        padding: 30px;
-    }
-
-    .form-group-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 25px;
-        flex-wrap: wrap;
-    }
-
-    .label-col {
-        flex: 1;
-        min-width: 250px;
-    }
-
-    .input-col {
-        flex: 0 0 350px;
-        text-align: right;
-    }
-
-    .main-label {
-        font-weight: 600;
-        color: var(--text-dark);
-        font-size: 15px;
-    }
-
-    .req {
-        color: #e03616;
-        margin-left: 3px;
-    }
-
-    .sub-label {
-        display: block;
-        font-size: 12px;
-        color: #999;
-        margin-top: 3px;
-    }
-
-    /* RADIO CUSTOM */
-    .yes-no-toggle {
-        display: flex;
-        gap: 30px;
-        justify-content: flex-start;
-    }
-
-    .radio-option {
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        font-size: 15px;
-        color: var(--text-dark);
-    }
-
-        .radio-option.disabled {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-
-    .custom-radio {
-        width: 20px;
-        height: 20px;
-        border: 2px solid #ccc;
-        border-radius: 50%;
-        margin-right: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
-    }
-
-        .custom-radio.checked {
-            border-color: var(--primary-blue);
-        }
-
-        .custom-radio .dot {
-            width: 10px;
-            height: 10px;
-            background-color: var(--primary-blue);
-            border-radius: 50%;
-            opacity: 0;
-            transform: scale(0);
-            transition: all 0.2s;
-        }
-
-        .custom-radio.checked .dot {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-    .styled-select {
-        padding: 10px;
-        border-radius: 4px;
-        border: 1px solid #ccc;
-        width: 100%;
-        background-color: white;
-    }
-
-    .divider {
-        border-top: 1px solid #eee;
-        margin: 20px 0 30px 0;
-    }
-
-    .bottom-action {
-        text-align: center;
-        margin-top: 30px;
-    }
-
-    .btn-oblicz-bottom {
-        background: transparent;
-        color: var(--primary-blue);
-        border: 2px solid var(--primary-blue);
-        padding: 10px 50px;
-        border-radius: 25px;
-        font-weight: 700;
-        transition: all 0.2s;
-    }
-
-        .btn-oblicz-bottom:hover {
-            background: var(--primary-blue);
-            color: white;
-        }
-
-    /* RESULT */
-    .result-box {
-        margin-top: 40px;
-        text-align: center;
-        border-top: 1px solid #eee;
-        padding-top: 30px;
-    }
-
-    .result-amount {
-        font-size: 40px;
-        font-weight: 800;
-        color: var(--text-dark);
-    }
-
-    .result-label {
-        font-size: 18px;
-        font-weight: 700;
-        color: var(--text-dark);
-    }
-
-    .result-annual {
-        color: var(--text-grey);
-        margin-top: 10px;
-        font-size: 14px;
-    }
-
-    @@media(max-width: 768px) {
-        .top-bar {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .form-group-row {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
-        }
-
-        .input-col {
-            width: 100%;
-            text-align: left;
-        }
-
-        .tabs-row {
-            flex-direction: column;
-            border-radius: 8px;
-        }
-
-        .tab-btn {
-            border-right: none;
-            border-bottom: 1px solid #eee;
-        }
-    }
-</style>
 
 @code {
     public enum AmountType { Gross, Net }
@@ -680,7 +363,7 @@
         // Zlecenie
         public ZlecenieStatus Zlecenie_Status { get; set; } = ZlecenieStatus.Standard;
         public bool Zlecenie_Sickness { get; set; } = false;
-        public decimal KupPercent { get; set; } = 0.2m; // Unified KUP for Zlecenie and Dzielo
+        public decimal KupPercent { get; set; } = 0.2m;
 
         // B2B
         public B2BZusType B2B_ZusType { get; set; } = B2BZusType.UlgaNaStart;
@@ -713,22 +396,7 @@
         public const decimal B2B_Base_Pref = 1290m;
     }
 
-    private void SetContract(ContractType type)
-    {
-        Input.ContractType = type;
-        Calculate();
-    }
-
-    private void UpdateAmountType(AmountType type)
-    {
-        Input.AmountType = type;
-        Calculate();
-    }
-
-    private void OnAmountChange(ChangeEventArgs e)
-    {
-        // Optional: debounce or react immediately
-    }
+    // Usunięto OnInitialized z wywołaniem Calculate(), aby wynik był widoczny dopiero po kliknięciu.
 
     private void Calculate()
     {
