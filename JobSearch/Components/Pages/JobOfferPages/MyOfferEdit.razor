@@ -120,21 +120,24 @@
                         <select id="empltype" @bind="JobOffer.EmplType" class="form-control" aria-required="true">
                             @foreach (var type in Enum.GetValues(typeof(EmploymentType)).Cast<EmploymentType>())
                             {
-                                <option value="@type">@type</option>
+                                <option value="@type">@EnumText.Display(type)</option>
                             }
                         </select>
                         <ValidationMessage For="() => JobOffer.EmplType" class="text-danger small" />
                     </div>
+
                     <div class="col-md-3">
                         <label class="form-label">Tryb</label>
                         <select id="jobtype" @bind="JobOffer.JobType" class="form-control" aria-required="true">
                             @foreach (var type in Enum.GetValues(typeof(JobType)).Cast<JobType>())
                             {
-                                <option value="@type">@type</option>
+                                <option value="@type">@EnumText.Display(type)</option>
                             }
                         </select>
                         <ValidationMessage For="() => JobOffer.JobType" class="text-danger small" />
                     </div>
+               
+
                     <div class="col-md-3">
                         <label class="form-label">Płaca (Min)</label>
                         <div class="input-group">

@@ -101,9 +101,10 @@
                             @bind="employmentTypeFilter"
                             class="form-select dark-select">
                         <option value="">Wszystkie</option>
-                        @foreach (var type in Enum.GetValues(typeof(EmploymentType)))
+
+                        @foreach (var type in Enum.GetValues(typeof(EmploymentType)).Cast<EmploymentType>())
                         {
-                            <option value="@type">@type</option>
+                            <option value="@type">@EnumText.Display(type)</option>
                         }
                     </select>
                 </div>
@@ -114,13 +115,15 @@
                             @bind="jobTypeFilter"
                             class="form-select dark-select">
                         <option value="">Wszystkie</option>
-                        @foreach (var type in Enum.GetValues(typeof(JobType)))
+
+                        @foreach (var type in Enum.GetValues(typeof(JobType)).Cast<JobType>())
                         {
-                            <option value="@type">@type</option>
+                            <option value="@type">@EnumText.Display(type)</option>
                         }
                     </select>
                 </div>
             </div>
+
 
             <div class="mt-4">
                 <button type="button"

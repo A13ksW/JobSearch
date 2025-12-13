@@ -158,22 +158,24 @@
                     <div class="col-md-6">
                         <label for="empltype" class="form-label">Rodzaj zatrudnienia</label>
                         <InputSelect id="empltype" @bind-Value="JobOffer.EmplType" class="form-select" aria-required="true">
-                            @foreach (var value in Enum.GetValues(typeof(EmploymentType)))
+                            @foreach (var value in Enum.GetValues(typeof(EmploymentType)).Cast<EmploymentType>())
                             {
-                                <option value="@value">@value</option>
+                                <option value="@value">@EnumText.Display(value)</option>
                             }
                         </InputSelect>
                     </div>
+
                     <div class="col-md-6">
                         <label for="jobtype" class="form-label">Tryb pracy</label>
                         <InputSelect id="jobtype" @bind-Value="JobOffer.JobType" class="form-select" aria-required="true">
-                            @foreach (var value in Enum.GetValues(typeof(JobType)))
+                            @foreach (var value in Enum.GetValues(typeof(JobType)).Cast<JobType>())
                             {
-                                <option value="@value">@value</option>
+                                <option value="@value">@EnumText.Display(value)</option>
                             }
                         </InputSelect>
                     </div>
                 </div>
+
 
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">

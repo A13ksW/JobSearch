@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using JobSearch.Data;
+using System.Reflection;
 
 namespace JobSearch.Services
 {
@@ -34,6 +35,17 @@ namespace JobSearch.Services
         None, Sprzedaz, Marketing, Finanse, Bankowosc, ObslugaKlienta, ZdrowieIUroda, Gastronomia,
         Turystyka, Zarzadzanie, PracaWSklepie, Budownictwo, Produkcja, Nieruchomosci, Edukacja,
         Logistyka, HR, Design, BIData, PracaBiurowa, Consulting, Media, Prawo, IT
+    }
+    public static class EnumText
+    {
+        public static string Display(Enum value)
+        {
+            var members = value.GetType().GetMember(value.ToString());
+            if (members.Length == 0) return value.ToString();
+
+            var display = members[0].GetCustomAttribute<DisplayAttribute>();
+            return display?.GetName() ?? value.ToString();
+        }
     }
 
     public class JobOffer : IValidatableObject

@@ -54,12 +54,26 @@
                 <label for="employmentTypeFilter" class="form-label">Rodzaj zatrudnienia</label>
                 <select id="employmentTypeFilter" @bind="employmentTypeFilter" class="form-select">
                     <option value="">Wszystkie</option>
-                    @foreach (var type in Enum.GetValues(typeof(EmploymentType)))
+
+                    @foreach (var type in Enum.GetValues(typeof(EmploymentType)).Cast<EmploymentType>())
                     {
-                        <option value="@type">@type</option>
+                        <option value="@type">@EnumText.Display(type)</option>
                     }
                 </select>
             </div>
+
+            <div class="col-md-6 col-lg-3">
+                <label for="jobTypeFilter" class="form-label">Tryb pracy</label>
+                <select id="jobTypeFilter" @bind="jobTypeFilter" class="form-select">
+                    <option value="">Wszystkie</option>
+
+                    @foreach (var type in Enum.GetValues(typeof(JobType)).Cast<JobType>())
+                    {
+                        <option value="@type">@EnumText.Display(type)</option>
+                    }
+                </select>
+            </div>
+
 
             <div class="col-md-6 col-lg-3">
                 <label for="industryFilter" class="form-label">Branża</label>
@@ -73,16 +87,7 @@
                 </select>
             </div>
 
-            <div class="col-md-6 col-lg-3">
-                <label for="jobTypeFilter" class="form-label">Tryb pracy</label>
-                <select id="jobTypeFilter" @bind="jobTypeFilter" class="form-select">
-                    <option value="">Wszystkie</option>
-                    @foreach (var type in Enum.GetValues(typeof(JobType)))
-                    {
-                        <option value="@type">@type</option>
-                    }
-                </select>
-            </div>
+           
 
             <div class="col-md-6 col-lg-3">
                 <label for="statusFilter" class="form-label">Status oferty</label>
