@@ -41,6 +41,7 @@
         {
             <div class="row g-5">
 
+                <!-- LEWA KOLUMNA -->
                 <div class="col-lg-8 fade-in delay-1">
                     <div class="white-card">
 
@@ -100,24 +101,26 @@
 
                             @if (jobOffer.RequiresSanitaryBook)
                             {
-                                <span class="tag-badge"><i class="bi bi-clipboard-pulse"></i> Sanepid</span>
+                                <span class="tag-badge"><i class="bi bi-clipboard-pulse"></i> Książeczka Sanepidowska</span>
                             }
                             @if (jobOffer.RequiresStudentStatus)
                             {
-                                <span class="tag-badge"><i class="bi bi-mortarboard"></i> Student</span>
+                                <span class="tag-badge"><i class="bi bi-mortarboard"></i> Status Studenta</span>
                             }
                             @if (jobOffer.RequiresDisabilityCertificate)
                             {
-                                <span class="tag-badge"><i class="bi bi-person-wheelchair"></i> Orzeczenie</span>
+                                <span class="tag-badge"><i class="bi bi-person-wheelchair"></i> Orzeczenie o niepełnosprawności</span>
                             }
                         </div>
 
                     </div>
                 </div>
 
+                <!-- PRAWA KOLUMNA -->
                 <div class="col-lg-4 fade-in delay-2">
                     <div class="sidebar-sticky">
                         <div class="white-card" style="padding: 2rem;">
+
                             <div class="salary-box">
                                 <div class="text-uppercase text-muted small fw-bold mb-1">Wynagrodzenie</div>
                                 <div class="salary-value">@jobOffer.SalaryRange</div>
@@ -125,10 +128,12 @@
                             </div>
 
                             <div class="mb-4">
+
                                 <div class="info-row">
                                     <i class="bi bi-geo-alt-fill"></i>
                                     <span>Lokalizacja - <strong>@jobOffer.Location</strong></span>
                                 </div>
+
                                 @if (jobOffer.IndustryCategory.HasValue)
                                 {
                                     <div class="info-row">
@@ -136,63 +141,64 @@
                                         <span>Branża - <strong>@jobOffer.IndustryCategory</strong></span>
                                     </div>
                                 }
+
                                 <div class="info-row">
-                                    <i class="bi bi-clock-fill"></i>
-                                    <span>Wymiar - <strong>@jobOffer.EmplType</strong></span>
+                                    <i class="bi bi-briefcase-fill"></i>
+                                    <span>Rodzaj zatrudnienia - <strong>@EnumText.Display(jobOffer.EmplType)</strong></span>
                                 </div>
+
                                 <div class="info-row">
-                                    <i class="bi bi-pc-display-horizontal"></i>
-                                    <span>Tryb - <strong>@jobOffer.JobType</strong></span>
+                                    <i class="bi bi-laptop"></i>
+                                    <span>Tryb pracy - <strong>@EnumText.Display(jobOffer.JobType)</strong></span>
                                 </div>
+
                                 <div class="info-row">
                                     <i class="bi bi-calendar3"></i>
                                     <span>Publikacja - <strong>@jobOffer.DatePosted.ToShortDateString()</strong></span>
                                 </div>
+
                                 <div class="info-row">
                                     <i class="bi bi-hourglass-split"></i>
                                     <span>
                                         Ważne do -
                                         @if (jobOffer.ApplicationDeadline.HasValue)
                                         {
-                                            <span class="text-danger fw-bold">@jobOffer.ApplicationDeadline.Value.ToShortDateString()</span>
+                                            <strong class="text-danger">@jobOffer.ApplicationDeadline.Value.ToShortDateString()</strong>
                                         }
                                         else
                                         {
-                                            <span>Bezterminowo</span>
+                                            <strong>Bezterminowo</strong>
                                         }
                                     </span>
                                 </div>
+
                             </div>
 
-                            <!-- SEKCJNA PRZYCISKÓW APLIKOWANIA -->
+                            <!-- PRZYCISKI APLIKOWANIA -->
                             <AuthorizeView>
                                 <NotAuthorized>
                                     <a href="@loginUrl" class="btn btn-outline-primary w-100 rounded-pill fw-bold py-2">
                                         Zaloguj się, aby aplikować
                                     </a>
                                 </NotAuthorized>
-                                <Authorized>
-                                    @* LOGIKA DLA ZALOGOWANYCH UŻYTKOWNIKÓW *@
 
+                                <Authorized>
                                     @if (currentUserId == jobOffer.CreatedByUserId)
                                     {
-                                        @* 1. Właściciel oferty *@
-                                        <div class="alert alert-secondary text-center m-0 border-0 fw-bold animate-fade-up">
+                                        <div class="alert alert-secondary text-center m-0 border-0 fw-bold">
                                             <i class="bi bi-person-workspace me-2"></i>
                                             To twoja oferta
                                         </div>
                                     }
                                     else if (!isCandidate)
                                     {
-                                        @* 2. Firma (użytkownik niebędący kandydatem "Individual") *@
-                                        <div class="alert alert-warning text-center m-0 border-0 fw-bold animate-fade-up" style="background-color: #fff3cd; color: #856404;">
+                                        <div class="alert alert-warning text-center m-0 border-0 fw-bold">
                                             <i class="bi bi-briefcase-fill me-2"></i>
-                                            Nie możesz aplikować - Jesteś kontem firmowym
+                                            Nie możesz aplikować - konto firmowe
                                         </div>
                                     }
                                     else
                                     {
-                                        @* 3. Kandydat (Individual) *@
                                         @if (hasApplied)
                                         {
                                             <button class="btn-apply-now disabled">
@@ -219,19 +225,17 @@
 </div>
 
 @code {
-    [Parameter]
-    public int Id { get; set; }
+    [Parameter] public int Id { get; set; }
 
-    [SupplyParameterFromQuery]
-    public string? Source { get; set; }
+    [SupplyParameterFromQuery] public string? Source { get; set; }
 
     private JobOffer? jobOffer;
     private string? currentUserId;
-    private bool hasApplied = false;
+    private bool hasApplied;
     private string loginUrl = string.Empty;
     private string? feedbackMessage;
     private bool isError;
-    private bool isCandidate = false; // Flaga określająca czy użytkownik może aplikować (Individual)
+    private bool isCandidate;
 
     protected override async Task OnInitializedAsync()
     {
@@ -241,12 +245,14 @@
         var user = authState.User;
         currentUserId = user.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        // Sprawdzamy, czy użytkownik ma typ konta "Individual" (kandydat)
         isCandidate = user.HasClaim(c => c.Type == "account_type" && c.Value == "Individual");
 
         jobOffer = await JobOfferService.GetByIdAsync(Id);
 
-        if (jobOffer == null || (jobOffer.Status != OfferStatus.Opublikowana && jobOffer.CreatedByUserId != currentUserId && !user.IsInRole("Admin")))
+        if (jobOffer == null ||
+            (jobOffer.Status != OfferStatus.Opublikowana &&
+             jobOffer.CreatedByUserId != currentUserId &&
+             !user.IsInRole("Admin")))
         {
             NavigationManager.NavigateTo("/offers");
             return;
@@ -275,34 +281,18 @@
 
         if (!userEntity.IsProfileComplete)
         {
-            feedbackMessage = "Nie możesz jeszcze aplikować na oferty. Uzupełnij swój profil (imię i nazwisko jako nazwę wyświetlaną oraz numer telefonu) oraz utwórz swoje CV na stronie w zakładce „Moje CV”.";
+            feedbackMessage = "Nie możesz jeszcze aplikować. Uzupełnij profil i CV.";
             isError = true;
-            StateHasChanged();
             return;
         }
 
-        try
-        {
-            bool success = await JobOfferService.ApplyForOfferAsync(jobOffer.Id, currentUserId);
+        bool success = await JobOfferService.ApplyForOfferAsync(jobOffer.Id, currentUserId);
 
-            if (success)
-            {
-                feedbackMessage = "Twoja aplikacja została wysłana pomyślnie!";
-                isError = false;
-                hasApplied = true;
-            }
-            else
-            {
-                feedbackMessage = "Wystąpił błąd (już aplikowałeś lub to Twoja oferta).";
-                isError = true;
-            }
-        }
-        catch (Exception ex)
-        {
-            feedbackMessage = $"Błąd serwera: {ex.Message}";
-            isError = true;
-        }
+        feedbackMessage = success
+            ? "Twoja aplikacja została wysłana pomyślnie!"
+            : "Już aplikowałeś lub to Twoja oferta.";
 
-        StateHasChanged();
+        isError = !success;
+        hasApplied = success;
     }
 }
